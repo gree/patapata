@@ -1,0 +1,14 @@
+.vscode/*
+.DS_Store
+**/coverage
+pubspec_overrides.yaml
+.dart_tool
+.melos_tool
+.atom
+.idea
+.packages
+.pub
+.symlinks
+pubspec.lock
+
+! .vscode/launch.json

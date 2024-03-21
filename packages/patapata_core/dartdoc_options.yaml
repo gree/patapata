@@ -1,0 +1,15 @@
+# Copyright (c) GREE, Inc.
+#
+# This source code is licensed under the MIT license found in the
+# LICENSE file in the root directory of this source tree.
+
+dartdoc: 
+  exclude:
+    - patapata_core_libs
+    - local_config_finder
+    - patapata_core_web
+    - patapata_web_plugin
+    - web_local_config
+    - web_local_config_finder
+    - native_ffi_finder
+    - native_local_config

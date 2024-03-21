@@ -1,0 +1,58 @@
+# This workflow uses actions that are not certified by GitHub.
+# They are provided by a third-party and are governed by
+# separate terms of service, privacy policy, and support
+# documentation.
+
+name: Check
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        flutterVersion:
+          - '3.19.3'
+          - '3.16.9'
+          - '3.13.9'
+          - '3.13.0'
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ matrix.flutterVersion }}
+          channel: 'stable'
+          cache: true
+
+      - name: Setup Go environment
+        uses: actions/setup-go@v4.1.0
+
+      - name: Install dependencies
+        run: |-
+          go install github.com/google/addlicense@latest
+          flutter pub get
+          dart pub global activate melos
+          melos bootstrap
+
+      - name: Analyze project source
+        run: melos run lint:all
+
+      - name: Run tests
+        run: melos run test:all
+
+      - name: Check license headers
+        run: melos run check-license-header
+
+      - name: Test building Android
+        run: melos run build:example_android
+
+      - name: Test building web
+        run: melos run build:example_web

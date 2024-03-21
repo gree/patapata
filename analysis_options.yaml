@@ -1,0 +1,8 @@
+linter:
+  rules:
+    avoid_dynamic_calls: true
+
+analyzer:
+  exclude:
+    # Ignore generated files
+    - '**/*.g.dart'

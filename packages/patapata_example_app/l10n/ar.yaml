@@ -1,0 +1,102 @@
+title: عينة نواة تطبيق باتاباتا
+plurals:
+  test1: هذا اختبار بـ {count, plural, other{# عناصر}}.
+errors:
+  app:
+    '000':
+      title: خطأ ({prefix}000)
+      message: خطأ غير معروف.
+    network:
+      '404':
+        title: خطأ ({prefix}404)
+        message: لا يمكن العثور على المحتوى.
+      '500':
+        title: خطأ ({prefix}500)
+        message: خطأ في الخادم الداخلي.
+      '503':
+        title: خطأ ({prefix}503)
+        message: الخدمة غير متوفرة. يخضع الخادم حاليًا للصيانة.
+        fix: اذهب إلى الصفحة الرئيسية
+pages:
+  agreement:
+    title: اتفاق
+    body: هذه صفحة الاتفاق. هل توافق؟
+    yes: نعم
+    no: لا
+  top:
+    title: الصفحة الرئيسية لنموذج باتاباتا
+    body: هذه هي صفحة البداية العينية لباتاباتا.
+    go_to_config: نموذج التكوين
+    go_to_screen_layout: تخطيط الشاشة العيني
+    go_to_standard_page: نموذج الصفحة القياسي
+    go_to_device_and_pakage_info: معلومات الجهاز والحزمة العينية
+    go_to_error: نموذج الخطأ
+    go_to_tab: نموذج علامة التبويب
+  config:
+    title: نموذج التكوين
+    body: هذه صفحة التكوين العينية.
+    increment: زيادة العدد
+    clear: مسح العدد المحلي للتكوين
+  error:
+    title: نموذج الخطأ
+    body: هذه صفحة الخطأ العينية.
+    example: خطأ عادي
+    network: خطأ في الشبكة ({prefix})
+    maintenance: خطأ الصيانة
+  maintenance:
+    title: صيانة الخادم
+    message: غير متاح حاليًا بسبب صيانة الخادم. الرجوع إلى الصفحة الرئيسية.
+  device_and_package_info:
+    title: نموذج معلومات الجهاز والحزمة
+    body: هذه صفحة عينة لاسترجاع معلومات الجهاز ومعلومات الحزمة.
+    model: اسم الجهاز
+    app_name: اسم التطبيق
+    build_number: رقم البناء
+    build_signature: توقيع البناء
+    package_name: اسم الحزمة
+    version: رقم الإصدار
+  standard_page:
+    title: نموذج الصفحة القياسي
+    body: هذه صفحة عينة من الصفحة القياسية.
+    go_to_next_standard_page: الانتقال إلى الصفحة القياسية التالية
+    go_to_custom_standard_page: الانتقال إلى الصفحة القياسية المخصصة
+    go_to_page_data: الانتقال إلى عينة بيانات الصفحة
+    page_data_value: "قيمة بيانات الصفحة: {prefix}" 
+    change_page_data: تغيير بيانات الصفحة
+    page_data_count: "عدد بيانات الصفحة: {prefix}"
+    change_page_data_type: تغيير نوع بيانات الصفحة
+    change_page_data_result: "القيمة الحالية لبيانات الصفحة: {prefix}"
+  tab:
+    home:
+      title: الرئيسية
+      body: هذه علامة التبويب الرئيسية.
+    title_details:
+      title: تفاصيل العنوان
+      body: هذه علامة التبويب تفاصيل العنوان.
+    my_page:
+      title: صفحتي
+      body: هذه علامة التبويب صفحتي.
+  screen_layout_example:
+    title: عينة تخطيط الشاشة
+    body: هذا عينة لتخطيط الشاشة.
+    sample_a: عينة A
+    sample_b: عينة B
+    base_description_before: |
+      تم تحديد هذا SizedBox بأبعاد 300x300، والSizedBoxes على اليمين واليسار لها عرض 37.5.
+      قد يظهر هناك هوامش أو ربما Flutter يعرض تحذيرًا بالتجاوز بسبب حجم الشاشة غير الكافي.
+      عن طريق استخدام نظام ScreenLayout، يتم تكبير أو تصغير RenderSize للطفل بناءً على القيم المحددة في StandardBreakpoint (ولكنه لا يتجاوز أبدًا maxScale).
+      العينة A هي الكائن الخام دون تطبيق ScreenLayout.
+    base_description_after: |
+      العينة B هي نتيجة تطبيق ScreenLayout على العينة A. إذا كان حجم الشاشة الفعلي 450 أو أقل، يجب أن يكون الحجم مثاليًا.
+      يكون هذا مفيدًا عند إنشاء ويدجت لا ترغب في تغيير مظهرها بشكل جذري بناءً على عرض الشاشة أو عندما ترغب في محاذاة الأحجام النسبية
+      بين الأجهزة اللوحية والأجهزة غير اللوحية، على سبيل المثال، عند عرض الحوارات.
+    description_case_equal: بسبب عرض جهازك البالغ {width}، لذلك يتم عرض الودجت بشكل مثالي. (إذا كنت ترغب في اختبار وظيفة ScreenLayout، يرجى تشغيلها على جهاز بعرض مختلف عن 375).
+    description_case_over: بسبب عرض جهازك البالغ {width}، هناك هوامش على اليسار واليمين.
+    description_case_other: بسبب عرض جهازك البالغ {width}، يتم عرض تحذير بالتجاوز.
+    description_sample: |
+      في المثال السابق، قمنا بتوضيح تكبير RenderSize بناءً على StandardBreakpoint. ومع ذلك، يعتمد حجم الودجت الفعلي على حجم والديها.
+      ومع ذلك، قد تكون هناك حالات ترغب في فرض قيود على الحجم الفعلي. في مثل هذه الحالات، يمكنك استخدام ConstrainedWidth.
+      من خلال تحديد ConstrainedWidth، يمكنك تغيير الحجم الفعلي والاستفادة لاحقًا من الحساب التلقائي لـ RenderSize بناءً على StandardBreakpoint.
+      إنها فعّالة أيضًا لإحاطة ويدجت ScreenLayout بـ ConstrainedBox أو نهج مماثل لتقييد الحجم.
+      يرجى اختيار النهج المناسب بناءً على الوضع في شجرة الودجت الخاصة بك.
+    description_example: في المثال أعلاه، تم تعيين قيمة ConstrainedWidth إلى 200. يقوم هذا بتحديد الحجم الفعلي إلى 200، ولكن يمكن ملاحظة الشكل النسبي للمحتوى.

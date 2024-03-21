@@ -1,0 +1,29 @@
+name: patapata_apps_flyer
+description: This package is a plugin for Patapata that adds support for AppsFlyer to your Patapata app.
+version: 1.0.0
+publish_to: none
+homepage: https://github.com/gree/patapata
+repository: https://github.com/gree/patapata/packages/patapata_apps_flyer
+
+environment:
+  sdk: ">=3.0.0 <4.0.0"
+  flutter: ">=3.13.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  patapata_core: ^1.0.0
+
+  appsflyer_sdk: ^6.11.3
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^2.0.2
+
+flutter:
+  plugin:
+    platforms:
+      ios:
+        pluginClass: PatapataAppsFlyerPlugin

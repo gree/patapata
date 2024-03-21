@@ -1,0 +1,102 @@
+title: Patapata Core サンプルアプリ
+plurals:
+  test1: これは{count, plural, other{#個}}の項目があるテストです。
+errors:
+  app:
+    '000':
+      title: エラー（{prefix}000）
+      message: 不明エラーが発生しました。
+    network:
+      '404':
+        title: エラー（{prefix}404）
+        message: コンテンツが見つかりませんでした。
+      '500':
+        title: エラー（{prefix}500）
+        message: サーバーエラーが発生しました。
+      '503':
+        title: サーバーメンテナンス
+        message: 現在サーバーメンテンス中のため利用できません。トップページに戻ります。
+        fix: トップ画面へ
+pages:
+  agreement:
+    title: 同意画面
+    body: これは同意画面です。承諾しますか？
+    yes: はい
+    no: いいえ
+  top:
+    title: Patapata サンプル トップ
+    body: ここはPatapataのサンプルトップページです。
+    go_to_config: Configのサンプル
+    go_to_screen_layout: ScreenLayoutのサンプル
+    go_to_standard_page: StandardPageのサンプル
+    go_to_device_and_pakage_info: DeviceInfoとPackageInfoのサンプル
+    go_to_error: Errorのサンプル
+    go_to_tab: Tabのサンプル
+  config:
+    title: Config サンプル
+    body: ここはConfigのサンプルページです。
+    increment: カウントを増やす
+    clear: Local Configを削除する
+  error:
+    title: エラー サンプル
+    body: ここはエラー機能のサンプルページです。
+    example: 通常のエラー
+    network: ネットワークエラー({prefix})
+    maintenance: メンテナンス中エラー
+  maintenance:
+    title: サーバーメンテナンス
+    message: 現在サーバーメンテンス中のため利用できません。トップページに戻ります。
+  device_and_package_info:
+    title: デバイスとパッケージ情報 サンプル
+    body: ここはデバイス情報とパッケージ情報を取得するサンプルページです。
+    model: デバイス名
+    app_name: アプリ名
+    build_number: ビルド番号
+    build_signature: ビルドサイン（build signature）
+    package_name: パッケージ名
+    version: バージョン番号
+  standard_page:
+    title: StandardPage サンプル
+    body: ここはStandardPageのサンプルページです。
+    go_to_next_standard_page: 次のStandardPageへ
+    go_to_custom_standard_page: カスタムStandardPageへ
+    go_to_page_data: ページデータのサンプルへ
+    page_data_value: PageDataの値:{prefix}
+    change_page_data: PageDataの値を変更する
+    page_data_count: PageDataのカウント数:{prefix}
+    change_page_data_type: PageDataの型を変更
+    change_page_data_result: 現在のPageDataの値:{prefix} 
+  tab:
+    home:
+      title: ホーム
+      body: ここはホームのタブです。
+    title_details:
+      title: タイトル詳細
+      body: ここはタイトル詳細のタブです。
+    my_page:
+      title: マイページ
+      body: ここはマイページのタブです。
+  screen_layout_example:
+    title: ScreenLayout サンプル
+    body: ここはScreenLayoutのサンプルページです。
+    sample_a: サンプルA
+    sample_b: サンプルB
+    base_description_before: |
+      このSizedBoxは300x300として指定されており、左右のSizedBoxはそれぞれ幅が37.5です。
+      実際の画面サイズに依存して、マージンが発生するか、Flutterが画面サイズが不足しているためにオーバーフローの警告を表示する可能性があります。
+      ScreenLayout システムを使用することで、子要素の RenderSize は StandardBreakpoint で設定された値に基づいて拡大または縮小されます（ただし、maxScale を超えることはありません）。
+      サンプルAは、ScreenLayoutを適用せずに生のオブジェクトです。
+    base_description_after: |
+      サンプルBは、サンプルAにScreenLayoutを適用した結果です。実際の画面サイズが450以下の場合、これは完璧なサイズになるはずです。
+      これは、画面の幅に基づいて外観を急激に変更したくないウィジェットを作成する場合や、
+      タブレットと非タブレットのデバイス間で相対的なサイズを整列させたい場合（たとえばダイアログを表示する場合など）に役立ちます。
+    description_case_equal: デバイスの幅が{width}であるため、ウィジェットは完璧に表示されます。（ScreenLayoutの機能をテストしたい場合は、幅が375でないデバイスで実行してみてください）。
+    description_case_over: デバイスの幅が{width}であるため、左右にマージンがあります。
+    description_case_other: デバイスの幅が{width}であるため、オーバーフローの警告が表示されています。
+    description_sample: |
+      前述の例では、StandardBreakpointに基づいてRenderSizeをスケーリングする方法を示しましたが、実際のウィジェットサイズはその親のサイズに依存します。
+      ただし、実際のサイズに制約を加えたい場合があります。そのような場合、ConstrainedWidthを使用できます。
+      ConstrainedWidthを指定することで、実際のサイズを変更し、依然としてStandardBreakpointに基づいてRenderSizeを自動計算する利点を得ることができます。
+      また、サイズを制約するためにScreenLayoutウィジェットをConstrainedBoxなどで囲むと効果的です。
+      ウィジェットツリー内の状況に基づいて適切なアプローチを選択してください。
+    description_example: 上記の例では、ConstrainedWidthの値が200に設定されています。これにより、実際のサイズが200に制限されますが、コンテンツの相対的な形状が保持されていることが観察されます。

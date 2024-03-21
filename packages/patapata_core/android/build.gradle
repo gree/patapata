@@ -1,0 +1,76 @@
+group 'dev.patapata.patapata_core'
+version '1.0-SNAPSHOT'
+
+buildscript {
+    ext.kotlin_version = '1.7.10'
+    repositories {
+        google()
+        mavenCentral()
+    }
+
+    dependencies {
+        classpath 'com.android.tools.build:gradle:7.3.0'
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+        classpath "org.jetbrains.dokka:dokka-gradle-plugin:1.8.10"
+    }
+}
+
+rootProject.allprojects {
+    repositories {
+        google()
+        mavenCentral()
+    }
+}
+
+apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android'
+apply plugin: 'org.jetbrains.dokka'
+
+android {
+    compileSdkVersion 33
+
+    compileOptions {
+        coreLibraryDesugaringEnabled true
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    kotlinOptions {
+        jvmTarget = '1.8'
+    }
+
+    sourceSets {
+        main.java.srcDirs += 'src/main/kotlin'
+    }
+
+    defaultConfig {
+        minSdkVersion 21
+    }
+
+  buildTypes {
+    release {
+      // Enables code shrinking, obfuscation, and optimization for only
+      // your project's release build type.
+      minifyEnabled true
+
+      // Includes the default ProGuard rules files that are packaged with
+      // the Android Gradle plugin. To learn more, go to the section about
+      // R8 configuration files.
+      proguardFiles getDefaultProguardFile(
+        'proguard-android-optimize.txt'),
+        'proguard-rules.pro'
+    }
+  }
+}
+
+dependencies {
+    coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:1.1.5'
+
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+    implementation "androidx.datastore:datastore-preferences:1.0.0"
+
+    // https://github.com/flutter/flutter/issues/110658#issuecomment-1282045767
+    // Crash fix for desugaring which is required by local notifications plugin
+    implementation "androidx.window:window:1.0.0-rc01"
+    implementation "androidx.window:window-java:1.0.0-rc01"
+}

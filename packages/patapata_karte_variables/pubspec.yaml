@@ -1,0 +1,27 @@
+name: patapata_karte_variables
+description: This package is a plugin for Patapata that adds support for Karte Variables to your Patapata app.
+version: 1.0.0
+publish_to: none
+homepage: https://github.com/gree/patapata
+repository: https://github.com/gree/patapata/packages/patapata_karte_variables
+
+environment:
+  sdk: ">=3.0.0 <4.0.0"
+  flutter: ">=3.13.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  patapata_core: ^1.0.0
+
+  patapata_karte_core: ^1.0.0
+
+  karte_variables: ^1.3.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^2.0.2
+
+flutter:

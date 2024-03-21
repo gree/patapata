@@ -1,0 +1,9 @@
+include: package:flutter_lints/flutter.yaml
+
+linter:
+  rules:
+    avoid_dynamic_calls: true
+
+analyzer:
+  exclude:
+    - example/**

@@ -1,0 +1,32 @@
+name: Upload Codecov
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Set up Flutter
+      uses: subosito/flutter-action@v2
+      with:
+        channel: 'stable'
+
+    - name: Install dependencies
+      run: flutter pub get
+      working-directory: ./packages/patapata_core
+
+    - name: Run tests for coverage
+      run: flutter test --dart-define=IS_TEST=true --no-pub --coverage
+      working-directory: ./packages/patapata_core
+
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v3
+      with:
+        token: ${{ secrets.CODECOV_TOKEN }}

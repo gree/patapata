@@ -1,0 +1,102 @@
+title: Patapata Core Sample App
+plurals:
+  test1: This is a test with {count, plural, other{# items}}.
+errors:
+  app:
+    '000':
+      title: Error ({prefix}000)
+      message: Unknown Error.
+    network:
+      '404':
+        title: Error ({prefix}404)
+        message: Contents not found.
+      '500':
+        title: Error ({prefix}500)
+        message: Internal server error.
+      '503':
+        title: Error ({prefix}503)
+        message: Service Unavailable. The server is currently undergoing maintenance.
+        fix: Go to Top Page
+pages:
+  agreement:
+    title: Agreement
+    body: This is the agreement page. Do you accept?
+    yes: Yes
+    no: No
+  top:
+    title: Patapata Sample Top
+    body: This is the sample top page of Patapata.
+    go_to_config: Config Sample
+    go_to_screen_layout: ScreenLayout Sample
+    go_to_standard_page: StandardPage Sample
+    go_to_device_and_pakage_info: Device And PackageInfo Sample
+    go_to_error: Error Sample
+    go_to_tab: Tab Sample
+  config:
+    title: Config Sample
+    body: This is the sample page of Config.
+    increment: Increment Count
+    clear: Clear Local Config Count
+  error:
+    title: Error Sample
+    body: This is the sample page of Error.
+    example: Normal Error
+    network: Network Error({prefix})
+    maintenance: Maintenance Error
+  maintenance:
+    title: Server Maintenance
+    message: Currently unavailable due to server maintenance. Returning to the Top Page.
+  device_and_package_info:
+    title: Sample of Device and Package Information
+    body: This is a sample page for retrieving device information and package information.
+    model: device name
+    app_name: app name
+    build_number: build number
+    build_signature: build signature
+    package_name: package name
+    version: version number
+  standard_page:
+    title: StandardPage Sample
+    body: This is a sample page of StandardPage.
+    go_to_next_standard_page: Go to next StandardPage
+    go_to_custom_standard_page: Go to Custom StandardPage
+    go_to_page_data: Go to Page Data Sample
+    page_data_value: PageData Value:{prefix}
+    change_page_data: Change PageData
+    page_data_count: PageData Count:{prefix}
+    change_page_data_type: Change PageData Type
+    change_page_data_result: Current PageData Value:{prefix} 
+  tab:
+    home:
+      title: Home
+      body: This is the home tab.
+    title_details:
+      title: Title Details
+      body: This is the title details tab.
+    my_page:
+      title: My Page
+      body: This is the my page tab.
+  screen_layout_example:
+    title: ScreenLayout Sample
+    body: This is a sample of ScreenLayout.
+    sample_a: Sample A
+    sample_b: Sample B
+    base_description_before: |
+      This SizedBox is specified as 300x300, and the SizedBoxes on the left and right have a Width of 37.5.
+      Depending on the actual screen size, there may be margins or Flutter may display an overflow warning due to insufficient screen size.
+      By using the ScreenLayout system, the RenderSize of the child is scaled up or down based on the values set in the StandardBreakpoint (but it never exceeds the maxScale).
+      Sample A is the raw object without applying ScreenLayout.
+    base_description_after: |
+      Sample B is the result of applying ScreenLayout to Sample A. If the actual screen size is 450 or less, it should be the perfect size. 
+      This is useful when creating widgets that you don\'t want to drastically change their appearance based on screen width or when you want to align relative sizes
+      between tablets and non-tablet devices, for example, when displaying dialogs. 
+    description_case_equal: Due to your device width of {width}, so the widget is displayed perfectly. (If you want to test the functionality of ScreenLayout, please try running it on a device with a width other than 375).
+    description_case_over: Due to your device width of {width}, there are margins on the left and right.
+    description_case_other: Due to your device width of {width}, an overflow warning is being displayed.
+    description_sample: |
+      In the previous example, we demonstrated scaling the RenderSize based on the StandardBreakpoint. However, the actual widget size depends on the size of its parent. 
+      However, there are cases where you may want to impose restrictions on the actual size. In such cases, you can use ConstrainedWidth. 
+      By specifying ConstrainedWidth, you can change the actual size and still benefit from the automatic calculation of RenderSize based on the StandardBreakpoint. 
+      It is also effective to enclose the ScreenLayout widget with a ConstrainedBox or similar approach to restrict the size. 
+      Please choose the appropriate approach based on the situation in your widget tree. 
+    description_example: In the above example, the value of ConstrainedWidth is set to 200. This limits the actual size to 200, but it can be observed that the relative shape of the content is preserved.
