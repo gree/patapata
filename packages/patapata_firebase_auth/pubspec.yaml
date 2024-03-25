@@ -1,6 +1,6 @@
 name: patapata_firebase_auth
 description: This package is a plugin for Patapata that adds support for Firebase Authentication to your Patapata app.
-version: 1.0.0
+version: 1.0.1
 homepage: https://github.com/gree/patapata
 repository: https://github.com/gree/patapata/tree/main/packages/patapata_firebase_auth
 
@@ -12,7 +12,7 @@ dependencies:
   flutter:
     sdk: flutter
 
-  patapata_core: ^1.0.0
+  patapata_core: ^1.0.1
 
   firebase_auth: ^4.2.5
 

@@ -1,6 +1,6 @@
 name: patapata_core
 description: A collection of best-practices for building applications quickly and reliably.
-version: 1.0.0
+version: 1.0.1
 homepage: https://github.com/gree/patapata
 repository: https://github.com/gree/patapata/tree/main/packages/patapata_core
 
