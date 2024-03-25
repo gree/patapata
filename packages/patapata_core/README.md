@@ -15,7 +15,7 @@
 
   <p align="center">
     <a href="https://github.com/gree/patapata/actions">
-      <img alt="GitHub Workflow Status (branch)" src="https://img.shields.io/github/workflow/status/gree/patapata/main"/>
+      <img alt="GitHub Workflow Status (branch)" src="https://img.shields.io/github/actions/workflow/status/gree/patapata/check.yml?branch=main"/>
     </a>
     <a href="https://pub.dev/packages/patapata_core">
       <img alt="Pub Popularity" src="https://img.shields.io/pub/popularity/patapata_core?"/>
