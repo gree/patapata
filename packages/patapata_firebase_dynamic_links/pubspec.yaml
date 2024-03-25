@@ -3,7 +3,7 @@ description: This package is a plugin for Patapata that adds support for Firebas
 version: 1.0.0
 publish_to: none
 homepage: https://github.com/gree/patapata
-repository: https://github.com/gree/patapata/packages/patapata_firebase_dynamic_links
+repository: https://github.com/gree/patapata/tree/main/packages/patapata_firebase_dynamic_links
 
 environment:
   sdk: ">=3.0.0 <4.0.0"

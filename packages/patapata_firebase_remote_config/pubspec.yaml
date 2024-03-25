@@ -2,7 +2,7 @@ name: patapata_firebase_remote_config
 description: This package is a plugin for Patapata that adds support for Firebase Remote Config to your Patapata app.
 version: 1.0.0
 homepage: https://github.com/gree/patapata
-repository: https://github.com/gree/patapata/packages/patapata_firebase_remote_config
+repository: https://github.com/gree/patapata/tree/main/packages/patapata_firebase_remote_config
 
 environment:
   sdk: ">=3.0.0 <4.0.0"
