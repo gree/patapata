@@ -126,6 +126,10 @@ void main(List<String> arguments) {
     // Check if the l10n directory exists.
     // And if not, create it.
     _checkL10nFiles(tResults);
+
+    // Check if a widget_test.dart file exists.
+    // And if not, create it with a empty code.
+    _checkWidgetTestFile(tResults);
   } catch (e) {
     switch (e) {
       case UsageException():
@@ -994,6 +998,31 @@ errors:
   }
 
   tPubspecFile.writeAsStringSync(tPubspecDocument.toString());
+
+  stdout.writeln('Done.');
+}
+
+void _checkWidgetTestFile(ArgResults results) {
+  stdout.writeln('Checking widget_test.dart file...');
+
+  final tFile = File('test/widget_test.dart');
+  final tFileExists = tFile.existsSync();
+
+  if (results['force'] == true || !tFileExists) {
+    stdout.writeln('Creating widget_test.dart file...');
+
+    if (!tFileExists) {
+      tFile.createSync(recursive: true);
+    }
+
+    tFile.writeAsStringSync(DartFormatter().format('''
+import 'package:flutter_test/flutter_test.dart';
+
+void main() {
+  testWidgets('empty', (WidgetTester tester) async {});
+}
+'''));
+  }
 
   stdout.writeln('Done.');
 }
