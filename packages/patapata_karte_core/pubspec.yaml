@@ -13,7 +13,7 @@ dependencies:
   flutter:
     sdk: flutter
 
-  patapata_core: ^1.0.1
+  patapata_core: ^1.0.2
 
   karte_core: ^1.2.1
   karte_in_app_messaging: ^1.2.0

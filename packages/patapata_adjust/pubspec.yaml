@@ -14,7 +14,7 @@ dependencies:
     sdk: flutter
   plugin_platform_interface: ^2.1.5
 
-  patapata_core: ^1.0.1
+  patapata_core: ^1.0.2
 
   adjust_sdk: ^4.33.1
 

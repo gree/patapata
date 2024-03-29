@@ -1,6 +1,6 @@
 name: patapata_firebase_messaging
 description: This package is a plugin for Patapata that adds support for Firebase Cloud Messaging to your Patapata app.
-version: 1.0.1
+version: 1.0.2
 homepage: https://github.com/gree/patapata
 repository: https://github.com/gree/patapata/tree/main/packages/patapata_firebase_messaging
 
@@ -12,9 +12,9 @@ dependencies:
   flutter:
     sdk: flutter
 
-  patapata_core: ^1.0.1
+  patapata_core: ^1.0.2
 
-  patapata_firebase_core: ^1.0.1
+  patapata_firebase_core: ^1.0.2
 
   firebase_messaging: ^14.6.6
   path_provider: ">=2.0.9 <3.0.0"

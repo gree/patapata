@@ -1,6 +1,6 @@
 name: patapata_riverpod
 description: This package is a plugin for Patapata that adds support for Riverpod to your Patapata app.
-version: 1.0.1
+version: 1.0.2
 homepage: https://github.com/gree/patapata
 repository: https://github.com/gree/patapata/tree/main/packages/patapata_riverpod
 
@@ -13,7 +13,7 @@ dependencies:
     sdk: flutter
 
   flutter_riverpod: ^2.4.6
-  patapata_core: ^1.0.1
+  patapata_core: ^1.0.2
   riverpod_annotation: ^2.3.1
 
 dev_dependencies:
