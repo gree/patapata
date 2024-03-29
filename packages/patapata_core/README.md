@@ -91,7 +91,7 @@ To just get the standard Patapata experience and have an app up and running, exe
 flutter create my_app
 cd my_app
 flutter pub add patapata_core
-dart run patapata_core:bootstrap
+dart run patapata_core:bootstrap -f
 ```
 
 Note that this will change the minimum Android SDK version to 21 and the minimum iOS version to 12.0.
