@@ -6,23 +6,23 @@ repository: https://github.com/gree/patapata/tree/main/packages/patapata_riverpo
 
 environment:
   sdk: ">=3.0.0 <4.0.0"
-  flutter: ">=3.13.0"
+  flutter: ">=3.19.0"
 
 dependencies:
   flutter:
     sdk: flutter
 
-  flutter_riverpod: ^2.4.6
+  flutter_riverpod: ^2.5.1
   patapata_core: ^1.0.2
-  riverpod_annotation: ^2.3.1
+  riverpod_annotation: ^2.3.5
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_lints: ^2.0.2
-  riverpod_generator: ^2.3.6
-  build_runner: ^2.4.6
-  custom_lint: ^0.5.6
-  riverpod_lint: ^2.3.4
+  flutter_lints: ^3.0.2
+  riverpod_generator: ^2.4.0
+  build_runner: ^2.4.9
+  custom_lint: ^0.6.4
+  riverpod_lint: ^2.3.10
 
 flutter:

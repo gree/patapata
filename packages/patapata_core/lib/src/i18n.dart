@@ -146,9 +146,8 @@ class _L10nAssetReloader extends StatefulWidget {
   final Widget child;
 
   const _L10nAssetReloader({
-    Key? key,
     required this.child,
-  }) : super(key: key);
+  });
 
   @override
   State<_L10nAssetReloader> createState() => __L10nAssetReloaderState();

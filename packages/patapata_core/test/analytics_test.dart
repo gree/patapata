@@ -514,9 +514,7 @@ class _TestAnalyticsImpressionThresholdCallbackPage extends StandardPage<void> {
 
 // Other Test Widgets
 class _TestAnalyticsHomeScreen extends StatelessWidget {
-  const _TestAnalyticsHomeScreen({
-    Key? key,
-  }) : super(key: key);
+  const _TestAnalyticsHomeScreen();
 
   @override
   Widget build(BuildContext context) {
@@ -539,9 +537,7 @@ class _TestAnalyticsHomeScreen extends StatelessWidget {
 }
 
 class _TestAnalyticsSecondScreen extends StatelessWidget {
-  const _TestAnalyticsSecondScreen({
-    Key? key,
-  }) : super(key: key);
+  const _TestAnalyticsSecondScreen();
   @override
   Widget build(BuildContext context) {
     return Scaffold(

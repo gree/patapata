@@ -526,10 +526,9 @@ class _TestSecondPage extends StandardPage<void> {
 
 class _TestAppTab extends StatelessWidget {
   const _TestAppTab({
-    Key? key,
     required this.body,
     this.appBar,
-  }) : super(key: key);
+  });
 
   final Widget body;
   final PreferredSizeWidget? appBar;
@@ -744,10 +743,9 @@ class _TestCupertinoFirstPage extends StandardPage<void> {
 
 class _TestCupertinoAppBar extends StatelessWidget {
   const _TestCupertinoAppBar({
-    Key? key,
     required this.body,
     this.appBar,
-  }) : super(key: key);
+  });
 
   final Widget body;
   final Widget? appBar;

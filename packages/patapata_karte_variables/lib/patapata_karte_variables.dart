@@ -38,16 +38,16 @@ class _KarteVariablesPluginRemoteConfig extends RemoteConfig {
         final tDefaultValue = _defaults[tKey];
 
         switch (tDefaultValue?.runtimeType) {
-          case int:
+          case const (int):
             await _updateVariable<int>(tKey, tDefaultValue as int);
             break;
-          case double:
+          case const (double):
             await _updateVariable<double>(tKey, tDefaultValue as double);
             break;
-          case String:
+          case const (String):
             await _updateVariable<String>(tKey, tDefaultValue as String);
             break;
-          case bool:
+          case const (bool):
             await _updateVariable<bool>(tKey, tDefaultValue as bool);
             break;
           default:
@@ -71,16 +71,16 @@ class _KarteVariablesPluginRemoteConfig extends RemoteConfig {
     dynamic tValue;
 
     switch (T) {
-      case int:
+      case const (int):
         tValue = await tVariable.getInteger(defaultValue as int);
         break;
-      case double:
+      case const (double):
         tValue = await tVariable.getDouble(defaultValue as double);
         break;
-      case String:
+      case const (String):
         tValue = await tVariable.getString(defaultValue as String);
         break;
-      case bool:
+      case const (bool):
         tValue = await tVariable.getBoolean(defaultValue as bool);
         break;
       default:

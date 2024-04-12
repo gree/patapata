@@ -111,11 +111,11 @@ class PlatformDialog {
 
 class _PlatformAlertDialog<T> extends StatelessWidget {
   const _PlatformAlertDialog({
-    Key? key,
+    super.key,
     required this.content,
     required this.actions,
     this.title,
-  }) : super(key: key);
+  });
 
   final String? title;
   final Widget content;

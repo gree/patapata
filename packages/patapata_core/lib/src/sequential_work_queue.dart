@@ -387,8 +387,19 @@ class SequentialWorkQueue {
   /// Warning. Never call this inside [SequentialWorkQueue.add.work].
   /// An assert will be thrown, or in release mode, ignored.
   Future<void> clear() async {
-    assert(Zone.current[#sequentialWorkQueueItem] == null,
-        'Can not clear() a SequentialWorkQueue inside a work callback.');
+    var tZoneToExecuteIn = Zone.current;
+
+    if (tZoneToExecuteIn[#sequentialWorkQueue] != null) {
+      // We are inside the queue.
+      // We will need to run this in the parent zone.
+      do {
+        tZoneToExecuteIn = tZoneToExecuteIn.parent!;
+      } while (tZoneToExecuteIn[#sequentialWorkQueue] != null);
+
+      tZoneToExecuteIn.run<void>(clear);
+
+      return;
+    }
 
     final tQueue = _queue
         .where((element) => element.cancellingCompleter == null)

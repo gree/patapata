@@ -5,6 +5,7 @@
 
 /// This file is for the sole purpose of providing an empty ffi shell for
 /// the web. Just to compile things. Not execute.
+library;
 
 class Pointer {}
 
