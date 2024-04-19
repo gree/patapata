@@ -124,13 +124,13 @@ void main() {
 
       tFutures.add(tQueue.add<void>(() {
         tValue += '0';
-      }, () => true));
+      }, onCancel: () => true));
 
       tQueue.clear();
 
       tFutures.add(tQueue.add<void>(() {
         tValue += '1';
-      }, () => true));
+      }, onCancel: () => true));
 
       while (tFutures.isNotEmpty) {
         final tFuturesCopy = tFutures.toList();
@@ -152,13 +152,13 @@ void main() {
       tFutures.add(tQueue.add<void>(() async {
         await Future.microtask(() => null);
         tValue += '0';
-      }, () async => await Future.microtask(() => true)));
+      }, onCancel: () async => await Future.microtask(() => true)));
 
       tQueue.clear();
 
       tFutures.add(tQueue.add<void>(() {
         tValue += '1';
-      }, () async => true));
+      }, onCancel: () async => true));
 
       while (tFutures.isNotEmpty) {
         final tFuturesCopy = tFutures.toList();
@@ -180,25 +180,25 @@ void main() {
       tFutures.add(tQueue.add<void>(() async {
         await Future.microtask(() => null);
         tValue += '0';
-      }, () async => await Future.microtask(() => true)));
+      }, onCancel: () async => await Future.microtask(() => true)));
 
       tFutures.add(tQueue.add<void>(() async {
         await Future.microtask(() => null);
         tValue += '0';
-      }, () async => await Future.microtask(() => true)));
+      }, onCancel: () async => await Future.microtask(() => true)));
 
       tQueue.clear();
 
       tFutures.add(tQueue.add<void>(() async {
         await Future.microtask(() => null);
         tValue += '0';
-      }, () async => await Future.microtask(() => true)));
+      }, onCancel: () async => await Future.microtask(() => true)));
 
       tQueue.clear();
 
       tFutures.add(tQueue.add<void>(() {
         tValue += '1';
-      }, () async => true));
+      }, onCancel: () async => true));
 
       while (tFutures.isNotEmpty) {
         final tFuturesCopy = tFutures.toList();
@@ -220,13 +220,13 @@ void main() {
       tFutures.add(tQueue.add<void>(() async {
         await Future.microtask(() => null);
         tValue += '0';
-      }, () async => await Future.microtask(() => false)));
+      }, onCancel: () async => await Future.microtask(() => false)));
 
       tQueue.clear();
 
       tFutures.add(tQueue.add<void>(() {
         tValue += '1';
-      }, () async => true));
+      }, onCancel: () async => true));
 
       while (tFutures.isNotEmpty) {
         final tFuturesCopy = tFutures.toList();

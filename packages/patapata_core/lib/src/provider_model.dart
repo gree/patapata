@@ -518,6 +518,9 @@ abstract class ProviderModel<T> with ChangeNotifier {
   /// with the same [lockKey].
   /// Every [ProviderModel] has a default [ProviderLockKey] that this function will default to
   /// if [lockKey] is not set.
+  ///
+  /// For details on what [waitForMicrotasks], [waitForTimers], and [waitForPeriodicTimers] do,
+  /// see [SequentialWorkQueue.add].
   @nonVirtual
   Future<bool> lock(
     ProviderModelProcess process, {
@@ -525,6 +528,9 @@ abstract class ProviderModel<T> with ChangeNotifier {
     bool override = false,
     bool overridable = false,
     FutureOr<void> Function()? onOverride,
+    bool waitForMicrotasks = true,
+    bool waitForTimers = false,
+    bool waitForPeriodicTimers = false,
   }) async {
     assert(!_disposed, 'ProviderModel was already disposed.');
     assert(
@@ -550,7 +556,7 @@ abstract class ProviderModel<T> with ChangeNotifier {
 
             return tBatch.valid && !disposed;
           },
-          () async {
+          onCancel: () async {
             if (onOverride != null) {
               tBatch._disable();
               await onOverride();
@@ -564,6 +570,9 @@ abstract class ProviderModel<T> with ChangeNotifier {
 
             return false;
           },
+          waitForMicrotasks: waitForMicrotasks,
+          waitForTimers: waitForTimers,
+          waitForPeriodicTimers: waitForPeriodicTimers,
         ) ==
         true;
   }
