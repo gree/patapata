@@ -137,15 +137,11 @@ class FirebaseMessagingRemoteMessagingRemoteMessage extends RemoteMessage {
   /// [data] as a Map for received data, and [notification] of [RemoteMessageNotification] with title and body information when receiving the notification.
   const FirebaseMessagingRemoteMessagingRemoteMessage({
     required this.firebaseRemoteMessage,
-    String? messageId,
+    super.messageId,
     String? channel,
-    Map<String, dynamic>? data,
-    RemoteMessageNotification? notification,
-  }) : super(
-          messageId: messageId,
-          data: data,
-          notification: notification,
-        );
+    super.data,
+    super.notification,
+  });
 
   /// A factory class that creates an instance of RemoteMessage from a Firebase remote message [message].
   factory FirebaseMessagingRemoteMessagingRemoteMessage.fromFirebase(

@@ -124,7 +124,7 @@ class StandardMaterialApp<T> extends StatefulWidget with StandardStatefulMixin {
 
   /// Creates a StandardMaterialApp.
   const StandardMaterialApp({
-    Key? key,
+    super.key,
     this.scaffoldMessengerKey,
     this.routeInformationProvider,
     this.backButtonDispatcher,
@@ -154,8 +154,7 @@ class StandardMaterialApp<T> extends StatefulWidget with StandardStatefulMixin {
     bool Function(Route<dynamic> route, dynamic result)? willPopPage,
   })  : _pages = pages,
         _routableBuilder = routableBuilder,
-        _willPopPage = willPopPage,
-        super(key: key);
+        _willPopPage = willPopPage;
 
   @override
   State<StandardMaterialApp<T>> createState() => _StandardMaterialAppState<T>();

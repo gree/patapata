@@ -13,10 +13,10 @@ import '../pages/my_page.dart';
 /// A sample StandardApp for Material with a widget displayed in a tab.
 class AppTab extends StatelessWidget {
   const AppTab({
-    Key? key,
+    super.key,
     required this.body,
     this.appBar,
-  }) : super(key: key);
+  });
 
   final Widget body;
   final PreferredSizeWidget? appBar;

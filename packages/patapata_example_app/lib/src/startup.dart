@@ -8,8 +8,7 @@ import 'package:patapata_core/patapata_core.dart';
 import 'pages/agreement_page.dart';
 
 class StartupStateCheckVersion extends StartupState {
-  StartupStateCheckVersion(StartupSequence startupSequence)
-      : super(startupSequence);
+  StartupStateCheckVersion(super.startupSequence);
 
   @override
   Future<void> process(Object? data) async {
@@ -29,8 +28,7 @@ class StartupStateAgreements extends StartupState {
 
   // static const _kAgreementVersionKey = 'agreementVersion';
 
-  StartupStateAgreements(StartupSequence startupSequence)
-      : super(startupSequence);
+  StartupStateAgreements(super.startupSequence);
 
   @override
   Future<void> process(Object? data) async {

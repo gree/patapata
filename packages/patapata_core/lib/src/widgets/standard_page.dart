@@ -490,20 +490,14 @@ class StandardMaterialPage<R extends Object?, E extends Object?>
 
   /// Create a StandardMaterialPage
   const StandardMaterialPage({
-    LocalKey? key,
-    String? name,
-    Object? arguments,
-    String? restorationId,
+    super.key,
+    super.name,
+    super.arguments,
+    super.restorationId,
     required this.standardPageKey,
     required this.factoryObject,
-    required Widget child,
-  }) : super(
-          key: key,
-          name: name,
-          arguments: arguments,
-          restorationId: restorationId,
-          child: child,
-        );
+    required super.child,
+  });
 }
 
 /// Implements functionality to extend [Page] and create a customized [StandardPageWithResult].
@@ -526,10 +520,10 @@ class StandardCustomPage<R, E> extends Page<void>
 
   /// Create a StandardCustomPage
   const StandardCustomPage({
-    LocalKey? key,
-    String? name,
-    Object? arguments,
-    String? restorationId,
+    super.key,
+    super.name,
+    super.arguments,
+    super.restorationId,
     this.maintainState = true,
     this.barrierDismissible = false,
     this.barrierColor,
@@ -541,12 +535,7 @@ class StandardCustomPage<R, E> extends Page<void>
     required this.factoryObject,
     this.transitionBuilder,
     required this.child,
-  }) : super(
-          key: key,
-          name: name,
-          arguments: arguments,
-          restorationId: restorationId,
-        );
+  });
 
   /// {@macro flutter.widgets.ModalRoute.maintainState}
   final bool maintainState;
@@ -658,10 +647,10 @@ class _StandardPageWidget<T extends Object?, E extends Object?>
   final T pageData;
 
   const _StandardPageWidget({
-    Key? key,
+    super.key,
     required this.factoryObject,
     required this.pageData,
-  }) : super(key: key);
+  });
 
   @override
   State<_StandardPageWidget<T, E>> createState() =>
@@ -1093,10 +1082,9 @@ class _SingleChildPluginBuilder extends StatelessWidget {
   final Widget child;
 
   const _SingleChildPluginBuilder({
-    Key? key,
     required this.plugin,
     required this.child,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) => plugin.buildPage(context, child);

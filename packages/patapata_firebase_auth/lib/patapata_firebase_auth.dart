@@ -2,6 +2,7 @@
 //
 // This source code is licensed under the MIT license found in the
 // LICENSE file in the root directory of this source tree.
+library patapata_firebase_auth;
 
 import 'package:firebase_auth/firebase_auth.dart' as firebase;
 import 'package:patapata_core/patapata_core.dart';

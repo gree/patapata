@@ -104,7 +104,7 @@ class Permissions with MethodChannelTestMixin {
       const MethodChannel('dexterous.com/flutter/local_notifications'),
       (methodCall) async {
         switch (methodCall.method) {
-          case 'requestPermission':
+          case 'requestNotificationsPermission':
             return _mockLocalNotificationsPermission;
           case 'requestPermissions':
             return _mockLocalNotificationsPermission;
@@ -202,7 +202,7 @@ class Permissions with MethodChannelTestMixin {
         final tPlatform = FlutterLocalNotificationsPlugin()
             .resolvePlatformSpecificImplementation<
                 AndroidFlutterLocalNotificationsPlugin>()!;
-        tNotificationResult = (await tPlatform.requestPermission() ?? true)
+        tNotificationResult = (await tPlatform.requestNotificationsPermission() ?? true)
             ? PermissionNotificationResult.authorized
             : PermissionNotificationResult.denied;
       } else if (defaultTargetPlatform == TargetPlatform.iOS) {

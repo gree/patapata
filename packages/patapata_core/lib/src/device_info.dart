@@ -136,6 +136,25 @@ class DeviceInfoPlugin extends Plugin {
   // of [AndroidDeviceInfo.fromMap] to make it easier to compare.
   static const Map<String, dynamic> _defaultMockAndroidDeviceInfoMap =
       <String, dynamic>{
+    'id': 'id',
+    'host': 'host',
+    'tags': 'tags',
+    'type': 'type',
+    'model': 'model',
+    'board': 'board',
+    'brand': 'Google',
+    'device': 'device',
+    'product': 'product',
+    'display': 'display',
+    'hardware': 'hardware',
+    'bootloader': 'bootloader',
+    'isPhysicalDevice': true,
+    'fingerprint': 'fingerprint',
+    'manufacturer': 'manufacturer',
+    'supportedAbis': ['arm64-v8a', 'x86', 'x86_64'],
+    'systemFeatures': ['FEATURE_AUDIO_PRO', 'FEATURE_AUDIO_OUTPUT'],
+    'supported32BitAbis': ['x86 (IA-32)', 'MMX'],
+    'supported64BitAbis': ['x86-64', 'MMX', 'SSSE3'],
     'version': <String, dynamic>{
       'sdkInt': 16,
       'baseOS': 'baseOS',
@@ -145,32 +164,8 @@ class DeviceInfoPlugin extends Plugin {
       'incremental': 'incremental',
       'securityPatch': 'securityPatch',
     },
-    'board': 'board',
-    'bootloader': 'bootloader',
-    'brand': 'Google',
-    'device': 'device',
-    'display': 'display',
-    'fingerprint': 'fingerprint',
-    'hardware': 'hardware',
-    'host': 'host',
-    'id': 'id',
-    'manufacturer': 'manufacturer',
-    'model': 'model',
-    'product': 'product',
-    'supported32BitAbis': <String?>['x86 (IA-32)', 'MMX'],
-    'supported64BitAbis': <String?>['x86-64', 'MMX', 'SSSE3'],
-    'supportedAbis': <String>['arm64-v8a', 'x86', 'x86_64'],
-    'tags': 'tags',
-    'type': 'type',
-    'isPhysicalDevice': true,
-    'systemFeatures': ['FEATURE_AUDIO_PRO', 'FEATURE_AUDIO_OUTPUT'],
-    'displayMetrics': <String, dynamic>{
-      'widthPx': 1080.0,
-      'heightPx': 2220.0,
-      'xDpi': 530.0859,
-      'yDpi': 529.4639,
-    },
-    'serialNumber': 'serialNumber',
+    'serialNumber': 'SERIAL',
+    'isLowRamDevice': false,
   };
 
   @visibleForTesting
@@ -191,17 +186,17 @@ class DeviceInfoPlugin extends Plugin {
     String? product,
     String? display,
     String? hardware,
-    bool? isPhysicalDevice,
     String? bootloader,
+    bool? isPhysicalDevice,
     String? fingerprint,
     String? manufacturer,
     List<String>? supportedAbis,
     List<String>? systemFeatures,
-    Map<String, dynamic>? version,
     List<String>? supported64BitAbis,
     List<String>? supported32BitAbis,
-    Map<String, dynamic>? displayMetrics,
+    Map<String, dynamic>? version,
     String? serialNumber,
+    bool? isLowRamDevice,
   }) {
     mockAndroidDeviceInfoMap = {
       'id': id ?? _defaultMockAndroidDeviceInfoMap['id'],
@@ -215,10 +210,10 @@ class DeviceInfoPlugin extends Plugin {
       'product': product ?? _defaultMockAndroidDeviceInfoMap['product'],
       'display': display ?? _defaultMockAndroidDeviceInfoMap['display'],
       'hardware': hardware ?? _defaultMockAndroidDeviceInfoMap['hardware'],
-      'isPhysicalDevice': isPhysicalDevice ??
-          _defaultMockAndroidDeviceInfoMap['isPhysicalDevice'],
       'bootloader':
           bootloader ?? _defaultMockAndroidDeviceInfoMap['bootloader'],
+      'isPhysicalDevice': isPhysicalDevice ??
+          _defaultMockAndroidDeviceInfoMap['isPhysicalDevice'],
       'fingerprint':
           fingerprint ?? _defaultMockAndroidDeviceInfoMap['fingerprint'],
       'manufacturer':
@@ -227,15 +222,15 @@ class DeviceInfoPlugin extends Plugin {
           supportedAbis ?? _defaultMockAndroidDeviceInfoMap['supportedAbis'],
       'systemFeatures':
           systemFeatures ?? _defaultMockAndroidDeviceInfoMap['systemFeatures'],
-      'version': version ?? _defaultMockAndroidDeviceInfoMap['version'],
       'supported64BitAbis': supported64BitAbis ??
           _defaultMockAndroidDeviceInfoMap['supported64BitAbis'],
       'supported32BitAbis': supported32BitAbis ??
           _defaultMockAndroidDeviceInfoMap['supported32BitAbis'],
-      'displayMetrics':
-          displayMetrics ?? _defaultMockAndroidDeviceInfoMap['displayMetrics'],
+      'version': version ?? _defaultMockAndroidDeviceInfoMap['version'],
       'serialNumber':
           serialNumber ?? _defaultMockAndroidDeviceInfoMap['serialNumber'],
+      'isLowRamDevice':
+          isLowRamDevice ?? _defaultMockAndroidDeviceInfoMap['isLowRamDevice'],
     };
   }
 
@@ -252,7 +247,7 @@ class DeviceInfoPlugin extends Plugin {
     },
     'systemName': 'systemName',
     'systemVersion': 'systemVersion',
-    'isPhysicalDevice': 'true',
+    'isPhysicalDevice': true,
     'localizedModel': 'localizedModel',
     'identifierForVendor': 'identifierForVendor',
   };
@@ -275,8 +270,8 @@ class DeviceInfoPlugin extends Plugin {
       'utsname': utsname ?? mockIosDeviceInfoMap['utsname'],
       'systemName': systemName ?? mockIosDeviceInfoMap['systemName'],
       'systemVersion': systemVersion ?? mockIosDeviceInfoMap['systemVersion'],
-      'isPhysicalDevice': isPhysicalDevice?.toString() ??
-          mockIosDeviceInfoMap['isPhysicalDevice'],
+      'isPhysicalDevice':
+          isPhysicalDevice ?? mockIosDeviceInfoMap['isPhysicalDevice'],
       'localizedModel':
           localizedModel ?? mockIosDeviceInfoMap['localizedModel'],
       'identifierForVendor':
