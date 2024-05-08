@@ -75,13 +75,16 @@ void main() {
         final tQueue = SequentialWorkQueue();
         final tResults = <int>[];
 
-        tQueue.add(() async {
-          await Future.microtask(() => null);
-          tResults.add(1);
-        }, () {
-          tResults.add(0);
-          return true;
-        });
+        tQueue.add(
+          () async {
+            await Future.microtask(() => null);
+            tResults.add(1);
+          },
+          onCancel: () {
+            tResults.add(0);
+            return true;
+          },
+        );
 
         tQueue.add(() async {
           await Future.microtask(() => null);
@@ -98,26 +101,32 @@ void main() {
         final tQueue = SequentialWorkQueue();
         final tResults = <int>[];
 
-        tQueue.add(() async {
-          await Future.microtask(() => null);
-          tResults.add(2);
-        }, () {
-          tResults.add(0);
-          return false;
-        });
+        tQueue.add(
+          () async {
+            await Future.microtask(() => null);
+            tResults.add(2);
+          },
+          onCancel: () {
+            tResults.add(0);
+            return false;
+          },
+        );
 
         tQueue.add(() async {
           await Future.microtask(() => null);
           tResults.add(3);
         });
 
-        tQueue.add(() async {
-          await Future.microtask(() => null);
-          tResults.add(4);
-        }, () {
-          tResults.add(1);
-          return false;
-        });
+        tQueue.add(
+          () async {
+            await Future.microtask(() => null);
+            tResults.add(4);
+          },
+          onCancel: () {
+            tResults.add(1);
+            return false;
+          },
+        );
 
         await tQueue.clear();
 
@@ -128,14 +137,17 @@ void main() {
         final tQueue = SequentialWorkQueue();
         final tResults = <int>[];
 
-        tQueue.add(() async {
-          await Future.microtask(() => null);
-          tResults.add(1);
-        }, () async {
-          tResults.add(0);
-          await Future.microtask(() => null);
-          return true;
-        });
+        tQueue.add(
+          () async {
+            await Future.microtask(() => null);
+            tResults.add(1);
+          },
+          onCancel: () async {
+            tResults.add(0);
+            await Future.microtask(() => null);
+            return true;
+          },
+        );
 
         tQueue.add(() async {
           tResults.add(2);
@@ -296,6 +308,12 @@ void main() {
             },
           );
 
+          // Explanation: The dart compiler decides that it's possible
+          // to run from the end of await microtask above all the way to the await tQueue.clear
+          // below synchronously. Therefore it gets scheduled that way and
+          // there is no way for our code to stop execution at this point
+          // (even though that's what we want).
+          // Therefore the final tResults.add(5) is executed.
           tResults.add(5);
         });
 
@@ -307,6 +325,26 @@ void main() {
         await tQueue.clear();
 
         expect(tResults, [1, 2, 3, 5]);
+      });
+
+      test('can clear inside of work', () async {
+        final tQueue = SequentialWorkQueue();
+        final tResults = <int>[];
+
+        await tQueue.add(
+          () async {
+            tResults.add(1);
+
+            tQueue.clear();
+
+            tResults.add(2);
+          },
+          onCancel: () {
+            return true;
+          },
+        );
+
+        expect(tResults, [1, 2]);
       });
     });
 
@@ -387,19 +425,22 @@ void main() {
         final tQueue = SequentialWorkQueue();
         final tResults = <int>[];
 
-        tQueue.add(() async {
-          tResults.add(1);
+        tQueue.add(
+          () async {
+            tResults.add(1);
 
-          await Future.microtask(() async {
-            tResults.add(2);
-            await Future.microtask(() => null);
-            tResults.add(3);
-          });
+            await Future.microtask(() async {
+              tResults.add(2);
+              await Future.microtask(() => null);
+              tResults.add(3);
+            });
 
-          tResults.add(4);
-        }, () {
-          return false;
-        });
+            tResults.add(4);
+          },
+          onCancel: () {
+            return false;
+          },
+        );
 
         tQueue.add(() async {
           await Future.microtask(() => null);
@@ -420,19 +461,22 @@ void main() {
         final tQueue = SequentialWorkQueue();
         final tResults = <int>[];
 
-        tQueue.add(() async {
-          tResults.add(1);
+        tQueue.add(
+          () async {
+            tResults.add(1);
 
-          await Future.microtask(() async {
-            tResults.add(2);
-            await Future.microtask(() => null);
-            tResults.add(3);
-          });
+            await Future.microtask(() async {
+              tResults.add(2);
+              await Future.microtask(() => null);
+              tResults.add(3);
+            });
 
-          tResults.add(4);
-        }, () async {
-          return false;
-        });
+            tResults.add(4);
+          },
+          onCancel: () async {
+            return false;
+          },
+        );
 
         tQueue.add(() async {
           await Future.microtask(() => null);
@@ -453,19 +497,22 @@ void main() {
         final tQueue = SequentialWorkQueue();
         final tResults = <int>[];
 
-        tQueue.add(() async {
-          tResults.add(1);
+        tQueue.add(
+          () async {
+            tResults.add(1);
 
-          await Future.microtask(() async {
-            tResults.add(2);
-            await Future.microtask(() => null);
-            tResults.add(3);
-          });
+            await Future.microtask(() async {
+              tResults.add(2);
+              await Future.microtask(() => null);
+              tResults.add(3);
+            });
 
-          tResults.add(4);
-        }, () async {
-          return true;
-        });
+            tResults.add(4);
+          },
+          onCancel: () async {
+            return true;
+          },
+        );
 
         tQueue.add(() async {
           await Future.microtask(() => null);
@@ -486,17 +533,20 @@ void main() {
         final tQueue = SequentialWorkQueue();
         final tResults = <int>[];
 
-        tQueue.add(() async {
-          tResults.add(1);
+        tQueue.add(
+          () async {
+            tResults.add(1);
 
-          await Future.microtask(() async {
-            tResults.add(2);
+            await Future.microtask(() async {
+              tResults.add(2);
 
-            throw Exception('Error');
-          });
-        }, () async {
-          return true;
-        });
+              throw Exception('Error');
+            });
+          },
+          onCancel: () async {
+            return true;
+          },
+        );
 
         tQueue.add(() async {
           await Future.microtask(() => null);
@@ -518,19 +568,22 @@ void main() {
           final tQueue = SequentialWorkQueue();
           final tResults = <int>[];
 
-          tQueue.add(() async {
-            tResults.add(1);
+          tQueue.add(
+            () async {
+              tResults.add(1);
 
-            await Future.microtask(() async {
-              tResults.add(2);
-              await Future.microtask(() => null);
-              tResults.add(3);
-            });
+              await Future.microtask(() async {
+                tResults.add(2);
+                await Future.microtask(() => null);
+                tResults.add(3);
+              });
 
-            tResults.add(4);
-          }, () async {
-            throw Exception('Error');
-          });
+              tResults.add(4);
+            },
+            onCancel: () async {
+              throw Exception('Error');
+            },
+          );
 
           tQueue.add(() async {
             await Future.microtask(() => null);
@@ -587,6 +640,68 @@ void main() {
 
         expect(tValue, 1);
       });
+
+      test(
+          'should be able to create microtasks inside a queue that is being executed inside another queue',
+          () async {
+        final tQueue = SequentialWorkQueue();
+        final tResults = <int>[];
+
+        Future<void>? tInnerQueue;
+
+        await tQueue.add(() async {
+          tResults.add(1);
+
+          tInnerQueue = tQueue.add<void>(() async {
+            tResults.add(2);
+
+            Future.microtask(() async {
+              await Future.delayed(const Duration(milliseconds: 1));
+              tResults.add(3);
+            });
+
+            tQueue.clear();
+
+            tResults.add(4);
+          });
+
+          tResults.add(5);
+        });
+
+        await tInnerQueue!;
+
+        expect(tResults, [1, 5, 2, 4]);
+      });
+
+      test('should be able to create microtasks 2', () async {
+        final tQueue = SequentialWorkQueue();
+        final tResults = <int>[];
+
+        void onSuccess() {
+          tResults.add(1);
+        }
+
+        await tQueue.add<void>(() async {
+          try {
+            final tCompleter = Completer<void>();
+            tCompleter.future.then((value) {
+              onSuccess();
+            });
+
+            scheduleMicrotask(() async {
+              await Future.delayed(const Duration(milliseconds: 1));
+
+              tCompleter.complete();
+            });
+
+            return tCompleter.future;
+          } catch (e) {
+            rethrow;
+          }
+        });
+
+        expect(tResults, [1]);
+      });
     });
   });
 
@@ -596,16 +711,19 @@ void main() {
       final tResults = <int>[];
       final tShouldCall = expectAsync0(() => null, count: 1);
 
-      await tQueue.add(() async {
-        tResults.add(1);
+      await tQueue.add(
+        () async {
+          tResults.add(1);
 
-        Timer.run(() async {
-          await Future.microtask(() => null);
-          tShouldCall();
-        });
+          Timer.run(() async {
+            await Future.microtask(() => null);
+            tShouldCall();
+          });
 
-        tResults.add(2);
-      });
+          tResults.add(2);
+        },
+        waitForTimers: true,
+      );
 
       expect(tResults, [1, 2]);
     });
@@ -618,19 +736,22 @@ void main() {
 
       runZonedGuarded(() async {
         await expectLater(
-          tQueue.add(() async {
-            tResults.add(1);
+          tQueue.add(
+            () async {
+              tResults.add(1);
 
-            Timer.run(() async {
-              tResults.add(2);
-              await Future.microtask(() => null);
-              throw _TestException('SWQ Error');
-              // ignore: dead_code
-              tShouldNotCall();
-            });
+              Timer.run(() async {
+                tResults.add(2);
+                await Future.microtask(() => null);
+                throw _TestException('SWQ Error');
+                // ignore: dead_code
+                tShouldNotCall();
+              });
 
-            return 1;
-          }),
+              return 1;
+            },
+            waitForTimers: true,
+          ),
           completion(1),
         );
 
@@ -651,23 +772,29 @@ void main() {
           final tResults = <int>[];
           final tShouldNotCall = expectAsync0(() => null, count: 0);
 
-          tQueue.add(() async {
-            tResults.add(1);
+          tQueue.add(
+            () async {
+              tResults.add(1);
 
-            Timer.run(() async {
-              tResults.add(2);
+              Timer.run(() async {
+                tResults.add(2);
+                await Future.microtask(() => null);
+                tShouldNotCall();
+                tResults.add(3);
+              });
+
+              tResults.add(4);
+            },
+            waitForTimers: true,
+          );
+
+          tQueue.add(
+            () async {
               await Future.microtask(() => null);
-              tShouldNotCall();
-              tResults.add(3);
-            });
-
-            tResults.add(4);
-          });
-
-          tQueue.add(() async {
-            await Future.microtask(() => null);
-            tResults.add(5);
-          });
+              tResults.add(5);
+            },
+            waitForTimers: true,
+          );
 
           // Allow one tick to let the microtasks run.
           await Future.microtask(() => null);
@@ -680,6 +807,46 @@ void main() {
     });
 
     test(
+        'should be able to create timers, and then cancel work with a synchronous tail run',
+        () async {
+      runZonedTimer(
+        () async {
+          final tQueue = SequentialWorkQueue();
+          final tResults = <int>[];
+          final tShouldNotCall = expectAsync0(() => null, count: 0);
+
+          tQueue.add(
+            () async {
+              tResults.add(1);
+
+              Timer(const Duration(milliseconds: 1), () async {
+                tResults.add(2);
+                await Future.microtask(() => null);
+                tShouldNotCall();
+                tResults.add(3);
+              });
+
+              tResults.add(4);
+            },
+            waitForTimers: true,
+          );
+
+          tQueue.add(
+            () async {
+              await Future.microtask(() => null);
+              tResults.add(5);
+            },
+            waitForTimers: true,
+          );
+
+          await tQueue.clear();
+
+          expect(tResults, [1, 4]);
+        },
+      );
+    });
+
+    test(
         'should be able to create timers in uncancelable work, and then attempt to cancel the work',
         () async {
       final tQueue = SequentialWorkQueue();
@@ -687,35 +854,42 @@ void main() {
       final tShouldCall = expectAsync0(() => null, count: 1);
       final tShouldNotCall = expectAsync0(() => null, count: 0);
 
-      final tFuture = tQueue.add(() async {
-        tResults.add(1);
+      final tFuture = tQueue.add(
+        () async {
+          tResults.add(1);
 
-        await Future.microtask(() => null);
-
-        Timer.run(() async {
-          tShouldCall();
-          tResults.add(2);
           await Future.microtask(() => null);
-          tResults.add(3);
-        });
 
-        await Future.microtask(() => null);
+          Timer.run(() async {
+            tShouldCall();
+            tResults.add(2);
+            await Future.microtask(() => null);
+            tResults.add(3);
+          });
 
-        tResults.add(4);
-      }, () {
-        return false;
-      });
-
-      tQueue.add(() async {
-        tResults.add(5);
-
-        Timer.run(() async {
-          tShouldNotCall();
-          tResults.add(6);
           await Future.microtask(() => null);
-          tResults.add(7);
-        });
-      });
+
+          tResults.add(4);
+        },
+        onCancel: () {
+          return false;
+        },
+        waitForTimers: true,
+      );
+
+      tQueue.add(
+        () async {
+          tResults.add(5);
+
+          Timer.run(() async {
+            tShouldNotCall();
+            tResults.add(6);
+            await Future.microtask(() => null);
+            tResults.add(7);
+          });
+        },
+        waitForTimers: true,
+      );
 
       // Allow one tick to let the microtasks run.
       await Future.microtask(() => null);
@@ -734,25 +908,28 @@ void main() {
       final tQueue = SequentialWorkQueue();
       final tResults = <int>[];
 
-      await tQueue.add(() async {
-        tResults.add(1);
+      await tQueue.add(
+        () async {
+          tResults.add(1);
 
-        await runZonedGuarded(
-          () async {
-            tResults.add(2);
-            Timer.run(() {
-              tResults.add(3);
-            });
-          },
-          (error, stackTrace) {
-            tResults.add(4);
-          },
-        );
+          await runZonedGuarded(
+            () async {
+              tResults.add(2);
+              Timer.run(() {
+                tResults.add(3);
+              });
+            },
+            (error, stackTrace) {
+              tResults.add(4);
+            },
+          );
 
-        tResults.add(5);
-      });
+          tResults.add(5);
+        },
+        waitForTimers: true,
+      );
 
-      expect(tResults, [1, 2, 5, 3]);
+      expect(tResults, [1, 2, 5]);
     });
 
     test('can use custom zones inside of work but not wait for async',
@@ -760,26 +937,26 @@ void main() {
       final tQueue = SequentialWorkQueue();
       final tResults = <int>[];
 
-      await tQueue.add(() async {
-        tResults.add(1);
+      await tQueue.add(
+        () async {
+          tResults.add(1);
 
-        await runZonedGuarded(
-          () async {
-            tResults.add(2);
-            Timer.run(() {
-              tResults.add(3);
-            });
-          },
-          (error, stackTrace) {
-            tResults.add(4);
-          },
-          zoneValues: {
-            #sequentialWorkQueueNoWaitForAsync: true,
-          },
-        );
+          await runZonedGuarded(
+            () async {
+              tResults.add(2);
+              Timer.run(() {
+                tResults.add(3);
+              });
+            },
+            (error, stackTrace) {
+              tResults.add(4);
+            },
+          );
 
-        tResults.add(5);
-      });
+          tResults.add(5);
+        },
+        waitForTimers: true,
+      );
 
       expect(tResults, [1, 2, 5]);
 
@@ -793,21 +970,25 @@ void main() {
         final tShouldCall = expectAsync0(() => null, count: 1);
         final tShouldNotCall = expectAsync0(() => null, count: 0);
 
-        tQueue.add(() async {
-          tResults.add(1);
+        tQueue.add(
+          () async {
+            tResults.add(1);
 
-          Timer.run(() async {
-            tShouldNotCall();
-            tResults.add(2);
-          });
+            Timer.run(() async {
+              tShouldNotCall();
+              tResults.add(2);
+            });
 
-          tResults.add(3);
-        }, () async {
-          tResults.add(4);
-          await Future.microtask(() => null);
-          tShouldCall();
-          return true;
-        });
+            tResults.add(3);
+          },
+          onCancel: () async {
+            tResults.add(4);
+            await Future.microtask(() => null);
+            tShouldCall();
+            return true;
+          },
+          waitForTimers: true,
+        );
 
         final tFuture = tQueue.clear();
         // Tick once to let the microtasks run.
@@ -825,21 +1006,25 @@ void main() {
         final tResults = <int>[];
         final tShouldCall = expectAsync0(() => null, count: 2);
 
-        tQueue.add(() async {
-          tResults.add(1);
+        tQueue.add(
+          () async {
+            tResults.add(1);
 
-          Timer.run(() async {
+            Timer.run(() async {
+              tShouldCall();
+              tResults.add(2);
+            });
+
+            tResults.add(3);
+          },
+          onCancel: () async {
+            tResults.add(4);
+            await Future.microtask(() => null);
             tShouldCall();
-            tResults.add(2);
-          });
-
-          tResults.add(3);
-        }, () async {
-          tResults.add(4);
-          await Future.microtask(() => null);
-          tShouldCall();
-          return false;
-        });
+            return false;
+          },
+          waitForTimers: true,
+        );
 
         final tFuture = tQueue.clear();
         // Tick once to let the microtasks run.
@@ -860,26 +1045,30 @@ void main() {
           final tQueue = SequentialWorkQueue();
           final tResults = <int>[];
 
-          tQueue.add(() async {
-            tResults.add(1);
+          tQueue.add(
+            () async {
+              tResults.add(1);
 
-            Timer.run(() async {
+              Timer.run(() async {
+                tShouldCall();
+                throw _TestException('RealError');
+                // ignore: dead_code
+                tResults.add(2);
+              });
+
+              tResults.add(3);
+            },
+            onCancel: () async {
               tShouldCall();
-              throw _TestException('RealError');
+              tResults.add(4);
+              await Future.microtask(() => null);
+              throw _TestException('CancelError');
               // ignore: dead_code
-              tResults.add(2);
-            });
-
-            tResults.add(3);
-          }, () async {
-            tShouldCall();
-            tResults.add(4);
-            await Future.microtask(() => null);
-            throw _TestException('CancelError');
-            // ignore: dead_code
-            tShouldNotCall();
-            return true;
-          });
+              tShouldNotCall();
+              return true;
+            },
+            waitForTimers: true,
+          );
 
           final tFuture = tQueue.clear();
           // Tick once to let the microtasks run.
@@ -898,6 +1087,39 @@ void main() {
         }
       });
     });
+
+    test('can cancel a timer and that should finish a clear operation',
+        () async {
+      final tQueue = SequentialWorkQueue();
+      final tResults = <int>[];
+      final tShouldNotCall = expectAsync0(() => null, count: 0);
+      late Timer tTimer;
+
+      final tAddFuture = tQueue.add(
+        () async {
+          tResults.add(1);
+
+          tTimer = Timer(const Duration(milliseconds: 500), () {
+            tShouldNotCall();
+            tResults.add(2);
+          });
+
+          tResults.add(3);
+        },
+        onCancel: () async {
+          return true;
+        },
+        waitForTimers: true,
+      );
+
+      tTimer.cancel();
+
+      await tAddFuture;
+      final tClearFuture = tQueue.clear();
+      await tClearFuture;
+
+      expect(tResults, [1, 3]);
+    });
   });
 
   group('periodic timers', () {
@@ -908,24 +1130,27 @@ void main() {
       int tCounter = 0;
 
       await runZonedTimer(() async {
-        await tQueue.add(() async {
-          tResults.add(1);
+        await tQueue.add(
+          () async {
+            tResults.add(1);
 
-          Timer.periodic(const Duration(milliseconds: 1), (timer) async {
-            tShouldCall();
-            await Future.microtask(() => null);
-            expect(timer.isActive, isTrue);
-            expect(timer.tick, isNonZero);
-            tResults.add(2);
+            Timer.periodic(const Duration(milliseconds: 1), (timer) async {
+              tShouldCall();
+              await Future.microtask(() => null);
+              expect(timer.isActive, isTrue);
+              expect(timer.tick, isNonZero);
+              tResults.add(2);
 
-            tCounter++;
-            if (tCounter == 3) {
-              timer.cancel();
-            }
-          });
+              tCounter++;
+              if (tCounter == 3) {
+                timer.cancel();
+              }
+            });
 
-          tResults.add(3);
-        });
+            tResults.add(3);
+          },
+          waitForPeriodicTimers: true,
+        );
 
         expect(tResults, [1, 3, 2, 2, 2]);
       });
@@ -942,23 +1167,26 @@ void main() {
       runZonedGuarded(() async {
         await runZonedTimer(() async {
           await expectLater(
-            tQueue.add(() async {
-              tResults.add(1);
+            tQueue.add(
+              () async {
+                tResults.add(1);
 
-              Timer.periodic(const Duration(milliseconds: 1), (timer) async {
-                tShouldCall();
-                tCounter++;
-                if (tCounter == 3) {
-                  timer.cancel();
-                }
-                tResults.add(2);
-                throw _TestException('SWQ Error');
-                // ignore: dead_code
-                tShouldNotCall();
-              });
+                Timer.periodic(const Duration(milliseconds: 1), (timer) async {
+                  tShouldCall();
+                  tCounter++;
+                  if (tCounter == 3) {
+                    timer.cancel();
+                  }
+                  tResults.add(2);
+                  throw _TestException('SWQ Error');
+                  // ignore: dead_code
+                  tShouldNotCall();
+                });
 
-              return 1;
-            }),
+                return 1;
+              },
+              waitForPeriodicTimers: true,
+            ),
             completion(1),
           );
 
@@ -983,21 +1211,24 @@ void main() {
           final tShouldNotCall = expectAsync0(() => null, count: 0);
           int tCounter = 0;
 
-          tQueue.add(() async {
-            tResults.add(1);
+          tQueue.add(
+            () async {
+              tResults.add(1);
 
-            Timer.periodic(const Duration(milliseconds: 1), (timer) async {
-              tShouldCall();
-              tCounter++;
-              if (tCounter == 3) {
-                tShouldNotCall();
-                timer.cancel();
-              }
-              tResults.add(2);
-            });
+              Timer.periodic(const Duration(milliseconds: 1), (timer) async {
+                tShouldCall();
+                tCounter++;
+                if (tCounter == 3) {
+                  tShouldNotCall();
+                  timer.cancel();
+                }
+                tResults.add(2);
+              });
 
-            tResults.add(3);
-          });
+              tResults.add(3);
+            },
+            waitForPeriodicTimers: true,
+          );
 
           tQueue.add(() async {
             await Future.microtask(() => null);
@@ -1024,33 +1255,40 @@ void main() {
       int tCounter = 0;
 
       runZonedTimer(() async {
-        final tFuture = tQueue.add(() async {
-          tResults.add(1);
+        final tFuture = tQueue.add(
+          () async {
+            tResults.add(1);
 
-          await Future.microtask(() => null);
+            await Future.microtask(() => null);
 
-          Timer.periodic(const Duration(milliseconds: 1), (timer) async {
-            tShouldCall();
-            tCounter++;
-            if (tCounter == 3) {
-              timer.cancel();
-            }
-            tResults.add(2);
-          });
+            Timer.periodic(const Duration(milliseconds: 1), (timer) async {
+              tShouldCall();
+              tCounter++;
+              if (tCounter == 3) {
+                timer.cancel();
+              }
+              tResults.add(2);
+            });
 
-          tResults.add(3);
-        }, () {
-          return false;
-        });
+            tResults.add(3);
+          },
+          onCancel: () {
+            return false;
+          },
+          waitForPeriodicTimers: true,
+        );
 
-        tQueue.add(() async {
-          tResults.add(4);
+        tQueue.add(
+          () async {
+            tResults.add(4);
 
-          Timer.periodic(const Duration(milliseconds: 1), (timer) async {
-            tShouldNotCall();
-            tResults.add(5);
-          });
-        });
+            Timer.periodic(const Duration(milliseconds: 1), (timer) async {
+              tShouldNotCall();
+              tResults.add(5);
+            });
+          },
+          waitForPeriodicTimers: true,
+        );
 
         // Allow one tick to let the microtasks run.
         await Future.microtask(() => null);
@@ -1076,33 +1314,40 @@ void main() {
       int tCounter = 0;
 
       runZonedTimer(() async {
-        final tFuture = tQueue.add(() async {
-          tResults.add(1);
+        final tFuture = tQueue.add(
+          () async {
+            tResults.add(1);
 
-          await Future.microtask(() => null);
+            await Future.microtask(() => null);
 
-          Timer.periodic(const Duration(milliseconds: 1), (timer) async {
-            tShouldCall();
-            tCounter++;
-            if (tCounter == 3) {
-              timer.cancel();
-            }
-            tResults.add(2);
-          });
+            Timer.periodic(const Duration(milliseconds: 1), (timer) async {
+              tShouldCall();
+              tCounter++;
+              if (tCounter == 3) {
+                timer.cancel();
+              }
+              tResults.add(2);
+            });
 
-          tResults.add(3);
-        }, () async {
-          return false;
-        });
+            tResults.add(3);
+          },
+          onCancel: () async {
+            return false;
+          },
+          waitForPeriodicTimers: true,
+        );
 
-        tQueue.add(() async {
-          tResults.add(4);
+        tQueue.add(
+          () async {
+            tResults.add(4);
 
-          Timer.periodic(const Duration(milliseconds: 1), (timer) async {
-            tShouldNotCall();
-            tResults.add(5);
-          });
-        });
+            Timer.periodic(const Duration(milliseconds: 1), (timer) async {
+              tShouldNotCall();
+              tResults.add(5);
+            });
+          },
+          waitForPeriodicTimers: true,
+        );
 
         // Allow one tick to let the microtasks run.
         await Future.microtask(() => null);
@@ -1128,33 +1373,40 @@ void main() {
       int tCounter = 0;
 
       await runZonedTimer(() async {
-        final tFuture = tQueue.add(() async {
-          tResults.add(1);
+        final tFuture = tQueue.add(
+          () async {
+            tResults.add(1);
 
-          await Future.microtask(() => null);
+            await Future.microtask(() => null);
 
-          Timer.periodic(const Duration(milliseconds: 1), (timer) async {
-            tShouldCall();
-            tCounter++;
-            if (tCounter == 3) {
-              timer.cancel();
-            }
-            tResults.add(2);
-          });
+            Timer.periodic(const Duration(milliseconds: 1), (timer) async {
+              tShouldCall();
+              tCounter++;
+              if (tCounter == 3) {
+                timer.cancel();
+              }
+              tResults.add(2);
+            });
 
-          tResults.add(3);
-        }, () async {
-          return true;
-        });
+            tResults.add(3);
+          },
+          onCancel: () async {
+            return true;
+          },
+          waitForPeriodicTimers: true,
+        );
 
-        tQueue.add(() async {
-          tResults.add(4);
+        tQueue.add(
+          () async {
+            tResults.add(4);
 
-          Timer.periodic(const Duration(milliseconds: 1), (timer) async {
-            tShouldNotCall();
-            tResults.add(5);
-          });
-        });
+            Timer.periodic(const Duration(milliseconds: 1), (timer) async {
+              tShouldNotCall();
+              tResults.add(5);
+            });
+          },
+          waitForPeriodicTimers: true,
+        );
 
         // Allow two ticks to let the microtasks run.
         await Future.microtask(() => null);
@@ -1180,28 +1432,32 @@ void main() {
           final tResults = <int>[];
           int tCounter = 0;
 
-          tQueue.add(() async {
-            tResults.add(1);
+          tQueue.add(
+            () async {
+              tResults.add(1);
 
-            Timer.periodic(const Duration(milliseconds: 1), (timer) async {
+              Timer.periodic(const Duration(milliseconds: 1), (timer) async {
+                tShouldCall();
+                tCounter++;
+                if (tCounter == 3) {
+                  timer.cancel();
+                }
+                tResults.add(2);
+              });
+
+              tResults.add(3);
+            },
+            onCancel: () async {
               tShouldCall();
-              tCounter++;
-              if (tCounter == 3) {
-                timer.cancel();
-              }
-              tResults.add(2);
-            });
-
-            tResults.add(3);
-          }, () async {
-            tShouldCall();
-            tResults.add(4);
-            await Future.microtask(() => null);
-            throw _TestException('CancelError');
-            // ignore: dead_code
-            tShouldNotCall();
-            return true;
-          });
+              tResults.add(4);
+              await Future.microtask(() => null);
+              throw _TestException('CancelError');
+              // ignore: dead_code
+              tShouldNotCall();
+              return true;
+            },
+            waitForPeriodicTimers: true,
+          );
 
           final tFuture = tQueue.clear();
           // Tick once to let the microtasks run.
@@ -1228,25 +1484,28 @@ void main() {
       int tCounter = 0;
 
       runZonedTimer(() async {
-        await tQueue.add(() async {
-          tResults.add(1);
+        await tQueue.add(
+          () async {
+            tResults.add(1);
 
-          runZoned(
-            () {
-              tResults.add(2);
-              Timer.periodic(const Duration(milliseconds: 1), (timer) async {
-                tShouldCall();
-                tCounter++;
-                if (tCounter == 3) {
-                  timer.cancel();
-                }
-                tResults.add(3);
-              });
-            },
-          );
+            runZoned(
+              () {
+                tResults.add(2);
+                Timer.periodic(const Duration(milliseconds: 1), (timer) async {
+                  tShouldCall();
+                  tCounter++;
+                  if (tCounter == 3) {
+                    timer.cancel();
+                  }
+                  tResults.add(3);
+                });
+              },
+            );
 
-          tResults.add(5);
-        });
+            tResults.add(5);
+          },
+          waitForPeriodicTimers: true,
+        );
 
         expect(tResults, [1, 2, 5, 3, 3, 3]);
       });
@@ -1260,28 +1519,28 @@ void main() {
       int tCounter = 0;
 
       runZonedTimer(() async {
-        await tQueue.add(() async {
-          tResults.add(1);
+        await tQueue.add(
+          () async {
+            tResults.add(1);
 
-          runZoned(
-            () {
-              tResults.add(2);
-              Timer.periodic(const Duration(milliseconds: 1), (timer) async {
-                tShouldCall();
-                tCounter++;
-                if (tCounter == 10) {
-                  timer.cancel();
-                }
-                tResults.add(3);
-              });
-            },
-            zoneValues: {
-              #sequentialWorkQueueNoWaitForAsync: true,
-            },
-          );
+            runZoned(
+              () {
+                tResults.add(2);
+                Timer.periodic(const Duration(milliseconds: 1), (timer) async {
+                  tShouldCall();
+                  tCounter++;
+                  if (tCounter == 10) {
+                    timer.cancel();
+                  }
+                  tResults.add(3);
+                });
+              },
+            );
 
-          tResults.add(5);
-        });
+            tResults.add(5);
+          },
+          waitForPeriodicTimers: true,
+        );
 
         expect(tResults, [1, 2, 5, 3, 3, 3]);
       });
