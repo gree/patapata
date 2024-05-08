@@ -98,7 +98,7 @@ class StandardCupertinoApp<T> extends StatefulWidget
 
   /// Creates a StandardCupertinoApp.
   const StandardCupertinoApp({
-    Key? key,
+    super.key,
     this.routeInformationProvider,
     this.backButtonDispatcher,
     this.routerConfig,
@@ -123,8 +123,7 @@ class StandardCupertinoApp<T> extends StatefulWidget
     bool Function(Route<dynamic> route, dynamic result)? willPopPage,
   })  : _pages = pages,
         _routableBuilder = routableBuilder,
-        _willPopPage = willPopPage,
-        super(key: key);
+        _willPopPage = willPopPage;
 
   @override
   State<StandardCupertinoApp> createState() => _StandardCupertinoAppState();

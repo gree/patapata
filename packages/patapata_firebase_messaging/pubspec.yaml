@@ -6,7 +6,7 @@ repository: https://github.com/gree/patapata/tree/main/packages/patapata_firebas
 
 environment:
   sdk: ">=3.0.0 <4.0.0"
-  flutter: ">=3.13.0"
+  flutter: ">=3.19.0"
 
 dependencies:
   flutter:
@@ -16,15 +16,15 @@ dependencies:
 
   patapata_firebase_core: ^1.0.2
 
-  firebase_messaging: ^14.6.6
+  firebase_messaging: ^14.8.1
   path_provider: ">=2.0.9 <3.0.0"
   crypto: ">=3.0.3 <4.0.0"
-  flutter_local_notifications: ^15.1.2
+  flutter_local_notifications: ^17.0.1
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_lints: ^2.0.2
+  flutter_lints: ^3.0.2
 
 flutter:
   plugin:

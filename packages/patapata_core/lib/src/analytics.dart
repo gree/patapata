@@ -486,14 +486,11 @@ class AnalyticsContextProvider extends SingleChildStatelessWidget {
   /// Provide an [analyticsContext] and pass the widget to be wrapped as [child].
   /// Optionally, use the [reset] flag to specify whether to reset the [analyticsContext].
   const AnalyticsContextProvider({
-    Key? key,
+    super.key,
     required this.analyticsContext,
-    required Widget child,
+    required super.child,
     this.reset = false,
-  }) : super(
-          key: key,
-          child: child,
-        );
+  });
 
   @override
   Widget buildWithChild(BuildContext context, Widget? child) {
@@ -519,13 +516,9 @@ class _AnalyticsContextProviderRenderWidget
   final AnalyticsContext analyticsContext;
 
   const _AnalyticsContextProviderRenderWidget({
-    Key? key,
     required this.analyticsContext,
-    required Widget child,
-  }) : super(
-          key: key,
-          child: child,
-        );
+    required super.child,
+  });
 
   @override
   _AnalyticsContextProviderRenderObject createRenderObject(
@@ -552,12 +545,9 @@ class _AnalyticsContextProviderRenderObject extends RenderProxyBox {
 /// @nodoc
 class AnalyticsPointerEventListener extends SingleChildRenderObjectWidget {
   const AnalyticsPointerEventListener({
-    Key? key,
-    required Widget child,
-  }) : super(
-          key: key,
-          child: child,
-        );
+    super.key,
+    required super.child,
+  });
 
   @override
   RenderObject createRenderObject(BuildContext context) =>
@@ -637,14 +627,13 @@ class AnalyticsEventWidget extends StatelessWidget {
   /// If you want to send a custom event, specify an AnalyticsEvent in [event]. If [event] is not set,
   /// send analytics data with the analytics event name specified in [name].
   const AnalyticsEventWidget({
-    Key? key,
+    super.key,
     this.name,
     this.data,
     this.event,
     this.child,
   })  : assert(event == null || name == null),
-        assert(data == null || event == null),
-        super(key: key);
+        assert(data == null || event == null);
 
   @override
   Widget build(BuildContext context) {
@@ -696,17 +685,13 @@ class AnalyticsSingletonEventWidget extends SingleChildStatefulWidget {
 
   /// Creates a AnalyticsSingletonEventWidget.
   const AnalyticsSingletonEventWidget({
-    Key? key,
+    super.key,
     this.name,
     this.data,
     this.event,
-    Widget? child,
+    super.child,
   })  : assert(event == null || name == null),
-        assert(data == null || event == null),
-        super(
-          key: key,
-          child: child,
-        );
+        assert(data == null || event == null);
 
   @override
   // ignore: library_private_types_in_public_api
@@ -820,8 +805,8 @@ class AnalyticsImpressionWidget extends SingleChildStatefulWidget {
 
   /// Creates a AnalyticsImpressionWidget.
   const AnalyticsImpressionWidget({
-    Key? key,
-    required Widget child,
+    super.key,
+    required super.child,
     this.name,
     this.data,
     this.event,
@@ -837,11 +822,7 @@ class AnalyticsImpressionWidget extends SingleChildStatefulWidget {
             (event == null && name != null) || (name == null && event != null)),
         assert(data == null || event == null),
         assert(visibleThreshold != null || thresholdCallback != null),
-        assert(!(event != null && batchGenerator != null)),
-        super(
-          key: key,
-          child: child,
-        );
+        assert(!(event != null && batchGenerator != null));
 
   @override
   // ignore: library_private_types_in_public_api

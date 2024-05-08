@@ -563,7 +563,7 @@ void main() {
 
   testWidgets('networkInformation can be accessed and watched', (tester) async {
     final tShouldCall = expectAsync0(() => null, count: 2);
-    NetworkConnectivity tConnectivity = NetworkConnectivity.none;
+    List<NetworkConnectivity> tConnectivity = [NetworkConnectivity.none];
 
     await doRefTest(
       tester,
@@ -571,10 +571,10 @@ void main() {
         tShouldCall();
         final tRef = ref.watch(networkInformationProvider);
 
-        expect(tRef.connectivity, equals(tConnectivity));
+        expect(tRef.connectivities, equals(tConnectivity));
       },
       testCallback: (tester, app) async {
-        tConnectivity = NetworkConnectivity.wifi;
+        tConnectivity = [NetworkConnectivity.wifi];
         await app.network.testChangeConnectivity(tConnectivity);
         await tester.pumpAndSettle();
       },

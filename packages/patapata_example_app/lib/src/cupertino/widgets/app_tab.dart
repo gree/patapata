@@ -13,10 +13,10 @@ import '../pages/my_page.dart';
 /// Sample StandardApp for Cupertino with a widget displayed in a tab.
 class CupertinoAppBar extends StatelessWidget {
   const CupertinoAppBar({
-    Key? key,
+    super.key,
     required this.body,
     this.appBar,
-  }) : super(key: key);
+  });
 
   final Widget body;
   final Widget? appBar;

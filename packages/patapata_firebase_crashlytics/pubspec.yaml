@@ -6,7 +6,7 @@ repository: https://github.com/gree/patapata/tree/main/packages/patapata_firebas
 
 environment:
   sdk: ">=3.0.0 <4.0.0"
-  flutter: ">=3.13.0"
+  flutter: ">=3.19.0"
 
 dependencies:
   flutter:
@@ -16,12 +16,12 @@ dependencies:
 
   patapata_firebase_core: ^1.0.2
 
-  firebase_crashlytics: ^3.3.5
+  firebase_crashlytics: ^3.5.1
   stack_trace: ^1.11.0
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_lints: ^2.0.2
+  flutter_lints: ^3.0.2
 
 flutter:

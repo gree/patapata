@@ -5,6 +5,7 @@
 
 import 'dart:async';
 
+import 'package:collection/collection.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
@@ -50,32 +51,36 @@ enum NetworkConnectivity {
 /// This class, within [NetworkPlugin]
 /// obtains the network status using [Connectivity].
 class NetworkInformation {
-  final NetworkConnectivity connectivity;
+  final List<NetworkConnectivity> connectivities;
 
   const NetworkInformation({
-    required this.connectivity,
+    required this.connectivities,
   });
 
   factory NetworkInformation.unknown() => const NetworkInformation(
-        connectivity: NetworkConnectivity.unknown,
+        connectivities: [NetworkConnectivity.unknown],
       );
 
   @override
-  String toString() => 'NetworkInformation:connectivity=${connectivity.name}';
+  String toString() => 'NetworkInformation:connectivity=[${[
+        for (final tConnectivity in connectivities) tConnectivity.name
+      ]}]';
 
   NetworkInformation copyWith({
-    NetworkConnectivity? connectivity,
+    List<NetworkConnectivity>? connectivities,
   }) =>
       NetworkInformation(
-        connectivity: connectivity ?? this.connectivity,
+        connectivities: connectivities ?? this.connectivities,
       );
 
   @override
   operator ==(Object other) =>
-      other is NetworkInformation && connectivity == other.connectivity;
+      other is NetworkInformation &&
+      const IterableEquality().equals(connectivities, other.connectivities);
 
   @override
-  int get hashCode => Object.hash('NetworkInformation', connectivity);
+  int get hashCode =>
+      Object.hashAllUnordered(['NetworkInformation', ...connectivities]);
 }
 
 /// Plugin for retrieving the network status of [App].
@@ -85,7 +90,7 @@ class NetworkPlugin extends Plugin with WidgetsBindingObserver {
   final Connectivity _connectivity = Connectivity();
 
   NetworkInformation _currentNetworkInformation = const NetworkInformation(
-    connectivity: NetworkConnectivity.unknown,
+    connectivities: [NetworkConnectivity.unknown],
   );
 
   /// Return the current network status of [App].
@@ -106,7 +111,8 @@ class NetworkPlugin extends Plugin with WidgetsBindingObserver {
   /// ```
   Stream<NetworkInformation> get informationStream => _streamController.stream;
 
-  StreamSubscription<ConnectivityResult>? _onConnectivityChangedSubscription;
+  StreamSubscription<List<ConnectivityResult>>?
+      _onConnectivityChangedSubscription;
 
   @override
   FutureOr<bool> init(App app) async {
@@ -146,23 +152,29 @@ class NetworkPlugin extends Plugin with WidgetsBindingObserver {
     );
   }
 
-  void _onConnectivityChanged(ConnectivityResult event) {
-    NetworkConnectivity tConnectivity = switch (event) {
-      ConnectivityResult.none => NetworkConnectivity.none,
-      ConnectivityResult.other => NetworkConnectivity.other,
-      ConnectivityResult.mobile => NetworkConnectivity.mobile,
-      ConnectivityResult.wifi => NetworkConnectivity.wifi,
-      ConnectivityResult.ethernet => NetworkConnectivity.ethernet,
-      ConnectivityResult.bluetooth => NetworkConnectivity.bluetooth,
-      ConnectivityResult.vpn => NetworkConnectivity.vpn,
-    };
+  void _onConnectivityChanged(List<ConnectivityResult> events) {
+    List<NetworkConnectivity> tConnectivity = [
+      for (final tEvent in events)
+        switch (tEvent) {
+          ConnectivityResult.none => NetworkConnectivity.none,
+          ConnectivityResult.other => NetworkConnectivity.other,
+          ConnectivityResult.mobile => NetworkConnectivity.mobile,
+          ConnectivityResult.wifi => NetworkConnectivity.wifi,
+          ConnectivityResult.ethernet => NetworkConnectivity.ethernet,
+          ConnectivityResult.bluetooth => NetworkConnectivity.bluetooth,
+          ConnectivityResult.vpn => NetworkConnectivity.vpn,
+        }
+    ];
 
-    if (_currentNetworkInformation.connectivity == tConnectivity) {
+    if (const IterableEquality().equals(
+      _currentNetworkInformation.connectivities,
+      tConnectivity,
+    )) {
       return;
     }
 
     _currentNetworkInformation = _currentNetworkInformation.copyWith(
-      connectivity: tConnectivity,
+      connectivities: tConnectivity,
     );
 
     _streamController.add(_currentNetworkInformation);
@@ -178,7 +190,10 @@ class NetworkPlugin extends Plugin with WidgetsBindingObserver {
         methodCallLogs.add(methodCall);
         switch (methodCall.method) {
           case 'check':
-            return testOnConnectivityChangedValue.name;
+            return [
+              for (final tConnectivity in testOnConnectivityChangedValue)
+                tConnectivity.name,
+            ];
           default:
             break;
         }
@@ -187,14 +202,14 @@ class NetworkPlugin extends Plugin with WidgetsBindingObserver {
     );
   }
 
-  StreamController<NetworkConnectivity>? _mockStreamController;
+  StreamController<List<NetworkConnectivity>>? _mockStreamController;
   Completer<void>? _testChangeConnectivityCompleter;
 
   @override
   @visibleForTesting
   void setMockStreamHandler() {
-    _mockStreamController = StreamController<NetworkConnectivity>();
-    StreamSubscription<NetworkConnectivity>? tMockStreamSubscription;
+    _mockStreamController = StreamController<List<NetworkConnectivity>>();
+    StreamSubscription<List<NetworkConnectivity>>? tMockStreamSubscription;
 
     // ignore: invalid_use_of_visible_for_testing_member
     testSetMockStreamHandler(
@@ -202,7 +217,9 @@ class NetworkPlugin extends Plugin with WidgetsBindingObserver {
       TestMockStreamHandler.inline(
         onListen: (data, sink) {
           tMockStreamSubscription = _mockStreamController!.stream.listen((v) {
-            sink.success(v.name);
+            sink.success(
+              [for (final tConnectivity in v) tConnectivity.name],
+            );
             _testChangeConnectivityCompleter?.complete();
             _testChangeConnectivityCompleter = null;
           });
@@ -217,7 +234,7 @@ class NetworkPlugin extends Plugin with WidgetsBindingObserver {
   }
 
   @visibleForTesting
-  Future<void> testChangeConnectivity(NetworkConnectivity result) {
+  Future<void> testChangeConnectivity(List<NetworkConnectivity> result) {
     final tCompleter = _testChangeConnectivityCompleter = Completer<void>();
     testOnConnectivityChangedValue = result;
     _mockStreamController?.add(result);
@@ -227,4 +244,6 @@ class NetworkPlugin extends Plugin with WidgetsBindingObserver {
 }
 
 @visibleForTesting
-NetworkConnectivity testOnConnectivityChangedValue = NetworkConnectivity.none;
+List<NetworkConnectivity> testOnConnectivityChangedValue = [
+  NetworkConnectivity.none
+];

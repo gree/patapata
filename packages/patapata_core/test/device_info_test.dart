@@ -38,8 +38,6 @@ void main() {
       await deviceInfoPlugin.init(app);
 
       expect(deviceInfoPlugin.androidDeviceInfo, isNotNull);
-      expect(deviceInfoPlugin.androidDeviceInfo!.data,
-          DeviceInfoPlugin.mockAndroidDeviceInfoMap);
       expect(deviceInfoPlugin.androidDeviceInfo!.id, 'id');
       expect(deviceInfoPlugin.androidDeviceInfo!.host, 'host');
       expect(deviceInfoPlugin.androidDeviceInfo!.tags, 'tags');
@@ -51,14 +49,18 @@ void main() {
       expect(deviceInfoPlugin.androidDeviceInfo!.product, 'product');
       expect(deviceInfoPlugin.androidDeviceInfo!.display, 'display');
       expect(deviceInfoPlugin.androidDeviceInfo!.hardware, 'hardware');
-      expect(deviceInfoPlugin.androidDeviceInfo!.isPhysicalDevice, isTrue);
       expect(deviceInfoPlugin.androidDeviceInfo!.bootloader, 'bootloader');
+      expect(deviceInfoPlugin.androidDeviceInfo!.isPhysicalDevice, isTrue);
       expect(deviceInfoPlugin.androidDeviceInfo!.fingerprint, 'fingerprint');
       expect(deviceInfoPlugin.androidDeviceInfo!.manufacturer, 'manufacturer');
       expect(deviceInfoPlugin.androidDeviceInfo!.supportedAbis,
           ['arm64-v8a', 'x86', 'x86_64']);
       expect(deviceInfoPlugin.androidDeviceInfo!.systemFeatures,
           ['FEATURE_AUDIO_PRO', 'FEATURE_AUDIO_OUTPUT']);
+      expect(deviceInfoPlugin.androidDeviceInfo!.supported32BitAbis,
+          ['x86 (IA-32)', 'MMX']);
+      expect(deviceInfoPlugin.androidDeviceInfo!.supported64BitAbis,
+          ['x86-64', 'MMX', 'SSSE3']);
       expect(deviceInfoPlugin.androidDeviceInfo!.version.sdkInt, 16);
       expect(deviceInfoPlugin.androidDeviceInfo!.version.baseOS, 'baseOS');
       expect(deviceInfoPlugin.androidDeviceInfo!.version.previewSdkInt, 30);
@@ -68,15 +70,8 @@ void main() {
           'incremental');
       expect(deviceInfoPlugin.androidDeviceInfo!.version.securityPatch,
           'securityPatch');
-      expect(deviceInfoPlugin.androidDeviceInfo!.supported32BitAbis,
-          ['x86 (IA-32)', 'MMX']);
-      expect(deviceInfoPlugin.androidDeviceInfo!.supported64BitAbis,
-          ['x86-64', 'MMX', 'SSSE3']);
-      expect(deviceInfoPlugin.androidDeviceInfo!.displayMetrics.widthPx, 1080);
-      expect(deviceInfoPlugin.androidDeviceInfo!.displayMetrics.heightPx, 2220);
-      expect(deviceInfoPlugin.androidDeviceInfo!.displayMetrics.xDpi, 530.0859);
-      expect(deviceInfoPlugin.androidDeviceInfo!.displayMetrics.yDpi, 529.4639);
-      expect(deviceInfoPlugin.androidDeviceInfo!.serialNumber, 'serialNumber');
+      expect(deviceInfoPlugin.androidDeviceInfo!.serialNumber, 'SERIAL');
+      expect(deviceInfoPlugin.androidDeviceInfo!.isLowRamDevice, isFalse);
     });
 
     test('setMockAndroidDeviceInfo with arguments', () async {
@@ -92,12 +87,14 @@ void main() {
         product: '',
         display: '',
         hardware: '',
-        isPhysicalDevice: false,
         bootloader: '',
+        isPhysicalDevice: false,
         fingerprint: '',
         manufacturer: '',
         supportedAbis: <String>[''],
         systemFeatures: [''],
+        supported64BitAbis: [''],
+        supported32BitAbis: [''],
         version: <String, dynamic>{
           'sdkInt': 0,
           'baseOS': '',
@@ -107,16 +104,10 @@ void main() {
           'incremental': '',
           'securityPatch': '',
         },
-        supported64BitAbis: [''],
-        supported32BitAbis: [''],
-        displayMetrics: <String, dynamic>{
-          'widthPx': 0.0,
-          'heightPx': 0.0,
-          'xDpi': 0.0,
-          'yDpi': 0.0,
-        },
         serialNumber: '',
+        isLowRamDevice: false,
       );
+
       await deviceInfoPlugin.init(app);
 
       expect(deviceInfoPlugin.androidDeviceInfo != null, isTrue);
@@ -139,6 +130,8 @@ void main() {
       expect(deviceInfoPlugin.androidDeviceInfo!.manufacturer, '');
       expect(deviceInfoPlugin.androidDeviceInfo!.supportedAbis, ['']);
       expect(deviceInfoPlugin.androidDeviceInfo!.systemFeatures, ['']);
+      expect(deviceInfoPlugin.androidDeviceInfo!.supported32BitAbis, ['']);
+      expect(deviceInfoPlugin.androidDeviceInfo!.supported64BitAbis, ['']);
       expect(deviceInfoPlugin.androidDeviceInfo!.version.sdkInt, 0);
       expect(deviceInfoPlugin.androidDeviceInfo!.version.baseOS, '');
       expect(deviceInfoPlugin.androidDeviceInfo!.version.previewSdkInt, 0);
@@ -146,13 +139,8 @@ void main() {
       expect(deviceInfoPlugin.androidDeviceInfo!.version.codename, '');
       expect(deviceInfoPlugin.androidDeviceInfo!.version.incremental, '');
       expect(deviceInfoPlugin.androidDeviceInfo!.version.securityPatch, '');
-      expect(deviceInfoPlugin.androidDeviceInfo!.supported32BitAbis, ['']);
-      expect(deviceInfoPlugin.androidDeviceInfo!.supported64BitAbis, ['']);
-      expect(deviceInfoPlugin.androidDeviceInfo!.displayMetrics.widthPx, 0);
-      expect(deviceInfoPlugin.androidDeviceInfo!.displayMetrics.heightPx, 0);
-      expect(deviceInfoPlugin.androidDeviceInfo!.displayMetrics.xDpi, 0);
-      expect(deviceInfoPlugin.androidDeviceInfo!.displayMetrics.yDpi, 0);
       expect(deviceInfoPlugin.androidDeviceInfo!.serialNumber, '');
+      expect(deviceInfoPlugin.androidDeviceInfo!.isLowRamDevice, isFalse);
     });
   });
 

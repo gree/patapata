@@ -626,9 +626,9 @@ class ChangeListenableNumber extends BaseListenable {
 
 class TestAnalyticsEvent extends AnalyticsEvent {
   TestAnalyticsEvent({
-    required String name,
-    Map<String, Object?>? data,
-  }) : super(name: name, data: data);
+    required super.name,
+    super.data,
+  });
 }
 
 class TestDataPlugin extends Plugin with StandardAppRoutePluginMixin {

@@ -36,7 +36,7 @@ const _testDeviceSizes = [
 late Uint8List _svgBytes;
 
 class _TestRow extends StatelessWidget {
-  const _TestRow({Key? key}) : super(key: key);
+  const _TestRow();
 
   @override
   Widget build(BuildContext context) {
@@ -78,7 +78,7 @@ class _TestRow extends StatelessWidget {
 }
 
 class _TestApp extends StatelessWidget {
-  const _TestApp({Key? key}) : super(key: key);
+  const _TestApp();
 
   @override
   Widget build(BuildContext context) {
@@ -98,11 +98,10 @@ class _TestApp extends StatelessWidget {
 
 class _TestScreenLayout extends StatelessWidget {
   const _TestScreenLayout({
-    Key? key,
     this.name,
     this.breakpoints,
     this.disableScreenLayout = false,
-  }) : super(key: key);
+  });
 
   final String? name;
   final ScreenLayoutBreakpoints? breakpoints;
@@ -138,10 +137,9 @@ class _AngleChangeNotifier extends ChangeNotifier {
 
 class _TestTransformScreenLayout extends StatelessWidget {
   const _TestTransformScreenLayout({
-    Key? key,
     this.disableScreenLayout = false,
     required this.initialRotate,
-  }) : super(key: key);
+  });
 
   final bool disableScreenLayout;
   final double initialRotate;
