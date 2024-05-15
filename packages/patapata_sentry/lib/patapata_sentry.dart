@@ -184,7 +184,7 @@ class SentryPlugin extends Plugin {
     final tMechanism = Mechanism(type: record.mechanism, handled: true);
     final tError = record.error;
 
-    tExtra['patapataReportRecord'] = record;
+    tExtra['patapataReportRecord'] = record.toString();
 
     if (record.mechanism == Log.kNativeMechanism && tError is NativeThrowable) {
       tException = SentryException(
