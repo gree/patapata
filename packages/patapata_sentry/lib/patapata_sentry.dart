@@ -91,6 +91,10 @@ class SentryPlugin extends Plugin {
       return null;
     }
 
+    if (event.level == null) {
+      return event;
+    }
+
     // Align the Sentry logging level to the app logging level.
     if (_sentryLevelToLoggingLevel(event.level!) < app.log.level) {
       return null;
@@ -103,6 +107,10 @@ class SentryPlugin extends Plugin {
     if (breadcrumb == null || disposed) {
       // Don't send if we are disabled.
       return null;
+    }
+
+    if (breadcrumb.level == null) {
+      return breadcrumb;
     }
 
     // Align the Sentry logging level to the app logging level.
