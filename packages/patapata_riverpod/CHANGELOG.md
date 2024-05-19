@@ -1,3 +1,7 @@
+## 1.1.0
+
+ - **FEAT**: Adapt to the Privacy Manifest.
+
 ## 1.0.2
 
  - Update a dependency to the latest release.

@@ -1,3 +1,9 @@
+## 1.1.0
+
+ - **FIX**: patapata_sentry Invalid argument Instance of ReportRecord.
+ - **FIX**: patapata_sentry null exception.
+ - **FEAT**: Adapt to the Privacy Manifest.
+
 ## 1.0.2
 
  - Update a dependency to the latest release.

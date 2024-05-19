@@ -13,9 +13,9 @@ dependencies:
   flutter:
     sdk: flutter
 
-  patapata_core: ^1.0.2
+  patapata_core: ^1.1.0
 
-  patapata_firebase_core: ^1.0.2
+  patapata_firebase_core: ^1.1.0
 
   firebase_dynamic_links: ^5.5.1
 

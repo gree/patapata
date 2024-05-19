@@ -3,6 +3,76 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 2024-05-20
+
+### Changes
+
+---
+
+Packages with breaking changes:
+
+ - There are no breaking changes in this release.
+
+Packages with other changes:
+
+ - [`patapata_apple_push_notifications` - `v1.1.0`](#patapata_apple_push_notifications---v110)
+ - [`patapata_core` - `v1.1.0`](#patapata_core---v110)
+ - [`patapata_firebase_analytics` - `v1.1.0`](#patapata_firebase_analytics---v110)
+ - [`patapata_firebase_auth` - `v1.1.0`](#patapata_firebase_auth---v110)
+ - [`patapata_firebase_core` - `v1.1.0`](#patapata_firebase_core---v110)
+ - [`patapata_firebase_crashlytics` - `v1.1.0`](#patapata_firebase_crashlytics---v110)
+ - [`patapata_firebase_messaging` - `v1.1.0`](#patapata_firebase_messaging---v110)
+ - [`patapata_firebase_remote_config` - `v1.1.0`](#patapata_firebase_remote_config---v110)
+ - [`patapata_riverpod` - `v1.1.0`](#patapata_riverpod---v110)
+ - [`patapata_sentry` - `v1.1.0`](#patapata_sentry---v110)
+
+---
+
+#### `patapata_apple_push_notifications` - `v1.1.0`
+
+ - **FEAT**: Adapt to the Privacy Manifest.
+
+#### `patapata_core` - `v1.1.0`
+
+ - **FEAT**: support flutter 3.22.0 by updating intl dependency constraints.
+ - **FEAT**: Adapt to the Privacy Manifest.
+ - **FEAT**: allow to choose whether to wait for microtasks, timers, and periodic timers in a SequentialWorkQueue, as well as ProviderModel's lock function.
+
+#### `patapata_firebase_analytics` - `v1.1.0`
+
+ - **FEAT**: Adapt to the Privacy Manifest.
+
+#### `patapata_firebase_auth` - `v1.1.0`
+
+ - **FEAT**: Adapt to the Privacy Manifest.
+
+#### `patapata_firebase_core` - `v1.1.0`
+
+ - **FEAT**: Adapt to the Privacy Manifest.
+
+#### `patapata_firebase_crashlytics` - `v1.1.0`
+
+ - **FEAT**: Adapt to the Privacy Manifest.
+
+#### `patapata_firebase_messaging` - `v1.1.0`
+
+ - **FEAT**: Adapt to the Privacy Manifest.
+
+#### `patapata_firebase_remote_config` - `v1.1.0`
+
+ - **FEAT**: Adapt to the Privacy Manifest.
+
+#### `patapata_riverpod` - `v1.1.0`
+
+ - **FEAT**: Adapt to the Privacy Manifest.
+
+#### `patapata_sentry` - `v1.1.0`
+
+ - **FIX**: patapata_sentry Invalid argument Instance of ReportRecord.
+ - **FIX**: patapata_sentry null exception.
+ - **FEAT**: Adapt to the Privacy Manifest.
+
+
 ## 2024-03-29
 
 ### Changes
