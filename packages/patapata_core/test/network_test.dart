@@ -119,8 +119,7 @@ void main() {
       );
 
       for (var i in tValues) {
-        testOnConnectivityChangedValue = i;
-        await tNetwork.didChangeAppLifecycleState(AppLifecycleState.resumed);
+        await tNetwork.testChangeConnectivity(i);
       }
 
       await tFuture;
