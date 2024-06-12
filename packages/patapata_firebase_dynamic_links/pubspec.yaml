@@ -15,7 +15,7 @@ dependencies:
 
   patapata_core: ^1.1.0
 
-  patapata_firebase_core: ^1.1.0
+  patapata_firebase_core: ^1.1.1
 
   firebase_dynamic_links: ^5.5.1
 

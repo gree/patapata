@@ -1,3 +1,7 @@
+## 1.1.1
+
+ - **FIX**: when running dart doc, some documentation is not generated.
+
 ## 1.1.0
 
  - **FEAT**: Adapt to the Privacy Manifest.

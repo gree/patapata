@@ -3,6 +3,57 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 2024-06-12
+
+### Changes
+
+---
+
+Packages with breaking changes:
+
+ - There are no breaking changes in this release.
+
+Packages with other changes:
+
+ - [`patapata_apple_push_notifications` - `v1.1.1`](#patapata_apple_push_notifications---v111)
+ - [`patapata_firebase_analytics` - `v1.1.1`](#patapata_firebase_analytics---v111)
+ - [`patapata_firebase_core` - `v1.1.1`](#patapata_firebase_core---v111)
+ - [`patapata_firebase_crashlytics` - `v1.1.1`](#patapata_firebase_crashlytics---v111)
+ - [`patapata_firebase_messaging` - `v1.1.1`](#patapata_firebase_messaging---v111)
+ - [`patapata_firebase_remote_config` - `v1.1.1`](#patapata_firebase_remote_config---v111)
+ - [`patapata_sentry` - `v1.1.1`](#patapata_sentry---v111)
+
+---
+
+#### `patapata_apple_push_notifications` - `v1.1.1`
+
+ - **FIX**: when running dart doc, some documentation is not generated.
+
+#### `patapata_firebase_analytics` - `v1.1.1`
+
+ - **FIX**: when running dart doc, some documentation is not generated.
+
+#### `patapata_firebase_core` - `v1.1.1`
+
+ - **FIX**: when running dart doc, some documentation is not generated.
+
+#### `patapata_firebase_crashlytics` - `v1.1.1`
+
+ - **FIX**: when running dart doc, some documentation is not generated.
+
+#### `patapata_firebase_messaging` - `v1.1.1`
+
+ - **FIX**: when running dart doc, some documentation is not generated.
+
+#### `patapata_firebase_remote_config` - `v1.1.1`
+
+ - **FIX**: when running dart doc, some documentation is not generated.
+
+#### `patapata_sentry` - `v1.1.1`
+
+ - **FIX**: when running dart doc, some documentation is not generated.
+
+
 ## 2024-05-20
 
 ### Changes
