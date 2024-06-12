@@ -7,3 +7,5 @@ linter:
 analyzer:
   exclude:
     - example/**
+  errors:
+    deprecated_member_use: ignore
