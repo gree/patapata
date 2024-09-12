@@ -33,8 +33,7 @@ mixin ErrorEnvironment {
 
 /// Defines exceptions that occur in applications using patapata.
 abstract class PatapataException {
-  final App? __app;
-  App? get _app => __app ?? (Zone.current[#patapataApp] as App?);
+  final App? _app;
 
   /// Error message.
   /// This message is for logging and debugging purposes and is not meant to be displayed to the user.
@@ -106,7 +105,7 @@ abstract class PatapataException {
   /// ```
   final Map<String, String>? localeFixData;
 
-  const PatapataException({
+  PatapataException({
     App? app,
     this.message,
     this.original,
@@ -117,7 +116,7 @@ abstract class PatapataException {
     this.fix,
     this.logLevel,
     Level? userLogLevel,
-  })  : __app = app,
+  })  : _app = app ?? (Zone.current[#patapataApp] as App?),
         _userLogLevel = userLogLevel;
 
   /// Prefix for [code]
@@ -234,6 +233,9 @@ abstract class PatapataException {
       _environment?.errorDefaultWidget?.call(this) ?? Text(localizedMessage);
 
   /// Notification [Level] to the [Log] system.
+  ///
+  /// This is the [Level] notified to the [Log] system for unknown errors.
+  /// If specified by the [Logger], it takes precedence.
   final Level? logLevel;
 
   /// Importance from the user's perspective.

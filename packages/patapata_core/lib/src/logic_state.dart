@@ -123,7 +123,7 @@ class LogicStateMachine with ChangeNotifier {
 
 /// Thrown when LogicStateTransition is not found.
 class LogicStateTransitionNotFound extends PatapataCoreException {
-  const LogicStateTransitionNotFound()
+  LogicStateTransitionNotFound()
       : super(code: PatapataCoreExceptionCode.PPE101);
 }
 
@@ -132,7 +132,7 @@ class LogicStateTransitionNotAllowed extends PatapataCoreException {
   final LogicState current;
   final LogicState next;
 
-  const LogicStateTransitionNotAllowed(
+  LogicStateTransitionNotAllowed(
     this.current,
     this.next,
   ) : super(code: PatapataCoreExceptionCode.PPE102);
@@ -146,7 +146,7 @@ class LogicStateTransitionNotAllowed extends PatapataCoreException {
 class LogicStateAllTransitionsNotAllowed extends PatapataCoreException {
   final LogicState current;
 
-  const LogicStateAllTransitionsNotAllowed(
+  LogicStateAllTransitionsNotAllowed(
     this.current,
   ) : super(code: PatapataCoreExceptionCode.PPE103);
 
@@ -159,7 +159,7 @@ class LogicStateAllTransitionsNotAllowed extends PatapataCoreException {
 class LogicStateNotCurrent extends PatapataCoreException {
   final LogicState current;
 
-  const LogicStateNotCurrent(
+  LogicStateNotCurrent(
     this.current,
   ) : super(code: PatapataCoreExceptionCode.PPE104);
 
@@ -207,7 +207,7 @@ abstract class LogicState {
     for (var tTransition in tTransitions) {
       final tNextFactoryCandidate = _machine._factories.firstWhere(
         (v) => v.type == tTransition.nextType,
-        orElse: () => throw const LogicStateTransitionNotFound(),
+        orElse: () => throw LogicStateTransitionNotFound(),
       );
       final tNextStateCandidate = tNextFactoryCandidate.create();
 
@@ -263,14 +263,14 @@ abstract class LogicState {
         .lastIndexWhere((v) => v.stateType == stateType && v.backAllowed);
 
     if (tHistoryIndex < 0) {
-      _complete(const LogicStateTransitionNotFound());
+      _complete(LogicStateTransitionNotFound());
     } else {
       final tNextFactory =
           _machine._factories.firstWhereOrNull((v) => v.type == stateType);
 
       if (tNextFactory == null) {
         // This process will not be executed if the value of _machine._stateHistories is normal.
-        _complete(const LogicStateTransitionNotFound()); // coverage:ignore-line
+        _complete(LogicStateTransitionNotFound()); // coverage:ignore-line
       } else {
         final tNextState = tNextFactory.create();
 
@@ -303,13 +303,13 @@ abstract class LogicState {
         .firstWhereOrNull((v) => v.nextType == stateType);
 
     if (tTransition == null) {
-      _complete(const LogicStateTransitionNotFound());
+      _complete(LogicStateTransitionNotFound());
     } else {
       final tNextFactory =
           _machine._factories.firstWhereOrNull((v) => v.type == stateType);
 
       if (tNextFactory == null) {
-        _complete(const LogicStateTransitionNotFound());
+        _complete(LogicStateTransitionNotFound());
       } else {
         final tNextState = tNextFactory.create();
 

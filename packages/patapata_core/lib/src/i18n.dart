@@ -403,7 +403,7 @@ AssetBundle? mockL10nAssetBundle;
 
 /// Thrown if the loading of an asset in [L10n] fails.
 class L10nLoadAssetsException extends PatapataCoreException {
-  const L10nLoadAssetsException({
+  L10nLoadAssetsException({
     super.original,
   }) : super(code: PatapataCoreExceptionCode.PPE401);
 }

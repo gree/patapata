@@ -47,7 +47,7 @@ class FetchFailsRemoteConfig extends MockRemoteConfig {
 }
 
 class _TestException extends PatapataException {
-  const _TestException(this._level);
+  _TestException(this._level);
 
   final Level? _level;
 
@@ -309,7 +309,7 @@ void main() {
       Object? tException;
       try {
         await tApp.runProcess(() async {
-          throw const _TestException(Level.SHOUT);
+          throw _TestException(Level.SHOUT);
         });
       } catch (e) {
         tException = e;
@@ -320,7 +320,7 @@ void main() {
       tException = null;
       try {
         await tApp.runProcess(() async {
-          throw const _TestException(Level.INFO);
+          throw _TestException(Level.INFO);
         });
       } catch (e) {
         tException = e;
@@ -332,7 +332,7 @@ void main() {
       tException = null;
       try {
         await tApp.runProcess(() async {
-          throw const _TestException(null);
+          throw _TestException(null);
         });
       } catch (e) {
         tException = e;
@@ -657,7 +657,7 @@ void main() {
       final tPluginA = Plugin.inline(
         name: 'testPluginA',
         init: (app) async {
-          throw const _TestException(Level.SEVERE);
+          throw _TestException(Level.SEVERE);
         },
       );
 

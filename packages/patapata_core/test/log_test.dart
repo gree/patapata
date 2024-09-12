@@ -35,7 +35,7 @@ class TestLogEnvironment with LogEnvironment {
 }
 
 class TestPatapataException extends PatapataException {
-  const TestPatapataException({
+  TestPatapataException({
     required void Function(ReportRecord) onReported,
   }) : _onReported = onReported;
 

@@ -298,7 +298,7 @@ Map<String, dynamic>? notificationAppLaunchDetailsMap;
 
 /// Throw when exception if an error occurs in initializing [NotificationsPlugin].
 class NotificationsInitializationException extends PatapataCoreException {
-  const NotificationsInitializationException({
+  NotificationsInitializationException({
     super.original,
   }) : super(code: PatapataCoreExceptionCode.PPE501);
 }

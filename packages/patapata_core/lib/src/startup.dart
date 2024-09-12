@@ -226,7 +226,7 @@ class StartupSequence {
 
     if (!tIsFirstRun) {
       if (tPreMachine?.complete == false) {
-        tPreMachine?.current.completeError(const ResetStartupSequence());
+        tPreMachine?.current.completeError(ResetStartupSequence());
       }
       _startupNavigator?.startupOnReset();
     }
@@ -391,5 +391,5 @@ class StartupNavigatorObserver extends NavigatorObserver {
 
 /// Thrown when [StartupSequence.resetMachine] is called while [StartupSequence] is already running.
 class ResetStartupSequence extends PatapataCoreException {
-  const ResetStartupSequence() : super(code: PatapataCoreExceptionCode.PPE301);
+  ResetStartupSequence() : super(code: PatapataCoreExceptionCode.PPE301);
 }

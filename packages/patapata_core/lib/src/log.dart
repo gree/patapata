@@ -331,12 +331,24 @@ class Log {
   }
 
   void _onFlutterError(FlutterErrorDetails details) {
+    final Level tLevel;
+    final List<String>? tFingerprint;
+    if (details.exception is PatapataException) {
+      final tException = details.exception as PatapataException;
+      tLevel = tException.logLevel ?? Level.SEVERE;
+      tFingerprint = tException.fingerprint;
+    } else {
+      tLevel = Level.SEVERE;
+      tFingerprint = null;
+    }
+
     report(
       ReportRecord(
-        level: Level.SEVERE,
+        level: tLevel,
         object: details,
         error: details.exception,
         stackTrace: details.stack,
+        fingerprint: tFingerprint,
         mechanism: Log.kFlutterErrorMechanism,
       ),
     );
