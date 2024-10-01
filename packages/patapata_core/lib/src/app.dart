@@ -251,6 +251,9 @@ class App<T extends Object> {
   final GlobalKey _providerKey;
   final bool _customProviderKey;
 
+  @visibleForTesting
+  static bool debugIsWeb = false;
+
   /// All providers registered inside of
   /// Patapata are accessible from with function, along with all
   /// providers above the providerKey given in this [App]'s constructor if provided.
@@ -600,221 +603,237 @@ class App<T extends Object> {
     try {
       _stageStreamController.add(this);
 
-      // Execute in a guarded Zone to catch all errors correctly.
-      // This also allows [getApp] to work as we set a zone value for it here.
-      runZonedGuarded<Future<void>>(
-        () async {
-          try {
-            if (kDebugMode && !kIsTest) {
-              // coverage:ignore-start
-              _debugAppZone = Zone.current;
-              // coverage:ignore-end
-            }
-            bool tIsDebug = false;
-            assert(tIsDebug = true);
+      Future<void> fRun() async {
+        try {
+          if (kDebugMode && !kIsTest) {
+            // coverage:ignore-start
+            _debugAppZone = Zone.current;
+            // coverage:ignore-end
+          }
+          bool tIsDebug = false;
+          assert(tIsDebug = true);
 
-            _appZone = Zone.current;
+          _appZone = Zone.current;
 
-            // Before we do anything,
-            // make sure the WidgetBindings are up and running so we can execute all of Flutter's APIs.
-            WidgetsFlutterBinding.ensureInitialized();
+          // Before we do anything,
+          // make sure the WidgetBindings are up and running so we can execute all of Flutter's APIs.
+          WidgetsFlutterBinding.ensureInitialized();
 
-            if (kIsTest) {
-              removeNativeSplashScreen();
-            } else {
-              // coverage:ignore-start
-              _forceRemoveNativeSplashScreenTimer ??= Timer(
-                  _forceRemoveNativeSplashScreenDuration,
-                  removeNativeSplashScreen);
-              // coverage:ignore-end
-            }
+          if (kIsTest) {
+            removeNativeSplashScreen();
+          } else {
+            // coverage:ignore-start
+            _forceRemoveNativeSplashScreenTimer ??= Timer(
+                _forceRemoveNativeSplashScreenDuration,
+                removeNativeSplashScreen);
+            // coverage:ignore-end
+          }
 
-            log = Log(this);
+          log = Log(this);
 
-            if (!tIsDebug) {
-              // coverage:ignore-start
-              _originalErrorWidgetBuilder = ErrorWidget.builder;
-              ErrorWidget.builder = nonDebugErrorWidgetBuilder;
-              // coverage:ignore-end
-            }
+          if (!tIsDebug) {
+            // coverage:ignore-start
+            _originalErrorWidgetBuilder = ErrorWidget.builder;
+            ErrorWidget.builder = nonDebugErrorWidgetBuilder;
+            // coverage:ignore-end
+          }
 
-            _stage = AppStage.bootstrap;
+          _stage = AppStage.bootstrap;
 
-            if (bootstrapCallback != null) {
-              await bootstrapCallback();
-            }
+          if (bootstrapCallback != null) {
+            await bootstrapCallback();
+          }
 
-            _stage = AppStage.initializingPlugins;
+          _stage = AppStage.initializingPlugins;
 
-            await _proxyRemoteMessaging.init(this);
+          await _proxyRemoteMessaging.init(this);
 
-            // Initialize plugins that don't require RemoteConfig
-            final tPluginsCopy = _plugins.toList(growable: false);
+          // Initialize plugins that don't require RemoteConfig
+          final tPluginsCopy = _plugins.toList(growable: false);
 
-            for (var tPlugin in tPluginsCopy) {
-              if (!tPlugin.requireRemoteConfig) {
-                if (!await _initializePlugin(tPlugin)) {
-                  _plugins.remove(tPlugin);
-                }
+          for (var tPlugin in tPluginsCopy) {
+            if (!tPlugin.requireRemoteConfig) {
+              if (!await _initializePlugin(tPlugin)) {
+                _plugins.remove(tPlugin);
               }
             }
+          }
 
-            _stage = AppStage.setupRemoteConfig;
+          _stage = AppStage.setupRemoteConfig;
 
-            // Update RemoteConfigs
-            await remoteConfig.init();
-            // Allow this fetch to fail like for offline startups.
-            remoteConfig.addListener(_onRemoteConfigChange);
-            await remoteConfig
-                .fetch()
-                .timeout(const Duration(seconds: 2), onTimeout: () {});
+          // Update RemoteConfigs
+          await remoteConfig.init();
+          // Allow this fetch to fail like for offline startups.
+          remoteConfig.addListener(_onRemoteConfigChange);
+          await remoteConfig
+              .fetch()
+              .timeout(const Duration(seconds: 2), onTimeout: () {});
 
-            _stage = AppStage.initializingPluginsWithRemoteConfig;
+          _stage = AppStage.initializingPluginsWithRemoteConfig;
 
-            // Now we can remotely disable plugins that need to be.
-            // Initialize plugins that do require RemoteConfig.
-            // And remove plugins that should be disabled.
-            final tPlugins = _plugins.toList(growable: false);
+          // Now we can remotely disable plugins that need to be.
+          // Initialize plugins that do require RemoteConfig.
+          // And remove plugins that should be disabled.
+          final tPlugins = _plugins.toList(growable: false);
 
-            for (var tPlugin in tPlugins) {
-              if (!remoteConfig.getBool(tPlugin.remoteConfigEnabledKey,
-                  defaultValue: true)) {
-                // Remotely disabled, remove it without initializing.
+          for (var tPlugin in tPlugins) {
+            if (!remoteConfig.getBool(tPlugin.remoteConfigEnabledKey,
+                defaultValue: true)) {
+              // Remotely disabled, remove it without initializing.
+              await removePlugin(tPlugin);
+
+              continue;
+            }
+
+            if (!tPlugin.initialized) {
+              if (!await _initializePlugin(tPlugin)) {
+                // Failed or rejected to initialize, remove it.
                 await removePlugin(tPlugin);
-
-                continue;
-              }
-
-              if (!tPlugin.initialized) {
-                if (!await _initializePlugin(tPlugin)) {
-                  // Failed or rejected to initialize, remove it.
-                  await removePlugin(tPlugin);
-                }
               }
             }
+          }
 
-            _stage = AppStage.running;
+          _stage = AppStage.running;
 
-            runApp(
-              MultiProvider(
-                providers: [
-                  Provider<App>.value(
-                    value: this,
-                  ),
-                  Provider<App<T>>.value(
-                    value: this,
-                  ),
-                  Provider<T>.value(
-                    value: environment,
-                  ),
-                  ChangeNotifierProvider<User>.value(
-                    value: user,
-                  ),
-                  ChangeNotifierProvider<RemoteConfig>.value(
-                    value: remoteConfig,
-                  ),
-                  ChangeNotifierProvider<LocalConfig>.value(
-                    value: localConfig,
-                  ),
-                  ChangeNotifierProvider<RemoteMessaging>.value(
-                    value: remoteMessaging,
-                  ),
-                  Provider<Analytics>.value(
-                    value: analytics,
-                  ),
-                  Provider<AnalyticsContext>.value(
-                    value: analytics.globalContext,
-                  ),
-                ],
-                child: AnalyticsPointerEventListener(
-                  child: (() {
-                    Widget tChild = Builder(
-                      builder: (context) {
-                        // Load fake time now and only once.
-                        if (!_loadedFakeNow) {
-                          _loadedFakeNow = true;
-                          loadFakeNow();
-                        }
-
-                        return createAppWidget(context, this);
-                      },
-                    );
-
-                    if (!_customProviderKey) {
-                      tChild = KeyedSubtree(
-                        key: _providerKey,
-                        child: tChild,
-                      );
-                    }
-
-                    for (var tPlugin in _plugins.reversed) {
-                      tChild = tPlugin.createAppWidgetWrapper(tChild);
-                    }
-
-                    return tChild;
-                  })(),
+          runApp(
+            MultiProvider(
+              providers: [
+                Provider<App>.value(
+                  value: this,
                 ),
+                Provider<App<T>>.value(
+                  value: this,
+                ),
+                Provider<T>.value(
+                  value: environment,
+                ),
+                ChangeNotifierProvider<User>.value(
+                  value: user,
+                ),
+                ChangeNotifierProvider<RemoteConfig>.value(
+                  value: remoteConfig,
+                ),
+                ChangeNotifierProvider<LocalConfig>.value(
+                  value: localConfig,
+                ),
+                ChangeNotifierProvider<RemoteMessaging>.value(
+                  value: remoteMessaging,
+                ),
+                Provider<Analytics>.value(
+                  value: analytics,
+                ),
+                Provider<AnalyticsContext>.value(
+                  value: analytics.globalContext,
+                ),
+              ],
+              child: AnalyticsPointerEventListener(
+                child: (() {
+                  Widget tChild = Builder(
+                    builder: (context) {
+                      // Load fake time now and only once.
+                      if (!_loadedFakeNow) {
+                        _loadedFakeNow = true;
+                        loadFakeNow();
+                      }
+
+                      return createAppWidget(context, this);
+                    },
+                  );
+
+                  if (!_customProviderKey) {
+                    tChild = KeyedSubtree(
+                      key: _providerKey,
+                      child: tChild,
+                    );
+                  }
+
+                  for (var tPlugin in _plugins.reversed) {
+                    tChild = tPlugin.createAppWidgetWrapper(tChild);
+                  }
+
+                  return tChild;
+                })(),
               ),
-            );
-
-            tCompleter.complete(true);
-          } catch (e, stackTrace) {
-            if (onInitFailure != null) {
-              await onInitFailure!(environment, e, stackTrace);
-            } else {
-              // ignore: avoid_print
-              print(e);
-              // ignore: avoid_print
-              print(stackTrace);
-            }
-
-            tCompleter.complete(false);
-            // Throw to runZonedGuarded onError. Processing takes place in the App zone.
-            rethrow;
-          }
-        },
-        (error, stackTrace) async {
-          removeNativeSplashScreen();
-
-          if (kDebugMode) {
-            // In debug mode, always print errors.
-            debugPrint(error.toString());
-
-            try {
-              debugPrintStack(stackTrace: stackTrace);
-            } catch (e) {
-              // coverage:ignore-start
-              // Sometimes debugPrintStack can't print custom stack traces
-              debugPrint(stackTrace.toString());
-              // coverage:ignore-end
-            }
-          }
-
-          final tLevel = (error is PatapataException)
-              ? (error.logLevel != null && error.logLevel! > Level.SEVERE)
-                  ? error.logLevel!
-                  : Level.SEVERE
-              : Level.SEVERE;
-          log.report(
-            ReportRecord(
-              level: tLevel,
-              error: error,
-              stackTrace: stackTrace,
-              fingerprint:
-                  (error is PatapataException) ? error.fingerprint : null,
-              mechanism: Log.kUnhandledErrorMechanism,
             ),
           );
-        },
-        zoneValues: {
-          #patapataApp: this,
-        },
-      );
+
+          tCompleter.complete(true);
+        } catch (e, stackTrace) {
+          if (onInitFailure != null) {
+            await onInitFailure!(environment, e, stackTrace);
+          } else {
+            // ignore: avoid_print
+            print(e);
+            // ignore: avoid_print
+            print(stackTrace);
+          }
+
+          tCompleter.complete(false);
+          rethrow;
+        }
+      }
+
+      if (kIsWeb || debugIsWeb) {
+        // Execute in a guarded Zone to catch all errors correctly.
+        // This also allows [getApp] to work as we set a zone value for it here.
+        runZonedGuarded<Future<void>>(
+          () {
+            return fRun();
+          },
+          (error, stackTrace) async {
+            removeNativeSplashScreen();
+
+            if (kDebugMode) {
+              // In debug mode, always print errors.
+              debugPrint(error.toString());
+
+              try {
+                debugPrintStack(stackTrace: stackTrace);
+              } catch (e) {
+                // coverage:ignore-start
+                // Sometimes debugPrintStack can't print custom stack traces
+                debugPrint(stackTrace.toString());
+                // coverage:ignore-end
+              }
+            }
+
+            final tLevel = (error is PatapataException)
+                ? (error.logLevel != null && error.logLevel! > Level.SEVERE)
+                    ? error.logLevel!
+                    : Level.SEVERE
+                : Level.SEVERE;
+            log.report(
+              ReportRecord(
+                level: tLevel,
+                error: error,
+                stackTrace: stackTrace,
+                fingerprint:
+                    (error is PatapataException) ? error.fingerprint : null,
+                mechanism: Log.kUnhandledErrorMechanism,
+              ),
+            );
+          },
+          zoneValues: {
+            #patapataApp: this,
+          },
+        );
+      } else {
+        // All errors are caught by [PlatformDispatcher] in the [Log] system.
+        // This also allows [getApp] to work as we set a zone value for it here.
+        runZoned<Future<void>>(
+          () {
+            return fRun();
+          },
+          zoneValues: {
+            #patapataApp: this,
+          },
+        );
+      }
     } catch (e, stackTrace) {
       // coverage:ignore-start
       // We don't care at this point.
       // It is possible that AppStage initialization failed or
-      // runZonedGuarded itself failed to execute.
+      // runZoned itself failed to execute.
       if (onInitFailure != null) {
         await onInitFailure!(environment, e, stackTrace);
       } else {

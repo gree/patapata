@@ -3,6 +3,9 @@
 // This source code is licensed under the MIT license found in the
 // LICENSE file in the root directory of this source tree.
 
+import 'dart:async';
+
+import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter/material.dart';
 import 'package:logging/logging.dart';
@@ -290,6 +293,70 @@ void main() {
     testWidgets(
         'An Exception raised by runProcess is handled as an unknown error in the App zone and rethrown to the caller.',
         (tester) async {
+      if (kIsWeb) {
+        // PlatformDispatcher is not supported on the Web.
+        return;
+      }
+
+      // Unknown errors are handled by PlatformDispatcher, but they are not invoked during tests.
+      // Perform testing within an errorZone.
+      // Since the PlatformDispatcher's handling is implemented in the Log system, testing is performed there.
+      final List<Object?> tThrownException = [];
+      final List<Object?> tUnhandledException = [];
+      await runZonedGuarded(() async {
+        await tApp.run();
+        await tApp.runProcess(() async {
+          await tester.pumpAndSettle();
+        });
+
+        Object? tException;
+        try {
+          await tApp.runProcess(() async {
+            throw _TestException(Level.SHOUT);
+          });
+        } catch (e) {
+          tException = e;
+        }
+        expect((tException as _TestException).logLevel, equals(Level.SHOUT));
+        tThrownException.add(tException);
+
+        tException = null;
+        try {
+          await tApp.runProcess(() async {
+            throw _TestException(Level.INFO);
+          });
+        } catch (e) {
+          tException = e;
+        }
+        expect((tException as _TestException).logLevel, equals(Level.INFO));
+        tThrownException.add(tException);
+
+        tException = null;
+        try {
+          await tApp.runProcess(() async {
+            throw _TestException(null);
+          });
+        } catch (e) {
+          tException = e;
+        }
+        expect((tException as _TestException).logLevel, isNull);
+        tThrownException.add(tException);
+
+        tApp.dispose();
+      }, (error, stackTrace) {
+        if (error is! _TestException) {
+          throw error;
+        }
+        tUnhandledException.add(error);
+      });
+
+      expect(tUnhandledException, tThrownException);
+    });
+
+    testWidgets(
+        '[Flutter web] UnhandledError is handled by App errorZone. The LogLevel for UnhandledError is SEVERE or higher.',
+        (tester) async {
+      App.debugIsWeb = true;
       await tApp.run();
       await tApp.runProcess(() async {
         await tester.pumpAndSettle();
@@ -301,6 +368,7 @@ void main() {
         tStream,
         emitsInOrder([
           Level.SHOUT,
+          Level.SEVERE,
           Level.SEVERE,
           Level.SEVERE,
         ]),
@@ -316,7 +384,6 @@ void main() {
       }
       expect((tException as _TestException).logLevel, equals(Level.SHOUT));
 
-      // Even if the log level is less than SEVERE, an unknown error in the App zone is handled as Level.SEVERE.
       tException = null;
       try {
         await tApp.runProcess(() async {
@@ -339,7 +406,19 @@ void main() {
       }
       expect((tException as _TestException).logLevel, isNull);
 
+      // If it is not a PatapataException, it is handled as Level.SEVERE in the App zone.
+      tException = null;
+      try {
+        await tApp.runProcess(() async {
+          throw 'not PatapataException';
+        });
+      } catch (e) {
+        tException = e;
+      }
+      expect(tException, equals('not PatapataException'));
+
       tApp.dispose();
+      App.debugIsWeb = false;
     });
   });
 
@@ -604,10 +683,70 @@ void main() {
     testWidgets(
         'If plugin init throws an exception during initialization, the application will fail to start.',
         (tester) async {
-      testInitialize();
+      await runZonedGuarded(() async {
+        testInitialize();
 
-      fCreateApp(List<Plugin> plugins) {
-        return App(
+        fCreateApp(List<Plugin> plugins) {
+          return App(
+            environment: _Environment(),
+            createAppWidget: (context, app) {
+              return MaterialApp(
+                home: SizedBox.shrink(
+                  key: tWidgetKey,
+                ),
+              );
+            },
+            plugins: plugins,
+          );
+        }
+
+        final tPluginFA = Plugin.inline(
+          name: 'testPluginFA',
+          init: (app) async {
+            throw _TestException(Level.INFO);
+          },
+        );
+        final tPluginFB = Plugin.inline(
+          name: 'testPluginFB',
+          requireRemoteConfig: true,
+          init: (app) async {
+            throw _TestException(Level.INFO);
+          },
+        );
+
+        tApp = fCreateApp([
+          tPluginFA,
+        ]);
+        expect(await tApp.run(), isFalse);
+        expect(tApp.stage, AppStage.initializingPlugins);
+        tApp.dispose();
+
+        tApp = fCreateApp([
+          tPluginFB,
+        ]);
+        expect(await tApp.run(), isFalse);
+        expect(tApp.stage, AppStage.initializingPluginsWithRemoteConfig);
+        tApp.dispose();
+      }, (error, stackTrace) {
+        if (error is! _TestException) {
+          throw error;
+        }
+      });
+    });
+
+    testWidgets('If App.run fails, onInitFailure is called.', (tester) async {
+      await runZonedGuarded(() async {
+        testInitialize();
+
+        final tPluginA = Plugin.inline(
+          name: 'testPluginA',
+          init: (app) async {
+            throw _TestException(Level.SEVERE);
+          },
+        );
+
+        Object? tException;
+        tApp = App(
           environment: _Environment(),
           createAppWidget: (context, app) {
             return MaterialApp(
@@ -616,73 +755,23 @@ void main() {
               ),
             );
           },
-          plugins: plugins,
+          plugins: [
+            tPluginA,
+          ],
+          onInitFailure: (env, e, stackTrace) {
+            tException = e;
+          },
         );
-      }
 
-      final tPluginFA = Plugin.inline(
-        name: 'testPluginFA',
-        init: (app) async {
-          throw Exception();
-        },
-      );
-      final tPluginFB = Plugin.inline(
-        name: 'testPluginFB',
-        requireRemoteConfig: true,
-        init: (app) async {
-          throw Exception();
-        },
-      );
+        expect(await tApp.run(), isFalse);
+        expect(tException, isA<_TestException>());
 
-      tApp = fCreateApp([
-        tPluginFA,
-      ]);
-      expect(await tApp.run(), isFalse);
-      expect(tApp.stage, AppStage.initializingPlugins);
-      tApp.dispose();
-
-      tApp = fCreateApp([
-        tPluginFB,
-      ]);
-      expect(await tApp.run(), isFalse);
-      expect(tApp.stage, AppStage.initializingPluginsWithRemoteConfig);
-      tApp.dispose();
-    });
-
-    testWidgets('If App.run fails, onInitFailure is called.', (tester) async {
-      testInitialize();
-
-      testInitialize();
-
-      final tPluginA = Plugin.inline(
-        name: 'testPluginA',
-        init: (app) async {
-          throw _TestException(Level.SEVERE);
-        },
-      );
-
-      Object? tException;
-      tApp = App(
-        environment: _Environment(),
-        createAppWidget: (context, app) {
-          return MaterialApp(
-            home: SizedBox.shrink(
-              key: tWidgetKey,
-            ),
-          );
-        },
-        plugins: [
-          tPluginA,
-        ],
-        onInitFailure: (env, e, stackTrace) {
-          tException = e;
-        },
-      );
-
-      expect(await tApp.run(), isFalse);
-      expect(tException, isA<_TestException>());
-
-      tApp.dispose();
+        tApp.dispose();
+      }, (error, stackTrace) {
+        if (error is! _TestException) {
+          throw error;
+        }
+      });
     });
 
     testWidgets('Use RemoteMessages.', (tester) async {

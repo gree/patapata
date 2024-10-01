@@ -233,19 +233,19 @@ class StartupSequence {
   }
 
   /// Waits until the time specified by [waitSplashScreenDuration] has elapsed.
-  Future<void> waitForSplash() {
+  Future<void> waitForSplash() async {
     if (splashFinished) {
-      return SynchronousFuture(null);
+      return;
     }
     if (_splashScreenCompleter == null ||
         _splashScreenCompleter?.isCompleted == true) {
       _splashScreenCompleter = Completer<void>();
     }
-    return _splashScreenCompleter!.future;
+    return await _splashScreenCompleter!.future;
   }
 
   /// Waits until the process is completed.
-  Future<void> waitForComplete() {
+  Future<void> waitForComplete() async {
     if (complete) {
       if (error != null) {
         if (error?.stackTrace != null) {
@@ -253,12 +253,12 @@ class StartupSequence {
         }
         throw error!.error;
       }
-      return SynchronousFuture(null);
+      return;
     }
     if (_startupCompleter == null || _startupCompleter?.isCompleted == true) {
       _startupCompleter = Completer<void>();
     }
-    return _startupCompleter!.future;
+    return await _startupCompleter!.future;
   }
 
   void _onUpdate() {

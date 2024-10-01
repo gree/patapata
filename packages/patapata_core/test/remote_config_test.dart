@@ -9,8 +9,6 @@ import 'package:patapata_core/patapata_core.dart';
 import 'utils/patapata_core_test_utils.dart';
 
 void main() {
-  TestWidgetsFlutterBinding.ensureInitialized();
-
   const kDefaultBoolKey = 'kDefaultBoolKey';
   const kDefaultDoubleKey = 'kDefaultDoubleKey';
   const kDefaultIntKey = 'kDefaultIntKey';
@@ -53,7 +51,8 @@ void main() {
     );
   }
 
-  test('Function hasKey.', () async {
+  // test('Function hasKey.', () async {
+  testWidgets('Function hasKey.', (WidgetTester tester) async {
     await runApp();
 
     expect(
@@ -75,7 +74,7 @@ void main() {
     );
   });
 
-  test('Function setDefaults.', () async {
+  testWidgets('Function setDefaults.', (WidgetTester tester) async {
     await runApp();
 
     expect(app.remoteConfig.getBool(kDefaultBoolKey), false);
@@ -96,7 +95,7 @@ void main() {
     expect(mockRemoteConfig.getString(kDefaultStringKey), '1');
   });
 
-  test('Function reset.', () async {
+  testWidgets('Function reset.', (WidgetTester tester) async {
     await runApp();
     mockRemoteConfig.testSetMockFetchValues({
       kBoolValueKey: true,
@@ -125,7 +124,7 @@ void main() {
     expect(app.remoteConfig.hasKey(kStringValueKey), false);
   });
 
-  test('Function resetAll.', () async {
+  testWidgets('Function resetAll.', (WidgetTester tester) async {
     await runApp();
     mockRemoteConfig.testSetMockFetchValues({
       kBoolValueKey: true,
@@ -151,7 +150,7 @@ void main() {
     expect(app.remoteConfig.hasKey(kStringValueKey), false);
   });
 
-  test('Function resetMany.', () async {
+  testWidgets('Function resetMany.', (WidgetTester tester) async {
     await runApp();
     mockRemoteConfig.testSetMockFetchValues({
       kBoolValueKey: true,
@@ -182,7 +181,7 @@ void main() {
     expect(app.remoteConfig.hasKey(kStringValueKey), false);
   });
 
-  test('Function dispose.', () async {
+  testWidgets('Function dispose.', (WidgetTester tester) async {
     await runApp();
 
     expect(app.remoteConfig.disposed, isFalse);
@@ -191,7 +190,7 @@ void main() {
     expect(app.remoteConfig.disposed, isTrue);
   });
 
-  test('Check bool value.', () async {
+  testWidgets('Check bool value.', (WidgetTester tester) async {
     await runApp();
 
     await app.remoteConfig.setDefaults({
@@ -220,7 +219,7 @@ void main() {
     expect(app.remoteConfig.getBool(kBoolValueKey), false);
   });
 
-  test('Check double value.', () async {
+  testWidgets('Check double value.', (WidgetTester tester) async {
     await runApp();
 
     await app.remoteConfig.setDefaults({
@@ -248,7 +247,7 @@ void main() {
     mockRemoteConfig.setDouble(kDoubleValueKey, 2.0);
     expect(app.remoteConfig.getDouble(kDoubleValueKey), 2.0);
   });
-  test('Check int value.', () async {
+  testWidgets('Check int value.', (WidgetTester tester) async {
     await runApp();
 
     await app.remoteConfig.setDefaults({
@@ -277,7 +276,7 @@ void main() {
     expect(app.remoteConfig.getInt(kIntValueKey), 2);
   });
 
-  test('Check String value.', () async {
+  testWidgets('Check String value.', (WidgetTester tester) async {
     await runApp();
 
     await app.remoteConfig.setDefaults({
@@ -306,7 +305,7 @@ void main() {
     expect(app.remoteConfig.getString(kStringValueKey), '2');
   });
 
-  test('Check many value.', () async {
+  testWidgets('Check many value.', (WidgetTester tester) async {
     await runApp();
 
     expect(app.remoteConfig.hasKey(kBoolValueKey), false);
