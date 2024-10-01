@@ -4,7 +4,6 @@
 // LICENSE file in the root directory of this source tree.
 
 import 'package:collection/collection.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 
 import 'package:patapata_core/patapata_core.dart';
