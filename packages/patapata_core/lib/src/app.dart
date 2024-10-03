@@ -773,6 +773,9 @@ class App<T extends Object> {
         }
       }
 
+      // PlatformDispatcher does not support Flutter web. Therefore, use an error zone instead.
+      // This code does not include any web-dependent processing.
+      // For test coverage, tests are executed using [debugIsWeb].
       if (kIsWeb || debugIsWeb) {
         // Execute in a guarded Zone to catch all errors correctly.
         // This also allows [getApp] to work as we set a zone value for it here.
