@@ -12,28 +12,28 @@ part 'providers.g.dart';
 
 /// The [App] instance.
 @riverpod
-App app(AppRef ref) {
+App app(Ref ref) {
   return getApp();
 }
 
 /// The current [User].
 /// Whenever [User] changes, this provider will be updated.
 @riverpod
-Raw<User> user(UserRef ref) {
+Raw<User> user(Ref ref) {
   return ref.disposeAndListenChangeNotifier(ref.read(appProvider).user);
 }
 
 /// Access to [RemoteConfig].
 /// Whenever [RemoteConfig] changes, this provider will be updated.
 @riverpod
-Raw<RemoteConfig> remoteConfig(RemoteConfigRef ref) {
+Raw<RemoteConfig> remoteConfig(Ref ref) {
   return ref.disposeAndListenChangeNotifier(ref.read(appProvider).remoteConfig);
 }
 
 /// Gets a [RemoteConfig] value as a [String].
 /// Whenever this [key] changes, this provider will be updated.
 @riverpod
-String remoteConfigString(RemoteConfigStringRef ref, String key,
+String remoteConfigString(Ref ref, String key,
     [String defaultValue = Config.defaultValueForString]) {
   return ref.watch(remoteConfigProvider
       .select((v) => v.getString(key, defaultValue: defaultValue)));
@@ -42,7 +42,7 @@ String remoteConfigString(RemoteConfigStringRef ref, String key,
 /// Gets a [RemoteConfig] value as a [int].
 /// Whenever this [key] changes, this provider will be updated.
 @riverpod
-int remoteConfigInt(RemoteConfigIntRef ref, String key,
+int remoteConfigInt(Ref ref, String key,
     [int defaultValue = Config.defaultValueForInt]) {
   return ref.watch(remoteConfigProvider
       .select((v) => v.getInt(key, defaultValue: defaultValue)));
@@ -51,7 +51,7 @@ int remoteConfigInt(RemoteConfigIntRef ref, String key,
 /// Gets a [RemoteConfig] value as a [double].
 /// Whenever this [key] changes, this provider will be updated.
 @riverpod
-double remoteConfigDouble(RemoteConfigDoubleRef ref, String key,
+double remoteConfigDouble(Ref ref, String key,
     [double defaultValue = Config.defaultValueForDouble]) {
   return ref.watch(remoteConfigProvider
       .select((v) => v.getDouble(key, defaultValue: defaultValue)));
@@ -60,7 +60,7 @@ double remoteConfigDouble(RemoteConfigDoubleRef ref, String key,
 /// Gets a [RemoteConfig] value as a [bool].
 /// Whenever this [key] changes, this provider will be updated.
 @riverpod
-bool remoteConfigBool(RemoteConfigBoolRef ref, String key,
+bool remoteConfigBool(Ref ref, String key,
     [bool defaultValue = Config.defaultValueForBool]) {
   return ref.watch(remoteConfigProvider
       .select((v) => v.getBool(key, defaultValue: defaultValue)));
@@ -69,14 +69,14 @@ bool remoteConfigBool(RemoteConfigBoolRef ref, String key,
 /// Access to [LocalConfig].
 /// Whenever [LocalConfig] changes, this provider will be updated.
 @riverpod
-Raw<LocalConfig> localConfig(LocalConfigRef ref) {
+Raw<LocalConfig> localConfig(Ref ref) {
   return ref.disposeAndListenChangeNotifier(ref.read(appProvider).localConfig);
 }
 
 /// Gets a [LocalConfig] value as a [String].
 /// Whenever this [key] changes, this provider will be updated.
 @riverpod
-String localConfigString(LocalConfigStringRef ref, String key,
+String localConfigString(Ref ref, String key,
     [String defaultValue = Config.defaultValueForString]) {
   return ref.watch(localConfigProvider
       .select((v) => v.getString(key, defaultValue: defaultValue)));
@@ -85,7 +85,7 @@ String localConfigString(LocalConfigStringRef ref, String key,
 /// Gets a [LocalConfig] value as a [int].
 /// Whenever this [key] changes, this provider will be updated.
 @riverpod
-int localConfigInt(LocalConfigIntRef ref, String key,
+int localConfigInt(Ref ref, String key,
     [int defaultValue = Config.defaultValueForInt]) {
   return ref.watch(localConfigProvider
       .select((v) => v.getInt(key, defaultValue: defaultValue)));
@@ -94,7 +94,7 @@ int localConfigInt(LocalConfigIntRef ref, String key,
 /// Gets a [LocalConfig] value as a [double].
 /// Whenever this [key] changes, this provider will be updated.
 @riverpod
-double localConfigDouble(LocalConfigDoubleRef ref, String key,
+double localConfigDouble(Ref ref, String key,
     [double defaultValue = Config.defaultValueForDouble]) {
   return ref.watch(localConfigProvider
       .select((v) => v.getDouble(key, defaultValue: defaultValue)));
@@ -103,7 +103,7 @@ double localConfigDouble(LocalConfigDoubleRef ref, String key,
 /// Gets a [LocalConfig] value as a [bool].
 /// Whenever this [key] changes, this provider will be updated.
 @riverpod
-bool localConfigBool(LocalConfigBoolRef ref, String key,
+bool localConfigBool(Ref ref, String key,
     [bool defaultValue = Config.defaultValueForBool]) {
   return ref.watch(localConfigProvider
       .select((v) => v.getBool(key, defaultValue: defaultValue)));
@@ -112,7 +112,7 @@ bool localConfigBool(LocalConfigBoolRef ref, String key,
 /// Access to [RemoteMessaging].
 /// Whenever [RemoteMessaging] changes, this provider will be updated.
 @riverpod
-Raw<RemoteMessaging> remoteMessaging(RemoteMessagingRef ref) {
+Raw<RemoteMessaging> remoteMessaging(Ref ref) {
   return ref
       .disposeAndListenChangeNotifier(ref.read(appProvider).remoteMessaging);
 }
@@ -121,8 +121,7 @@ Raw<RemoteMessaging> remoteMessaging(RemoteMessagingRef ref) {
 /// Whenever a new [RemoteMessage] is receieved via [RemoteMessaging.messages], this provider will be updated.
 /// The first execution of this will return the initial message from [RemoteMessaging.getInitialMessage].
 @riverpod
-Stream<RemoteMessage> remoteMessagingMessages(
-    RemoteMessagingMessagesRef ref) async* {
+Stream<RemoteMessage> remoteMessagingMessages(Ref ref) async* {
   final tRemoteMessaging = ref.watch(remoteMessagingProvider);
 
   final tInitialMessage = await tRemoteMessaging.getInitialMessage();
@@ -138,7 +137,7 @@ Stream<RemoteMessage> remoteMessagingMessages(
 /// Whenever a new token is receieved via [RemoteMessaging.tokens], this provider will be updated.
 /// The first execution of this will return the current token from [RemoteMessaging.getToken].
 @riverpod
-Stream<String?> remoteMessagingTokens(RemoteMessagingTokensRef ref) async* {
+Stream<String?> remoteMessagingTokens(Ref ref) async* {
   final tRemoteMessaging = ref.watch(remoteMessagingProvider);
 
   yield await tRemoteMessaging.getToken();
@@ -147,20 +146,20 @@ Stream<String?> remoteMessagingTokens(RemoteMessagingTokensRef ref) async* {
 
 /// Access to [Analytics].
 @riverpod
-Analytics analytics(AnalyticsRef ref) {
+Analytics analytics(Ref ref) {
   return ref.read(appProvider).analytics;
 }
 
 /// Access to the global [AnalyticsContext] from [Analytics.globalContext].
 @riverpod
-AnalyticsContext globalAnalyticsContext(GlobalAnalyticsContextRef ref) {
+AnalyticsContext globalAnalyticsContext(Ref ref) {
   return ref.read(analyticsProvider).globalContext;
 }
 
 /// Access to a stream of [NetworkInformation].
 /// Whenever [NetworkInformation] changes, this provider will be updated.
 @riverpod
-NetworkInformation networkInformation(NetworkInformationRef ref) {
+NetworkInformation networkInformation(Ref ref) {
   final tNetworkPlugin = ref.read(appProvider).getPlugin<NetworkPlugin>()!;
 
   final tSubscription = tNetworkPlugin.informationStream.listen((event) {
@@ -174,13 +173,13 @@ NetworkInformation networkInformation(NetworkInformationRef ref) {
 
 /// Access to [PackageInfo].
 @riverpod
-PackageInfoPlugin packageInfo(PackageInfoRef ref) {
+PackageInfoPlugin packageInfo(Ref ref) {
   return ref.read(appProvider).package;
 }
 
 /// Access to [DeviceInfo].
 @riverpod
-DeviceInfoPlugin deviceInfo(DeviceInfoRef ref) {
+DeviceInfoPlugin deviceInfo(Ref ref) {
   return ref.read(appProvider).device;
 }
 
