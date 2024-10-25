@@ -35,8 +35,9 @@ class TestLogEnvironment with LogEnvironment {
 }
 
 class TestPatapataException extends PatapataException {
-  const TestPatapataException({
+  TestPatapataException({
     required void Function(ReportRecord) onReported,
+    super.logLevel,
   }) : _onReported = onReported;
 
   final void Function(ReportRecord) _onReported;
@@ -513,7 +514,7 @@ void main() {
 
     final App tApp = createApp(
       environment: TestLogEnvironment(
-        logLevel: Level.SEVERE.value,
+        logLevel: Level.INFO.value,
         printLog: false,
       ),
     );
@@ -523,10 +524,14 @@ void main() {
     await tApp.runProcess(() async {
       await tester.pumpAndSettle();
 
-      final tStream = tApp.log.reports.asyncMap((event) => event.object);
+      final tStream = tApp.log.reports.asyncMap((event) => event.level);
       expectLater(
         tStream,
-        emits(isA<FlutterErrorDetails>()),
+        emitsInOrder([
+          Level.INFO,
+          Level.SEVERE,
+          Level.SEVERE,
+        ]),
       );
 
       // throw FlutterError
@@ -534,20 +539,111 @@ void main() {
         MaterialApp(
           home: Column(
             children: [
-              ListView(
-                children: const [
-                  Text('Exception!'),
-                ],
+              FilledButton(
+                onPressed: () {
+                  throw TestPatapataException(
+                    onReported: (_) {},
+                    logLevel: Level.INFO,
+                  );
+                },
+                child: const Text('ExceptionA'),
+              ),
+              FilledButton(
+                onPressed: () {
+                  throw TestPatapataException(
+                    onReported: (_) {},
+                    logLevel: null,
+                  );
+                },
+                child: const Text('ExceptionB'),
+              ),
+              FilledButton(
+                onPressed: () {
+                  throw 'not PatapataException';
+                },
+                child: const Text('ExceptionC'),
               ),
             ],
           ),
         ),
       );
+
+      await tester.tap(find.text('ExceptionA'));
+      await tester.takeException();
+
+      await tester.tap(find.text('ExceptionB'));
+      await tester.takeException();
+
+      await tester.tap(find.text('ExceptionC'));
       await tester.takeException();
 
       expect(tOnErrorCalled, isTrue);
-
       FlutterError.onError = tOriginalOnError;
+    });
+
+    tApp.dispose();
+  });
+
+  testWidgets(
+      'UnhandledError is handled by PlatformDispatcher. The LogLevel for UnhandledError is SEVERE or higher.',
+      (WidgetTester tester) async {
+    if (kIsWeb) {
+      // PlatformDispatcher is not supported on the Web.
+      return;
+    }
+
+    final App tApp = createApp(
+      environment: TestLogEnvironment(
+        logLevel: Level.SEVERE.value,
+        printLog: true,
+      ),
+    );
+
+    await tApp.run();
+
+    await tApp.runProcess(() async {
+      await tester.pumpAndSettle();
+      // Check log levels processed within the App zone.
+      final tStream = tApp.log.reports.asyncMap((event) => event.level);
+      expectLater(
+        tStream,
+        emitsInOrder([
+          Level.SHOUT,
+          Level.SEVERE,
+          Level.SEVERE,
+          Level.SEVERE,
+        ]),
+      );
+
+      // Since PlatformDispatcher is not called during tests, call it directly.
+
+      tester.binding.platformDispatcher.onError?.call(
+        TestPatapataException(
+          onReported: (_) {},
+          logLevel: Level.SHOUT,
+        ),
+        StackTrace.empty,
+      );
+      tester.binding.platformDispatcher.onError?.call(
+        TestPatapataException(
+          onReported: (_) {},
+          logLevel: Level.INFO,
+        ),
+        StackTrace.empty,
+      );
+      // If logLevel is null, it is processed as Level.SEVERE in App zone.
+      tester.binding.platformDispatcher.onError?.call(
+        TestPatapataException(
+          onReported: (_) {},
+          logLevel: null,
+        ),
+        StackTrace.empty,
+      );
+      // If it is not a PatapataException, it is handled as Level.SEVERE in the App zone.
+      tester.binding.platformDispatcher.onError?.call(
+        'not PatapataException',
+        StackTrace.empty,
+      );
     });
 
     tApp.dispose();

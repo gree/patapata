@@ -261,7 +261,7 @@ class ProviderLockKey {
 
 /// Thrown when [ProviderModel.begin] is called while a lock is already in place.
 class ConflictException extends PatapataCoreException {
-  const ConflictException(this.key, this.from)
+  ConflictException(this.key, this.from)
       : super(code: PatapataCoreExceptionCode.PPE201);
 
   /// The [ProviderLockKey] that was being used when this exception was thrown.

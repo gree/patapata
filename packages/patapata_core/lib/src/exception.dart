@@ -58,7 +58,7 @@ extension PatapataCoreExceptionCodeExtension on PatapataCoreExceptionCode {
 abstract class PatapataCoreException extends PatapataException {
   final PatapataCoreExceptionCode _exceptionCode;
 
-  const PatapataCoreException({
+  PatapataCoreException({
     required PatapataCoreExceptionCode code,
     super.app,
     super.message,

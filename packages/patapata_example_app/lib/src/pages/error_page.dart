@@ -77,7 +77,7 @@ class ErrorSelectPage extends StandardPage<void> {
           TextButton(
             onPressed: () {
               try {
-                throw const ExampleException();
+                throw ExampleException();
               } on PatapataException catch (e) {
                 e.showDialog(context);
                 logger.severe(e.toString(), e);
@@ -90,7 +90,7 @@ class ErrorSelectPage extends StandardPage<void> {
           TextButton(
             onPressed: () {
               try {
-                throw const ExampleNetworkException(statusCode: 404);
+                throw ExampleNetworkException(statusCode: 404);
               } on PatapataException catch (e) {
                 e.showDialog(context);
                 logger.severe(e.toString(), e);
@@ -101,7 +101,7 @@ class ErrorSelectPage extends StandardPage<void> {
           TextButton(
             onPressed: () {
               try {
-                throw const ExampleNetworkException(statusCode: 500);
+                throw ExampleNetworkException(statusCode: 500);
               } on PatapataException catch (e) {
                 e.showDialog(context);
                 logger.severe(e.toString(), e);

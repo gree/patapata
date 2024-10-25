@@ -5,6 +5,7 @@
 
 import 'dart:async';
 import 'dart:convert';
+import 'dart:ui';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
@@ -76,6 +77,7 @@ class Log {
   DebugPrintCallback? _originalDebugPrint;
   StreamSubscription<LogRecord>? _rootLogDelegateSubscription;
   FlutterExceptionHandler? _originalOnFlutterError;
+  ErrorCallback? _originalOnUnhandledError;
   final _filters = <ReportRecordFilter>[];
   final _typeFilters = <Type>{};
 
@@ -99,6 +101,10 @@ class Log {
     _rootLogDelegateSubscription =
         Logger.root.onRecord.listen(_onRootLogRecordDelegate);
 
+    if (!kIsWeb) {
+      _originalOnUnhandledError = PlatformDispatcher.instance.onError;
+      PlatformDispatcher.instance.onError = _onUnhandledError;
+    }
     _originalOnFlutterError = FlutterError.onError;
     FlutterError.onError = _onFlutterError;
 
@@ -168,6 +174,17 @@ class Log {
     if (_originalOnFlutterError != null) {
       FlutterError.onError = _originalOnFlutterError;
       _originalOnFlutterError = null;
+    }
+
+    if (!kIsWeb) {
+      Zone.root.run(() {
+        // In most cases, _originalOnUnhandledError is assumed to be set in the
+        // rootZone, but this is not guaranteed.
+        // Therefore, this process does not ensure that _originalOnUnhandledError
+        // returns to the Zone it originally belonged to.
+        PlatformDispatcher.instance.onError = _originalOnUnhandledError;
+        _originalOnUnhandledError = null;
+      });
     }
 
     _reportStreamController.close();
@@ -331,12 +348,24 @@ class Log {
   }
 
   void _onFlutterError(FlutterErrorDetails details) {
+    final Level tLevel;
+    final List<String>? tFingerprint;
+    if (details.exception is PatapataException) {
+      final tException = details.exception as PatapataException;
+      tLevel = tException.logLevel ?? Level.SEVERE;
+      tFingerprint = tException.fingerprint;
+    } else {
+      tLevel = Level.SEVERE;
+      tFingerprint = null;
+    }
+
     report(
       ReportRecord(
-        level: Level.SEVERE,
+        level: tLevel,
         object: details,
         error: details.exception,
         stackTrace: details.stack,
+        fingerprint: tFingerprint,
         mechanism: Log.kFlutterErrorMechanism,
       ),
     );
@@ -344,6 +373,54 @@ class Log {
     if (_originalOnFlutterError != null) {
       _originalOnFlutterError!(details);
     }
+  }
+
+  bool _onUnhandledError(Object error, StackTrace stackTrace) {
+    void fPrint(Object error, StackTrace stackTrace) {
+      if (kDebugMode) {
+        // In debug mode, always print errors.
+        debugPrint(error.toString());
+
+        try {
+          debugPrintStack(stackTrace: stackTrace);
+        } catch (e) {
+          // coverage:ignore-start
+          // Sometimes debugPrintStack can't print custom stack traces
+          debugPrint(stackTrace.toString());
+          // coverage:ignore-end
+        }
+      }
+    }
+
+    fPrint(error, stackTrace);
+    return runZonedGuarded<bool>(
+          () {
+            getApp().removeNativeSplashScreen();
+            final tLevel = (error is PatapataException)
+                ? (error.logLevel != null && error.logLevel! > Level.SEVERE)
+                    ? error.logLevel!
+                    : Level.SEVERE
+                : Level.SEVERE;
+            report(
+              ReportRecord(
+                level: tLevel,
+                error: error,
+                stackTrace: stackTrace,
+                fingerprint:
+                    (error is PatapataException) ? error.fingerprint : null,
+                mechanism: Log.kUnhandledErrorMechanism,
+              ),
+            );
+
+            return _originalOnUnhandledError?.call(error, stackTrace) ?? true;
+          },
+          // coverage:ignore-start
+          (error, stackTrace) {
+            fPrint(error, stackTrace);
+          },
+          // coverage:ignore-end
+        ) ??
+        true;
   }
 
   /// Filters [record] and adds the result to [reports].
