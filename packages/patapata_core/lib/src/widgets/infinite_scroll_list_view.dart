@@ -8,10 +8,10 @@ import 'package:flutter/rendering.dart';
 import 'package:patapata_core/patapata_core.dart';
 import 'package:provider/provider.dart';
 
-/// A widget that provides infinite scrolling functionality to ListView or GridView.
+/// A widget that provides infinite scrolling functionality to [ListView] or [GridView].
 ///
-/// This widget fetches data of type T using the fetch method when the user scrolls
-/// the list or grid and calls the itemBuilder.
+/// This widget fetches data of type [T] using either of the [fetchNext] or [fetchPrevious] methods
+/// when the user scrolls the list or grid and calls the [itemBuilder].
 ///
 /// Each item's Widget has a Provider in its parent, and you can access each item's information
 /// using methods like `context.read<T>()` or `context.read<InfiniteScrollItemInformation>()`, etc.
