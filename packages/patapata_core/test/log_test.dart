@@ -842,103 +842,154 @@ void main() {
       Trace(
         [
           Frame(
-            Uri.file('java.lang/Integer.java'),
+            Uri.file(
+              'java.lang/Integer.java',
+              windows: false,
+            ),
             797,
             null,
             'Integer.parseInt',
           ),
           Frame(
-            Uri.file('java.lang/Integer.java'),
+            Uri.file(
+              'java.lang/Integer.java',
+              windows: false,
+            ),
             915,
             null,
             'Integer.parseInt',
           ),
           Frame(
-            Uri.file('dev.patapata.patapata_core_example/MainActivity.kt'),
+            Uri.file(
+              'dev.patapata.patapata_core_example/MainActivity.kt',
+              windows: false,
+            ),
             27,
             null,
             'MainActivity.configureFlutterEngine\$lambda-1\$lambda-0',
           ),
           Frame(
-            Uri.file('dev.patapata.patapata_core_example/Unknown<space>Source'),
+            Uri.file(
+              'dev.patapata.patapata_core_example/Unknown<space>Source',
+              windows: false,
+            ),
             0,
             null,
             'MainActivity.\$r8\$lambda\$mgziiATvBKRngKgviCJADp8PLSA',
           ),
           Frame(
-            Uri.file('dev.patapata.patapata_core_example/Unknown<space>Source'),
+            Uri.file(
+              'dev.patapata.patapata_core_example/Unknown<space>Source',
+              windows: false,
+            ),
             2,
             null,
             'MainActivity\$\$ExternalSyntheticLambda0.onMethodCall',
           ),
           Frame(
-            Uri.file('io.flutter.plugin.common/MethodChannel.java'),
+            Uri.file(
+              'io.flutter.plugin.common/MethodChannel.java',
+              windows: false,
+            ),
             258,
             null,
             'MethodChannel\$IncomingMethodCallHandler.onMessage',
           ),
           Frame(
-            Uri.file('io.flutter.embedding.engine.dart/DartMessenger.java'),
+            Uri.file(
+              'io.flutter.embedding.engine.dart/DartMessenger.java',
+              windows: false,
+            ),
             295,
             null,
             'DartMessenger.invokeHandler',
           ),
           Frame(
-            Uri.file('io.flutter.embedding.engine.dart/DartMessenger.java'),
+            Uri.file(
+              'io.flutter.embedding.engine.dart/DartMessenger.java',
+              windows: false,
+            ),
             322,
             null,
             'DartMessenger.lambda\$dispatchMessageToQueue\$0\$io-flutter-embedding-engine-dart-DartMessenger',
           ),
           Frame(
-            Uri.file('io.flutter.embedding.engine.dart/Unknown<space>Source'),
+            Uri.file(
+              'io.flutter.embedding.engine.dart/Unknown<space>Source',
+              windows: false,
+            ),
             12,
             null,
             'DartMessenger\$\$ExternalSyntheticLambda0.run',
           ),
           Frame(
-            Uri.file('android.os/Handler.java'),
+            Uri.file(
+              'android.os/Handler.java',
+              windows: false,
+            ),
             942,
             null,
             'Handler.handleCallback',
           ),
           Frame(
-            Uri.file('android.os/Handler.java'),
+            Uri.file(
+              'android.os/Handler.java',
+              windows: false,
+            ),
             99,
             null,
             'Handler.dispatchMessage',
           ),
           Frame(
-            Uri.file('android.os/Looper.java'),
+            Uri.file(
+              'android.os/Looper.java',
+              windows: false,
+            ),
             346,
             null,
             'Looper.loopOnce',
           ),
           Frame(
-            Uri.file('android.os/Looper.java'),
+            Uri.file(
+              'android.os/Looper.java',
+              windows: false,
+            ),
             475,
             null,
             'Looper.loop',
           ),
           Frame(
-            Uri.file('android.app/ActivityThread.java'),
+            Uri.file(
+              'android.app/ActivityThread.java',
+              windows: false,
+            ),
             7950,
             null,
             'ActivityThread.main',
           ),
           Frame(
-            Uri.file('java.lang.reflect/Native<space>Method'),
+            Uri.file(
+              'java.lang.reflect/Native<space>Method',
+              windows: false,
+            ),
             null,
             null,
             'Method.invoke',
           ),
           Frame(
-            Uri.file('com.android.internal.os/RuntimeInit.java'),
+            Uri.file(
+              'com.android.internal.os/RuntimeInit.java',
+              windows: false,
+            ),
             548,
             null,
             'RuntimeInit\$MethodAndArgsCaller.run',
           ),
           Frame(
-            Uri.file('com.android.internal.os/ZygoteInit.java'),
+            Uri.file(
+              'com.android.internal.os/ZygoteInit.java',
+              windows: false,
+            ),
             942,
             null,
             'ZygoteInit.main',
@@ -948,19 +999,28 @@ void main() {
       Trace(
         [
           Frame(
-            Uri.file('java.lang/Integer.java'),
+            Uri.file(
+              'java.lang/Integer.java',
+              windows: false,
+            ),
             4,
             null,
             'Integer.parseInt',
           ),
           Frame(
-            Uri.file('java.lang/Integer.java'),
+            Uri.file(
+              'java.lang/Integer.java',
+              windows: false,
+            ),
             5,
             null,
             'Integer.parseInt',
           ),
           Frame(
-            Uri.file('dev.patapata.patapata_core_example/MainActivity.kt'),
+            Uri.file(
+              'dev.patapata.patapata_core_example/MainActivity.kt',
+              windows: false,
+            ),
             6,
             null,
             'MainActivity.test',
@@ -1210,91 +1270,136 @@ void main() {
     final tExpectTrace = Trace(
       [
         Frame(
-          Uri.file('Runner/<NoFileName>'),
+          Uri.file(
+            'Runner/<NoFileName>',
+            windows: false,
+          ),
           72,
           null,
           '\$s6Runner12NativeLoggerC14viewControllerACSo011FlutterViewE0C_tcfcySo0F10MethodCallC_yypSgctcACcfu_yAH_yAIctcfu0_',
         ),
         Frame(
-          Uri.file('Runner/<NoFileName>'),
+          Uri.file(
+            'Runner/<NoFileName>',
+            windows: false,
+          ),
           136,
           null,
           '\$sSo17FlutterMethodCallCypSgIegn_Ieggg_AByXlSgIeyBy_IeyByy_TR',
         ),
         Frame(
-          Uri.file('Flutter/<NoFileName>'),
+          Uri.file(
+            'Flutter/<NoFileName>',
+            windows: false,
+          ),
           172,
           null,
           '__45-[FlutterMethodChannel setMethodCallHandler:]_block_invoke',
         ),
         Frame(
-          Uri.file('Flutter/<NoFileName>'),
+          Uri.file(
+            'Flutter/<NoFileName>',
+            windows: false,
+          ),
           116,
           null,
           '___ZN7flutter25PlatformMessageHandlerIos21HandlePlatformMessageENSt21_LIBCPP_ABI_NAMESPACE10unique_ptrINS_15PlatformMessageENS1_14default_deleteIS3_EEEE_block_invoke',
         ),
         Frame(
-          Uri.file('libdispatch.dylib/<NoFileName>'),
+          Uri.file(
+            'libdispatch.dylib/<NoFileName>',
+            windows: false,
+          ),
           7172,
           null,
           '959CD6E4-0CE7-3022-B73C-8B36F79F4745',
         ),
         Frame(
-          Uri.file('libdispatch.dylib/<NoFileName>'),
+          Uri.file(
+            'libdispatch.dylib/<NoFileName>',
+            windows: false,
+          ),
           14672,
           null,
           '959CD6E4-0CE7-3022-B73C-8B36F79F4745',
         ),
         Frame(
-          Uri.file('libdispatch.dylib/<NoFileName>'),
+          Uri.file(
+            'libdispatch.dylib/<NoFileName>',
+            windows: false,
+          ),
           940,
           null,
           '_dispatch_main_queue_callback_4CF',
         ),
         Frame(
-          Uri.file('CoreFoundation/<NoFileName>'),
+          Uri.file(
+            'CoreFoundation/<NoFileName>',
+            windows: false,
+          ),
           335076,
           null,
           '6174789A-E88C-3F5C-BA39-DE2E9EDC0750',
         ),
         Frame(
-          Uri.file('CoreFoundation/<NoFileName>'),
+          Uri.file(
+            'CoreFoundation/<NoFileName>',
+            windows: false,
+          ),
           48828,
           null,
           '6174789A-E88C-3F5C-BA39-DE2E9EDC0750',
         ),
         Frame(
-          Uri.file('CoreFoundation/<NoFileName>'),
+          Uri.file(
+            'CoreFoundation/<NoFileName>',
+            windows: false,
+          ),
           600,
           null,
           'CFRunLoopRunSpecific',
         ),
         Frame(
-          Uri.file('GraphicsServices/<NoFileName>'),
+          Uri.file(
+            'GraphicsServices/<NoFileName>',
+            windows: false,
+          ),
           164,
           null,
           'GSEventRunModal',
         ),
         Frame(
-          Uri.file('UIKitCore/<NoFileName>'),
+          Uri.file(
+            'UIKitCore/<NoFileName>',
+            windows: false,
+          ),
           5353660,
           null,
           '0E2D8679-D5F1-3C03-9010-7F6CE3662789',
         ),
         Frame(
-          Uri.file('UIKitCore/<NoFileName>'),
+          Uri.file(
+            'UIKitCore/<NoFileName>',
+            windows: false,
+          ),
           2124,
           null,
           'UIApplicationMain',
         ),
         Frame(
-          Uri.file('Runner/<NoFileName>'),
+          Uri.file(
+            'Runner/<NoFileName>',
+            windows: false,
+          ),
           64,
           null,
           'main',
         ),
         Frame(
-          Uri.file('dyld/<NoFileName>'),
+          Uri.file(
+            'dyld/<NoFileName>',
+            windows: false,
+          ),
           520,
           null,
           'start',

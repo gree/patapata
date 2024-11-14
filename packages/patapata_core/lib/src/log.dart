@@ -5,6 +5,7 @@
 
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 import 'dart:ui';
 
 import 'package:flutter/foundation.dart';
@@ -976,9 +977,10 @@ class NativeThrowable {
                   final tLine = tMatch.group(tLineGroup);
                   return Frame(
                     Uri.file(
-                        '${tMatch.group(tPackageGroup) ?? '<NoPackage>'}${(tFileGroup != null ? '/${tMatch.group(tFileGroup)}' : null) ?? '/<NoFileName>'}'
-                            .replaceAll(' ', '<space>'),
-                        windows: false),
+                      '${tMatch.group(tPackageGroup) ?? '<NoPackage>'}${(tFileGroup != null ? '/${tMatch.group(tFileGroup)}' : null) ?? '/<NoFileName>'}'
+                          .replaceAll(' ', '<space>'),
+                      windows: false,
+                    ),
                     tLine != null ? int.tryParse(tLine) : null,
                     null,
                     tMatch.group(tMethodGroup),
@@ -1025,9 +1027,10 @@ class NativeThrowable {
     final tPratformStackTrace = List.generate(tFrames?.length ?? 0, (index) {
       final tFrame = tFrames![index];
       try {
+        final tPathSeparator = (kIsWeb) ? '/' : Platform.pathSeparator;
         switch (defaultTargetPlatform) {
           case TargetPlatform.android:
-            final tLibrary = tFrame.library.split('/');
+            final tLibrary = tFrame.library.split(tPathSeparator);
             final tLine = tFrame.line != null ? ':${tFrame.line}' : '';
             final tPackageGroup = tLibrary[0].replaceAll('<NoPackage>', '');
             final tFileGroup = tLibrary[1].replaceAll('<NoFileName>', '');
@@ -1036,7 +1039,7 @@ class NativeThrowable {
             return ('$tPackageGroup${tPackageGroup.isNotEmpty ? '.' : ''}$tMethodGroup($tFileGroup$tLine)')
                 .replaceAll('<space>', ' ');
           case TargetPlatform.iOS:
-            final tLibrary = tFrame.library.split('/');
+            final tLibrary = tFrame.library.split(tPathSeparator);
             final tLine = tFrame.line != null ? ' + ${tFrame.line}' : '';
             final tPackageGroup = tLibrary[0].replaceAll('<NoPackage>', '');
             final tMethodGroup = tFrame.member ?? '';
