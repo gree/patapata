@@ -1040,6 +1040,8 @@ abstract class StandardPageWithResult<T extends Object?, E extends Object?>
         _navigator = Navigator(
           key: _childNavigatorKey,
           pages: _pageChildInstances![tParentPageInstance]!,
+          // TODO: To be addressed in the future.
+          // ignore: deprecated_member_use
           onPopPage: (route, result) {
             if (_delegate?.willPopPage != null) {
               if (_delegate!.willPopPage!(route, result)) {
@@ -1424,6 +1426,8 @@ class StandardRouterDelegate extends RouterDelegate<StandardRouteData>
         routeObserver,
       ],
       pages: _pageInstances,
+      // TODO: To be addressed in the future.
+      // ignore: deprecated_member_use
       onPopPage: _onPopPage,
     );
 
