@@ -770,6 +770,13 @@ abstract class StandardPageWithResult<T extends Object?, E extends Object?>
 
       return;
     }
+
+    // TODO: In the future, we should look at use cases here
+    // And decide if we want to update the current navigation
+    // data (like the URL) or not. Currently, we do not.
+    // If we were to, we'd need to update _pageInstanceToRouteData
+    // with the newest pageData.
+
     _sendPageDataEvent();
     (Router.of(context).routerDelegate as StandardRouterDelegate?)
         ?._updatePages();
@@ -1178,8 +1185,9 @@ class StandardRouteInformationParser
 
   @override
   RouteInformation? restoreRouteInformation(StandardRouteData configuration) {
-    final tStringLocation =
-        configuration.factory?.generateLink(configuration.pageData);
+    final tStringLocation = configuration.factory?.generateLink(
+        configuration.pageData ??
+            configuration.factory?.pageDataWhenNull?.call());
 
     if (tStringLocation != null) {
       final tLocation = Uri.tryParse(tStringLocation);
@@ -1820,9 +1828,12 @@ class StandardRouterDelegate extends RouterDelegate<StandardRouteData>
             ?.standardPageKey
             .currentState;
 
+        bool tLastPageDataChanged = false;
+
         if (tLastPage != null) {
           if (tLastPage.pageData != pageData) {
             tLastPage.pageData = pageData;
+            tLastPageDataChanged = true;
           }
 
           if (tLastPage.active) {
@@ -1851,6 +1862,13 @@ class StandardRouterDelegate extends RouterDelegate<StandardRouteData>
         );
 
         final tFuture = (tCompleter as Completer<E?>).future;
+
+        if (tLastPageDataChanged) {
+          _pageInstanceToRouteData[tLastPageInstance] = StandardRouteData(
+            factory: tFactory,
+            pageData: pageData,
+          );
+        }
 
         _updatePages();
 
