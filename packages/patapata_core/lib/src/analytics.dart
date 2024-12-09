@@ -269,7 +269,7 @@ class Analytics {
   /// Convert the data type of [object] to int, double, or String using the default judgment and return it.
   /// Additionally, in this function, data for the Analytics system trims the value side of key-value pairs to a maximum of 100 characters.
   /// This is because the average length limitation for the value strings of third-party Analytics systems is around 100 characters.
-  static Object? defaultMakeLoggableToNative(Object? object) {
+  static Object defaultMakeLoggableToNative(Object? object) {
     if (object == null) {
       return '';
     } else if (object is int || object is double || object is String) {
