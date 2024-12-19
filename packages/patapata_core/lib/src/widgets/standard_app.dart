@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:patapata_core/patapata_core.dart';
 import 'package:patapata_core/patapata_core_libs.dart';
+import 'package:patapata_core/src/exception.dart';
 import 'package:provider/provider.dart';
 
 part 'standard_page.dart';
@@ -59,6 +60,19 @@ Element? _findChildElement(
   }
 }
 
+/// Settings for [StandardAppPlugin].
+mixin StandardAppEnvironment {
+  /// Automatically calls [StandardRouterDelegate.processInitialRoute] upon completion of initialization.
+  /// If set to false, the app will continue to display [SplashPageFactory] or an empty page until
+  /// [StandardRouterDelegate.processInitialRoute] is called manually.
+  ///
+  /// When using [StartupSequence], this setting is ignored and [StandardAppPlugin.startupProcessInitialRoute]
+  /// is called instead. To override this behavior, please use [StartupNavigatorMixin].
+  ///
+  /// (default is `true`)
+  bool get autoProcessInitialRoute => true;
+}
+
 /// A typedef for the key of a `LinkHandler` used in [StandardAppPlugin].
 typedef StandardAppPluginLinkHandlerKey = Object;
 
@@ -79,6 +93,9 @@ class StandardAppPlugin extends Plugin with StartupNavigatorMixin {
   StandardRouteInformationParser? get parser => _parser;
 
   StreamSubscription<AnalyticsEvent>? _sub;
+
+  @visibleForTesting
+  static bool debugIsWeb = false;
 
   @override
   FutureOr<bool> init(App<Object> app) async {
@@ -164,8 +181,12 @@ class StandardAppPlugin extends Plugin with StartupNavigatorMixin {
 
   @override
   void startupOnReset() {
-    delegate?._factoryTypeMap.values.first
-        .goWithResult(null, StandardPageNavigationMode.removeAll);
+    final tFactory = delegate?._factoryTypeMap.values
+        .whereType<SplashPageFactory>()
+        .firstOrNull;
+
+    tFactory?.goWithResult(null, StandardPageNavigationMode.removeAll);
+    delegate?._initialRouteProcessed = false;
   }
 }
 
@@ -524,5 +545,12 @@ extension StandardAppApp on App {
   String? generateLink<P extends StandardPage<R>, R extends Object?>(
       R pageData) {
     return standardAppPlugin.generateLink<P, R>(pageData);
+  }
+}
+
+class _DummySplashPage extends StandardPage<void> {
+  @override
+  Widget buildPage(BuildContext context) {
+    return const SizedBox.shrink();
   }
 }
