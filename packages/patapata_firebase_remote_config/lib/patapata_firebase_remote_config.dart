@@ -7,6 +7,7 @@ library patapata_firebase_remote_config;
 
 import 'package:firebase_remote_config/firebase_remote_config.dart'
     as firebase_remote_config;
+import 'package:flutter/foundation.dart';
 import 'package:patapata_core/patapata_core.dart';
 import 'package:patapata_core/patapata_core_libs.dart';
 import 'package:patapata_firebase_core/patapata_firebase_core.dart';
@@ -49,7 +50,10 @@ class _FirebaseRemoteConfigPluginRemoteConfig extends RemoteConfig {
       _logger.finer('Enabled debug mode. Fetches will be more frequent!');
     }
 
-    _subscription = _remoteConfig.onConfigUpdated.listen(_onRemoteChanged);
+    if (!kIsWeb) {
+      _subscription = _remoteConfig.onConfigUpdated.listen(_onRemoteChanged);
+    }
+
     await super.init();
   }
 

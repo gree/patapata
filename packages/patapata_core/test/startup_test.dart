@@ -3,7 +3,6 @@
 // This source code is licensed under the MIT license found in the
 // LICENSE file in the root directory of this source tree.
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:patapata_core/patapata_core.dart';
@@ -188,12 +187,11 @@ void main() {
 
       await tester.pumpAndSettle();
       expect(find.text('HomePage'), findsOneWidget);
+      expect(tOnSuccess, true);
 
       // Already Complete. To achieve 100% test coverage.
-      expect(tApp.startupSequence?.waitForComplete().runtimeType,
-          SynchronousFuture<void>);
-
-      expect(tOnSuccess, true);
+      // Test that no exception is thrown.
+      await tApp.startupSequence?.waitForComplete();
     });
 
     tApp.dispose();
@@ -391,9 +389,11 @@ void main() {
     tApp.run();
 
     await tApp.runProcess(() async {
-      final tWaitForComplete = Completer<void>();
-      tApp.startupSequence!.waitForComplete().catchError((error, stackTrace) {
-        tWaitForComplete.completeError(error, stackTrace);
+      Object? tException;
+      final tWaitFuture = tApp.startupSequence!
+          .waitForComplete()
+          .catchError((error, stackTrace) {
+        tException = error;
       });
 
       await tester.pumpAndSettle();
@@ -402,18 +402,19 @@ void main() {
       await tester.pumpAndSettle(const Duration(milliseconds: 1000));
       expect(find.text('StartupPageA'), findsNothing);
 
-      expect(
-        () => tWaitForComplete.future,
-        throwsA('StateXB'),
-      );
+      await tWaitFuture;
+      expect(tException, equals('StateXB'));
 
       expect(tApp.startupSequence?.error?.error, 'StateXB');
 
       // Already Complete. To achieve 100% test coverage.
-      expect(
-        () => tApp.startupSequence?.waitForComplete(),
-        throwsA('StateXB'),
-      );
+      tException = null;
+      await tApp.startupSequence!
+          .waitForComplete()
+          .catchError((error, stackTrace) {
+        tException = error;
+      });
+      expect(tException, equals('StateXB'));
     });
 
     tApp.dispose();

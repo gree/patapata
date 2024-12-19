@@ -78,7 +78,7 @@ We try to support the newest version of Flutter and will not purposely keep supp
 
 The Patapata team believes that it is important to keep up to date with the latest version of Flutter as in our expierence with real world applications, old versions of Flutter have trouble supporting the newer versions of Android and especially iOS.
 
-Currently, we support Flutter 3.19.0 and above, with a minimum Dart version of 3.0.0 up to 4.0.0.
+Currently, we support Flutter 3.24.0 and above, with a minimum Dart version of 3.0.0 up to 4.0.0.
 
 We officially support Android, iOS fully, and best effort for Web and MacOS.
 Windows and Linux are currently not supported.

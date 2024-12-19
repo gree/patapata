@@ -11,7 +11,7 @@ part of 'providers.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$appHash() => r'b221fc2a0f1007056310f6ab8af4b3bdb50f2ecc';
+String _$appHash() => r'a386eda9ca296deee36af71770b18e030ea7fa01';
 
 /// The [App] instance.
 ///
@@ -26,8 +26,10 @@ final appProvider = AutoDisposeProvider<App>.internal(
   allTransitiveDependencies: null,
 );
 
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
 typedef AppRef = AutoDisposeProviderRef<App>;
-String _$userHash() => r'185492973048a3679bb21cb6e2bf4ce15012ec7e';
+String _$userHash() => r'b7f4b2123aac513b4e6995ec4b0568dcc3aa0c6c';
 
 /// The current [User].
 /// Whenever [User] changes, this provider will be updated.
@@ -43,8 +45,10 @@ final userProvider = AutoDisposeProvider<Raw<User>>.internal(
   allTransitiveDependencies: null,
 );
 
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
 typedef UserRef = AutoDisposeProviderRef<Raw<User>>;
-String _$remoteConfigHash() => r'8e75aba0bc4b5c62efcad5a0d20aba8538c17cd3';
+String _$remoteConfigHash() => r'f4f49484ad446cc9577c644c46c75b76c5e330b6';
 
 /// Access to [RemoteConfig].
 /// Whenever [RemoteConfig] changes, this provider will be updated.
@@ -60,9 +64,11 @@ final remoteConfigProvider = AutoDisposeProvider<Raw<RemoteConfig>>.internal(
   allTransitiveDependencies: null,
 );
 
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
 typedef RemoteConfigRef = AutoDisposeProviderRef<Raw<RemoteConfig>>;
 String _$remoteConfigStringHash() =>
-    r'd3defab5f7870a383673f72bbe259deb968ff000';
+    r'6fa9cc31e55d7e7a76899ab404ee562fa0dc26d9';
 
 /// Copied from Dart SDK
 class _SystemHash {
@@ -228,6 +234,8 @@ class RemoteConfigStringProvider extends AutoDisposeProvider<String> {
   }
 }
 
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
 mixin RemoteConfigStringRef on AutoDisposeProviderRef<String> {
   /// The parameter `key` of this provider.
   String get key;
@@ -247,7 +255,7 @@ class _RemoteConfigStringProviderElement
       (origin as RemoteConfigStringProvider).defaultValue;
 }
 
-String _$remoteConfigIntHash() => r'102555b16644b3768133e933fbb7e6b4e84efe61';
+String _$remoteConfigIntHash() => r'a69bc4ad3ef9a8e2e8d91ed3e1070c1f71fe1157';
 
 /// Gets a [RemoteConfig] value as a [int].
 /// Whenever this [key] changes, this provider will be updated.
@@ -392,6 +400,8 @@ class RemoteConfigIntProvider extends AutoDisposeProvider<int> {
   }
 }
 
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
 mixin RemoteConfigIntRef on AutoDisposeProviderRef<int> {
   /// The parameter `key` of this provider.
   String get key;
@@ -411,7 +421,7 @@ class _RemoteConfigIntProviderElement extends AutoDisposeProviderElement<int>
 }
 
 String _$remoteConfigDoubleHash() =>
-    r'f7cf93febfff6eab6e48c05bb7aa177e31aaf84b';
+    r'fc88e6237a28490b6c6c5b76b471714cff3f6993';
 
 /// Gets a [RemoteConfig] value as a [double].
 /// Whenever this [key] changes, this provider will be updated.
@@ -556,6 +566,8 @@ class RemoteConfigDoubleProvider extends AutoDisposeProvider<double> {
   }
 }
 
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
 mixin RemoteConfigDoubleRef on AutoDisposeProviderRef<double> {
   /// The parameter `key` of this provider.
   String get key;
@@ -575,7 +587,7 @@ class _RemoteConfigDoubleProviderElement
       (origin as RemoteConfigDoubleProvider).defaultValue;
 }
 
-String _$remoteConfigBoolHash() => r'13a9e5417b965b88f843d5fa69b7cb03cb9fea95';
+String _$remoteConfigBoolHash() => r'15dc8fae111c031129a09354ab7fca16b545899d';
 
 /// Gets a [RemoteConfig] value as a [bool].
 /// Whenever this [key] changes, this provider will be updated.
@@ -720,6 +732,8 @@ class RemoteConfigBoolProvider extends AutoDisposeProvider<bool> {
   }
 }
 
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
 mixin RemoteConfigBoolRef on AutoDisposeProviderRef<bool> {
   /// The parameter `key` of this provider.
   String get key;
@@ -738,7 +752,7 @@ class _RemoteConfigBoolProviderElement extends AutoDisposeProviderElement<bool>
   bool get defaultValue => (origin as RemoteConfigBoolProvider).defaultValue;
 }
 
-String _$localConfigHash() => r'2d0900f1e1f41f25456b738fcc2a18d4fd7cca59';
+String _$localConfigHash() => r'd0fd0c12e8ac890c2b7681a8fb3f5790f5f3d67f';
 
 /// Access to [LocalConfig].
 /// Whenever [LocalConfig] changes, this provider will be updated.
@@ -754,8 +768,10 @@ final localConfigProvider = AutoDisposeProvider<Raw<LocalConfig>>.internal(
   allTransitiveDependencies: null,
 );
 
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
 typedef LocalConfigRef = AutoDisposeProviderRef<Raw<LocalConfig>>;
-String _$localConfigStringHash() => r'5d87800e6aa2139e9129dba2d78145a941927fc5';
+String _$localConfigStringHash() => r'1e5e30c43a240dd52f7fff8a02d23d8c6c28a9b8';
 
 /// Gets a [LocalConfig] value as a [String].
 /// Whenever this [key] changes, this provider will be updated.
@@ -900,6 +916,8 @@ class LocalConfigStringProvider extends AutoDisposeProvider<String> {
   }
 }
 
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
 mixin LocalConfigStringRef on AutoDisposeProviderRef<String> {
   /// The parameter `key` of this provider.
   String get key;
@@ -918,7 +936,7 @@ class _LocalConfigStringProviderElement
   String get defaultValue => (origin as LocalConfigStringProvider).defaultValue;
 }
 
-String _$localConfigIntHash() => r'4050a4918e2d6b5b05931444019231f0dd3def14';
+String _$localConfigIntHash() => r'd7bd540bfb506417c059d5af13c6712644700216';
 
 /// Gets a [LocalConfig] value as a [int].
 /// Whenever this [key] changes, this provider will be updated.
@@ -1063,6 +1081,8 @@ class LocalConfigIntProvider extends AutoDisposeProvider<int> {
   }
 }
 
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
 mixin LocalConfigIntRef on AutoDisposeProviderRef<int> {
   /// The parameter `key` of this provider.
   String get key;
@@ -1081,7 +1101,7 @@ class _LocalConfigIntProviderElement extends AutoDisposeProviderElement<int>
   int get defaultValue => (origin as LocalConfigIntProvider).defaultValue;
 }
 
-String _$localConfigDoubleHash() => r'177c15a70d201d5ec197ec3569a654193b6297fb';
+String _$localConfigDoubleHash() => r'4f2de71381d06b9ab23530ff8b516186d8ac69d1';
 
 /// Gets a [LocalConfig] value as a [double].
 /// Whenever this [key] changes, this provider will be updated.
@@ -1226,6 +1246,8 @@ class LocalConfigDoubleProvider extends AutoDisposeProvider<double> {
   }
 }
 
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
 mixin LocalConfigDoubleRef on AutoDisposeProviderRef<double> {
   /// The parameter `key` of this provider.
   String get key;
@@ -1244,7 +1266,7 @@ class _LocalConfigDoubleProviderElement
   double get defaultValue => (origin as LocalConfigDoubleProvider).defaultValue;
 }
 
-String _$localConfigBoolHash() => r'45ff874a484e20c2ae29d4113d77914e6cf46696';
+String _$localConfigBoolHash() => r'c818ba2223a40f13130a32696df6e77e25bc18b4';
 
 /// Gets a [LocalConfig] value as a [bool].
 /// Whenever this [key] changes, this provider will be updated.
@@ -1389,6 +1411,8 @@ class LocalConfigBoolProvider extends AutoDisposeProvider<bool> {
   }
 }
 
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
 mixin LocalConfigBoolRef on AutoDisposeProviderRef<bool> {
   /// The parameter `key` of this provider.
   String get key;
@@ -1407,7 +1431,7 @@ class _LocalConfigBoolProviderElement extends AutoDisposeProviderElement<bool>
   bool get defaultValue => (origin as LocalConfigBoolProvider).defaultValue;
 }
 
-String _$remoteMessagingHash() => r'3202165a9ba8b104810ce6db9ab4a689b08397f3';
+String _$remoteMessagingHash() => r'dbe187f77269933c293bea5e45657c378c8fdf7a';
 
 /// Access to [RemoteMessaging].
 /// Whenever [RemoteMessaging] changes, this provider will be updated.
@@ -1425,9 +1449,11 @@ final remoteMessagingProvider =
   allTransitiveDependencies: null,
 );
 
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
 typedef RemoteMessagingRef = AutoDisposeProviderRef<Raw<RemoteMessaging>>;
 String _$remoteMessagingMessagesHash() =>
-    r'cceead0236a21e44607e4fdd1fb2e064ec52f6ae';
+    r'8285f650cf673fd0645e5b0c3cf8b65b0cd6de9f';
 
 /// Access to [RemoteMessaging.messages].
 /// Whenever a new [RemoteMessage] is receieved via [RemoteMessaging.messages], this provider will be updated.
@@ -1446,10 +1472,12 @@ final remoteMessagingMessagesProvider =
   allTransitiveDependencies: null,
 );
 
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
 typedef RemoteMessagingMessagesRef
     = AutoDisposeStreamProviderRef<RemoteMessage>;
 String _$remoteMessagingTokensHash() =>
-    r'b336b909e5704473fc7b36dfa176063c7a9c66c2';
+    r'84ae2672e5cbe8686f5a9861ced71279165895a3';
 
 /// Access to [RemoteMessaging.tokens].
 /// Whenever a new token is receieved via [RemoteMessaging.tokens], this provider will be updated.
@@ -1468,8 +1496,10 @@ final remoteMessagingTokensProvider =
   allTransitiveDependencies: null,
 );
 
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
 typedef RemoteMessagingTokensRef = AutoDisposeStreamProviderRef<String?>;
-String _$analyticsHash() => r'1fd69a6ec7906d89d0ebaf111bed072b736dc3f3';
+String _$analyticsHash() => r'449bd835a33a36ee85450b1139172925ec245ba7';
 
 /// Access to [Analytics].
 ///
@@ -1484,9 +1514,11 @@ final analyticsProvider = AutoDisposeProvider<Analytics>.internal(
   allTransitiveDependencies: null,
 );
 
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
 typedef AnalyticsRef = AutoDisposeProviderRef<Analytics>;
 String _$globalAnalyticsContextHash() =>
-    r'0f4421d75f4445217509cff50843e89797133fce';
+    r'20c27a4b507a0be0866e6e8fbda4f78d9ef726f7';
 
 /// Access to the global [AnalyticsContext] from [Analytics.globalContext].
 ///
@@ -1503,9 +1535,11 @@ final globalAnalyticsContextProvider =
   allTransitiveDependencies: null,
 );
 
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
 typedef GlobalAnalyticsContextRef = AutoDisposeProviderRef<AnalyticsContext>;
 String _$networkInformationHash() =>
-    r'13d7cae849d6733c528c329d79f79e1a43d5f53c';
+    r'f512cf8eaa5196f1d499cabe74b2203a2ab7e6a3';
 
 /// Access to a stream of [NetworkInformation].
 /// Whenever [NetworkInformation] changes, this provider will be updated.
@@ -1523,8 +1557,10 @@ final networkInformationProvider =
   allTransitiveDependencies: null,
 );
 
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
 typedef NetworkInformationRef = AutoDisposeProviderRef<NetworkInformation>;
-String _$packageInfoHash() => r'bb4b207e4e72b204cb2ce57645ec41ad09115b53';
+String _$packageInfoHash() => r'eb33e7faec41df692cfc4a05f6ac2f745b8944ea';
 
 /// Access to [PackageInfo].
 ///
@@ -1539,8 +1575,10 @@ final packageInfoProvider = AutoDisposeProvider<PackageInfoPlugin>.internal(
   allTransitiveDependencies: null,
 );
 
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
 typedef PackageInfoRef = AutoDisposeProviderRef<PackageInfoPlugin>;
-String _$deviceInfoHash() => r'737aa403f7f02cb999e488554c1110ae3b2f03d2';
+String _$deviceInfoHash() => r'c16f9af70ea0ce72e120dbf230e92fbf562edccb';
 
 /// Access to [DeviceInfo].
 ///
@@ -1555,6 +1593,8 @@ final deviceInfoProvider = AutoDisposeProvider<DeviceInfoPlugin>.internal(
   allTransitiveDependencies: null,
 );
 
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
 typedef DeviceInfoRef = AutoDisposeProviderRef<DeviceInfoPlugin>;
 // ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member
+// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

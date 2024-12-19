@@ -72,173 +72,203 @@ void main() {
   });
 
   testWidgets("Standard Page Test, Pages removed", (WidgetTester tester) async {
-    late TestChangeNotifierData tProvider;
-    final App tApp = createApp(
-      appWidget: ChangeNotifierProvider<TestChangeNotifierData>(
-        create: (context) => TestChangeNotifierData(
-          title: "title",
-          pages: [
-            StandardPageFactory<TestPageA, void>(
-              create: (data) => TestPageA(),
-            ),
-            StandardPageFactory<TestPageB, void>(
-              create: (data) => TestPageB(),
-            ),
-          ],
+    int tExceptionCount = 0;
+    await runZonedGuarded(() async {
+      late TestChangeNotifierData tProvider;
+      final App tApp = createApp(
+        appWidget: ChangeNotifierProvider<TestChangeNotifierData>(
+          create: (context) => TestChangeNotifierData(
+            title: "title",
+            pages: [
+              StandardPageFactory<TestPageA, void>(
+                create: (data) => TestPageA(),
+              ),
+              StandardPageFactory<TestPageB, void>(
+                create: (data) => TestPageB(),
+              ),
+            ],
+          ),
+          child: Builder(builder: (context) {
+            tProvider = context.watch<TestChangeNotifierData>();
+
+            return StandardMaterialApp(
+              onGenerateTitle: (context) => tProvider.title,
+              pages: tProvider.pages,
+            );
+          }),
         ),
-        child: Builder(builder: (context) {
-          tProvider = context.watch<TestChangeNotifierData>();
+      );
 
-          return StandardMaterialApp(
-            onGenerateTitle: (context) => tProvider.title,
-            pages: tProvider.pages,
-          );
-        }),
-      ),
-    );
+      tApp.run();
 
-    tApp.run();
+      await tApp.runProcess(() async {
+        await tester.pumpAndSettle();
 
-    await tApp.runProcess(() async {
-      await tester.pumpAndSettle();
+        expect(find.text('Test Title'), findsOneWidget);
+        expect(find.text('Test Message'), findsOneWidget);
 
-      expect(find.text('Test Title'), findsOneWidget);
-      expect(find.text('Test Message'), findsOneWidget);
+        await tester.pumpAndSettle();
 
-      await tester.pumpAndSettle();
+        // update widget using provider
+        tProvider.changeTitle('Change Test Title');
 
-      // update widget using provider
-      tProvider.changeTitle('Change Test Title');
+        tProvider.changePages([
+          StandardPageFactory<TestPageB, void>(
+            create: (data) => TestPageB(),
+          ),
+        ]);
 
-      tProvider.changePages([
-        StandardPageFactory<TestPageB, void>(
-          create: (data) => TestPageB(),
-        ),
-      ]);
+        await tester.pumpAndSettle();
 
-      await tester.pumpAndSettle();
+        expect(find.text('Test Title B'), findsOneWidget);
+        expect(find.text('Test Message B'), findsOneWidget);
+      });
 
-      expect(find.text('Test Title B'), findsOneWidget);
-      expect(find.text('Test Message B'), findsOneWidget);
+      tApp.dispose();
+    }, (error, stackTrace) {
+      if (error != 'Page deleted') {
+        throw error;
+      }
+      tExceptionCount++;
     });
 
-    tApp.dispose();
+    expect(tExceptionCount, 1);
   });
 
   testWidgets("Standard Page Test, Pages removed in history",
       (WidgetTester tester) async {
-    late TestChangeNotifierData tProvider;
-    final App tApp = createApp(
-      appWidget: ChangeNotifierProvider<TestChangeNotifierData>(
-        create: (context) => TestChangeNotifierData(
-          title: "title",
-          pages: [
-            StandardPageFactory<TestPageA, void>(
-              create: (data) => TestPageA(),
-            ),
-            StandardPageFactory<TestPageB, void>(
-              create: (data) => TestPageB(),
-            ),
-            StandardPageFactory<TestPageC, TestPageData>(
-              create: (data) => TestPageC(),
-            ),
-          ],
+    int tExceptionCount = 0;
+    await runZonedGuarded(() async {
+      late TestChangeNotifierData tProvider;
+      final App tApp = createApp(
+        appWidget: ChangeNotifierProvider<TestChangeNotifierData>(
+          create: (context) => TestChangeNotifierData(
+            title: "title",
+            pages: [
+              StandardPageFactory<TestPageA, void>(
+                create: (data) => TestPageA(),
+              ),
+              StandardPageFactory<TestPageB, void>(
+                create: (data) => TestPageB(),
+              ),
+              StandardPageFactory<TestPageC, TestPageData>(
+                create: (data) => TestPageC(),
+              ),
+            ],
+          ),
+          child: Builder(builder: (context) {
+            tProvider = context.watch<TestChangeNotifierData>();
+
+            return StandardMaterialApp(
+              onGenerateTitle: (context) => tProvider.title,
+              pages: tProvider.pages,
+            );
+          }),
         ),
-        child: Builder(builder: (context) {
-          tProvider = context.watch<TestChangeNotifierData>();
+      );
 
-          return StandardMaterialApp(
-            onGenerateTitle: (context) => tProvider.title,
-            pages: tProvider.pages,
-          );
-        }),
-      ),
-    );
+      tApp.run();
 
-    tApp.run();
+      await tApp.runProcess(() async {
+        await tester.pumpAndSettle();
 
-    await tApp.runProcess(() async {
-      await tester.pumpAndSettle();
+        expect(find.text('Test Title'), findsOneWidget);
+        expect(find.text('Test Message'), findsOneWidget);
 
-      expect(find.text('Test Title'), findsOneWidget);
-      expect(find.text('Test Message'), findsOneWidget);
+        await tester.tap(find.byKey(const ValueKey(kGoPageDataButton)));
 
-      await tester.tap(find.byKey(const ValueKey(kGoPageDataButton)));
+        await tester.pumpAndSettle();
 
-      await tester.pumpAndSettle();
+        expect(find.text('Test Title C'), findsOneWidget);
+        expect(find.text('Test Message C'), findsOneWidget);
 
-      expect(find.text('Test Title C'), findsOneWidget);
-      expect(find.text('Test Message C'), findsOneWidget);
+        // update widget using provider
+        tProvider.changeTitle('Change Test Title');
 
-      // update widget using provider
-      tProvider.changeTitle('Change Test Title');
+        tProvider.changePages([
+          StandardPageFactory<TestPageB, void>(
+            create: (data) => TestPageB(),
+          ),
+          StandardPageFactory<TestPageC, TestPageData>(
+            create: (data) => TestPageC(),
+          ),
+        ]);
 
-      tProvider.changePages([
-        StandardPageFactory<TestPageB, void>(
-          create: (data) => TestPageB(),
-        ),
-        StandardPageFactory<TestPageC, TestPageData>(
-          create: (data) => TestPageC(),
-        ),
-      ]);
+        await tester.pumpAndSettle();
 
-      await tester.pumpAndSettle();
+        expect(find.text('Test Title B'), findsOneWidget);
+        expect(find.text('Test Message B'), findsOneWidget);
+      });
 
-      expect(find.text('Test Title B'), findsOneWidget);
-      expect(find.text('Test Message B'), findsOneWidget);
+      tApp.dispose();
+    }, (error, stackTrace) {
+      if (error != 'Page deleted') {
+        throw error;
+      }
+      tExceptionCount++;
     });
 
-    tApp.dispose();
+    expect(tExceptionCount, 2);
   });
 
   testWidgets("Standard Page Test, Pages swapped", (WidgetTester tester) async {
-    late TestChangeNotifierData tProvider;
-    final App tApp = createApp(
-      appWidget: ChangeNotifierProvider<TestChangeNotifierData>(
-        create: (context) => TestChangeNotifierData(
-          title: "title",
-          pages: [
-            StandardPageFactory<TestPageA, void>(
-              create: (data) => TestPageA(),
-            ),
-          ],
+    int tExceptionCount = 0;
+    await runZonedGuarded(() async {
+      late TestChangeNotifierData tProvider;
+      final App tApp = createApp(
+        appWidget: ChangeNotifierProvider<TestChangeNotifierData>(
+          create: (context) => TestChangeNotifierData(
+            title: "title",
+            pages: [
+              StandardPageFactory<TestPageA, void>(
+                create: (data) => TestPageA(),
+              ),
+            ],
+          ),
+          child: Builder(builder: (context) {
+            tProvider = context.watch<TestChangeNotifierData>();
+            return StandardMaterialApp(
+              onGenerateTitle: (context) => tProvider.title,
+              pages: tProvider.pages,
+            );
+          }),
         ),
-        child: Builder(builder: (context) {
-          tProvider = context.watch<TestChangeNotifierData>();
-          return StandardMaterialApp(
-            onGenerateTitle: (context) => tProvider.title,
-            pages: tProvider.pages,
-          );
-        }),
-      ),
-    );
+      );
 
-    tApp.run();
+      tApp.run();
 
-    await tApp.runProcess(() async {
-      await tester.pumpAndSettle();
+      await tApp.runProcess(() async {
+        await tester.pumpAndSettle();
 
-      expect(find.text('Test Title'), findsOneWidget);
-      expect(find.text('Test Message'), findsOneWidget);
+        expect(find.text('Test Title'), findsOneWidget);
+        expect(find.text('Test Message'), findsOneWidget);
 
-      await tester.pumpAndSettle();
+        await tester.pumpAndSettle();
 
-      // update widget using provider
-      tProvider.changeTitle('Change Test Title');
+        // update widget using provider
+        tProvider.changeTitle('Change Test Title');
 
-      tProvider.changePages([
-        StandardPageFactory<TestPageB, void>(
-          create: (data) => TestPageB(),
-        ),
-      ]);
+        tProvider.changePages([
+          StandardPageFactory<TestPageB, void>(
+            create: (data) => TestPageB(),
+          ),
+        ]);
 
-      await tester.pumpAndSettle();
+        await tester.pumpAndSettle();
 
-      expect(find.text('Test Title B'), findsOneWidget);
-      expect(find.text('Test Message B'), findsOneWidget);
+        expect(find.text('Test Title B'), findsOneWidget);
+        expect(find.text('Test Message B'), findsOneWidget);
+      });
+
+      tApp.dispose();
+    }, (error, stackTrace) {
+      if (error != 'Page deleted') {
+        throw error;
+      }
+      tExceptionCount++;
     });
 
-    tApp.dispose();
+    expect(tExceptionCount, 1);
   });
 
   testWidgets("Standard Page Test, Same pages (Not Update)",
@@ -369,57 +399,67 @@ void main() {
 
   testWidgets("Standard Page Test, Did update widgets",
       (WidgetTester tester) async {
-    late TestChangeNotifierData tProvider;
-    final App tApp = createApp(
-      appWidget: ChangeNotifierProvider<TestChangeNotifierData>(
-        create: (context) => TestChangeNotifierData(
-          title: "title",
-          pages: [
-            StandardPageFactory<TestPageA, void>(
-              create: (data) => TestPageA(),
+    int tExceptionCount = 0;
+    await runZonedGuarded(() async {
+      late TestChangeNotifierData tProvider;
+      final App tApp = createApp(
+        appWidget: ChangeNotifierProvider<TestChangeNotifierData>(
+          create: (context) => TestChangeNotifierData(
+            title: "title",
+            pages: [
+              StandardPageFactory<TestPageA, void>(
+                create: (data) => TestPageA(),
+              ),
+            ],
+          ),
+          child: Builder(builder: (context) {
+            tProvider = context.watch<TestChangeNotifierData>();
+
+            return StandardMaterialApp(
+              onGenerateTitle: (context) => tProvider.title,
+              pages: tProvider.pages,
+              routableBuilder: tProvider.routableBuilder,
+              willPopPage: tProvider.willPopPage,
+            );
+          }),
+        ),
+      );
+
+      tApp.run();
+
+      await tApp.runProcess(() async {
+        await tester.pumpAndSettle();
+
+        // update widget using provider
+        tProvider.changeTitle('Change Test Title');
+        tProvider.changePages(
+          [
+            StandardPageFactory<TestPageB, void>(
+              create: (data) => TestPageB(),
             ),
           ],
-        ),
-        child: Builder(builder: (context) {
-          tProvider = context.watch<TestChangeNotifierData>();
+        );
+        tProvider.changeRoutableBuilder((context, child) {
+          return child!;
+        });
+        tProvider.changeWillPopPage((route, result) {
+          return false;
+        });
 
-          return StandardMaterialApp(
-            onGenerateTitle: (context) => tProvider.title,
-            pages: tProvider.pages,
-            routableBuilder: tProvider.routableBuilder,
-            willPopPage: tProvider.willPopPage,
-          );
-        }),
-      ),
-    );
+        await tester.pumpAndSettle();
 
-    tApp.run();
-
-    await tApp.runProcess(() async {
-      await tester.pumpAndSettle();
-
-      // update widget using provider
-      tProvider.changeTitle('Change Test Title');
-      tProvider.changePages(
-        [
-          StandardPageFactory<TestPageB, void>(
-            create: (data) => TestPageB(),
-          ),
-        ],
-      );
-      tProvider.changeRoutableBuilder((context, child) {
-        return child!;
+        expect(find.text('Test Title B'), findsOneWidget);
+        expect(find.text('Test Message B'), findsOneWidget);
       });
-      tProvider.changeWillPopPage((route, result) {
-        return false;
-      });
-
-      await tester.pumpAndSettle();
-
-      expect(find.text('Test Title B'), findsOneWidget);
-      expect(find.text('Test Message B'), findsOneWidget);
+      tApp.dispose();
+    }, (error, stackTrace) {
+      if (error != 'Page deleted') {
+        throw error;
+      }
+      tExceptionCount++;
     });
-    tApp.dispose();
+
+    expect(tExceptionCount, 1);
   });
 
   testWidgets("Standard Material App global Navigator Context Test",

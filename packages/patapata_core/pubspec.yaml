@@ -6,7 +6,7 @@ repository: https://github.com/gree/patapata/tree/main/packages/patapata_core
 
 environment:
   sdk: ">=3.0.0 <4.0.0"
-  flutter: ">=3.19.0"
+  flutter: ">=3.24.0"
 
 executables:
   bootstrap:

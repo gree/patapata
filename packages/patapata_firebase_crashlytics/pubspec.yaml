@@ -1,12 +1,12 @@
 name: patapata_firebase_crashlytics
 description: This package is a plugin for Patapata that adds support for Firebase Crashlytics to your Patapata app.
-version: 1.1.0
+version: 1.1.1
 homepage: https://github.com/gree/patapata
 repository: https://github.com/gree/patapata/tree/main/packages/patapata_firebase_crashlytics
 
 environment:
   sdk: ">=3.0.0 <4.0.0"
-  flutter: ">=3.19.0"
+  flutter: ">=3.24.0"
 
 dependencies:
   flutter:
@@ -14,7 +14,7 @@ dependencies:
 
   patapata_core: ^1.1.0
 
-  patapata_firebase_core: ^1.1.0
+  patapata_firebase_core: ^1.1.1
 
   firebase_crashlytics: ^3.5.1
   stack_trace: ^1.11.0
