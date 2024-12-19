@@ -16,7 +16,7 @@ dependencies:
 
   patapata_firebase_core: ^1.1.1
 
-  firebase_analytics: ^10.10.1
+  firebase_analytics: ^11.3.5
 
 dev_dependencies:
   flutter_test:
