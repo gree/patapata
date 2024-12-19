@@ -238,6 +238,7 @@ class DeviceInfoPlugin extends Plugin {
   static Map<String, dynamic> mockIosDeviceInfoMap = <String, dynamic>{
     'name': 'name',
     'model': 'model',
+    'modelName': 'modelName',
     'utsname': <String, dynamic>{
       'release': 'release',
       'version': 'version',
@@ -248,6 +249,7 @@ class DeviceInfoPlugin extends Plugin {
     'systemName': 'systemName',
     'systemVersion': 'systemVersion',
     'isPhysicalDevice': true,
+    'isiOSAppOnMac': true,
     'localizedModel': 'localizedModel',
     'identifierForVendor': 'identifierForVendor',
   };
@@ -257,21 +259,25 @@ class DeviceInfoPlugin extends Plugin {
   static void setMockIosDeviceInfo({
     String? name,
     String? model,
+    String? modelName,
     Map<String, dynamic>? utsname,
     String? systemName,
     String? systemVersion,
     bool? isPhysicalDevice,
+    bool? isiOSAppOnMac,
     String? localizedModel,
     String? identifierForVendor,
   }) {
     mockIosDeviceInfoMap = <String, dynamic>{
       'name': name ?? mockIosDeviceInfoMap['name'],
       'model': model ?? mockIosDeviceInfoMap['model'],
+      'modelName': modelName ?? mockIosDeviceInfoMap['modelName'],
       'utsname': utsname ?? mockIosDeviceInfoMap['utsname'],
       'systemName': systemName ?? mockIosDeviceInfoMap['systemName'],
       'systemVersion': systemVersion ?? mockIosDeviceInfoMap['systemVersion'],
       'isPhysicalDevice':
           isPhysicalDevice ?? mockIosDeviceInfoMap['isPhysicalDevice'],
+      'isiOSAppOnMac': isiOSAppOnMac ?? mockIosDeviceInfoMap['isiOSAppOnMac'],
       'localizedModel':
           localizedModel ?? mockIosDeviceInfoMap['localizedModel'],
       'identifierForVendor':
@@ -330,6 +336,7 @@ class DeviceInfoPlugin extends Plugin {
     'hostName': 'hostName',
     'arch': 'arch',
     'model': 'model',
+    'modelName': 'modelName',
     'kernelVersion': 'kernelVersion',
     'osRelease': 'osRelease',
     'majorVersion': 10,
@@ -346,6 +353,7 @@ class DeviceInfoPlugin extends Plugin {
   static void setMockMacosDeviceInfo({
     String? arch,
     String? model,
+    String? modelName,
     int? activeCPUs,
     int? memorySize,
     int? cpuFrequency,
@@ -361,6 +369,7 @@ class DeviceInfoPlugin extends Plugin {
     mockMacosDeviceInfoMap = <String, dynamic>{
       'arch': arch ?? mockMacosDeviceInfoMap['arch'],
       'model': model ?? mockMacosDeviceInfoMap['model'],
+      'modelName': modelName ?? mockMacosDeviceInfoMap['modelName'],
       'activeCPUs': activeCPUs ?? mockMacosDeviceInfoMap['activeCPUs'],
       'memorySize': memorySize ?? mockMacosDeviceInfoMap['memorySize'],
       'cpuFrequency': cpuFrequency ?? mockMacosDeviceInfoMap['cpuFrequency'],
