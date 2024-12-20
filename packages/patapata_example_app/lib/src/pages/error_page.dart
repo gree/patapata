@@ -12,18 +12,9 @@ import '../../exceptions.dart';
 import '../../main.dart';
 import '../errors.dart';
 
-/// ErrorPage is a page that is displayed when an error occurs in the application.
-class ErrorPage extends StandardPage<ReportRecord> {
+class AppExceptionPage extends StandardPage<ReportRecord> {
   @override
   Widget buildPage(BuildContext context) {
-    if (pageData.error is AppException) {
-      return _buildAppExceptionPage(context);
-    } else {
-      return _buildUnknownExceptionPage(context);
-    }
-  }
-
-  Widget _buildAppExceptionPage(BuildContext context) {
     final tAppException = pageData.error as AppException;
 
     return Scaffold(
@@ -46,8 +37,31 @@ class ErrorPage extends StandardPage<ReportRecord> {
       ),
     );
   }
+}
 
-  Widget _buildUnknownExceptionPage(BuildContext context) {
+class WebPageNotFoundPage extends StandardPage<ReportRecord> {
+  @override
+  Widget buildPage(BuildContext context) {
+    final tException = pageData.error as WebPageNotFound;
+
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(tException.localizedTitle),
+      ),
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            Text(tException.localizedMessage),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class UnknownExceptionPage extends StandardPage<ReportRecord> {
+  @override
+  Widget buildPage(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text(l(context, 'errors.app.000.title')),

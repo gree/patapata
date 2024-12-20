@@ -134,6 +134,10 @@ abstract class StartupState extends LogicState {
 /// [StandardRouterDelegate.processInitialRoute]. In other words,
 /// If a deep link was used to start the app, that deep link's page will be displayed.
 /// If no deep link was used, the route with a link of nothing (`r''`) will be navigated to.
+/// If a link cannot be found, the first page in the [StandardMaterialApp.pages] array with
+/// [StandardPageFactory.group] having [StandardPageWithResultFactory.defaultGroup] is displayed.
+/// In the case of Web, [WebPageNotFound] is thrown at this point.
+/// If these pages cannot be found, the first page in [StandardMaterialApp.pages] is displayed.
 ///
 /// If the app is rendering widgets using the [StandardAppPlugin] system,
 /// [StartupSequence.resetMachine] is automatically executed only once when the app is launched.
@@ -211,6 +215,7 @@ class StartupSequence {
       getApp().removeNativeSplashScreen().whenComplete(() {
         _splashFinished = true;
         _splashScreenCompleter?.complete();
+        _splashScreenCompleter = null;
         _waitSplashScreenTimer = null;
       });
     });

@@ -6,6 +6,7 @@
 // ignore_for_file: constant_identifier_names
 
 import 'package:patapata_core/patapata_core.dart';
+import 'package:patapata_core/patapata_widgets.dart';
 
 /// Error codes for [PatapataCoreException].
 enum PatapataCoreExceptionCode {
@@ -32,6 +33,9 @@ enum PatapataCoreExceptionCode {
 
   /// [NotificationsInitializationException]
   PPE501,
+
+  /// [WebPageNotFound]
+  PPE601,
 }
 
 /// Extension to split [PatapataCoreExceptionCode] into
