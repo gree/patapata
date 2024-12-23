@@ -14,7 +14,7 @@ dependencies:
 
   patapata_core: ^1.1.0
 
-  firebase_core: ^2.29.0
+  firebase_core: ^3.8.1
 
 dev_dependencies:
   flutter_test:
