@@ -95,6 +95,9 @@ base class StandardPageWithResultFactory<T extends StandardPageWithResult<R, E>,
   /// Flag indicating whether to stack this page as part of the history or not.
   final bool keepHistory;
 
+  /// Flag indicating whether to enable analytics for navigation.
+  final bool enableNavigationAnalytics;
+
   /// The method for transitioning to this page from other pages.
   /// Please refer to [StandardPageNavigationMode] for navigation modes.
   final StandardPageNavigationMode navigationMode;
@@ -150,6 +153,8 @@ base class StandardPageWithResultFactory<T extends StandardPageWithResult<R, E>,
   ///
   /// [keepHistory] is a flag for whether to push history on the Navigator during transitions. The default is `true`.
   ///
+  /// [enableNavigationAnalytics] is a flag indicating whether to enable navigation analytics. The default is `true`.
+  ///
   /// [navigationMode] specifies the NavigationMode when navigating to this page. The default is [StandardPageNavigationMode.moveToTop].
   ///
   /// [pageKey] is a [LocalKey] to identify the page.
@@ -170,6 +175,7 @@ base class StandardPageWithResultFactory<T extends StandardPageWithResult<R, E>,
     this.groupRoot = false,
     this.group = defaultGroup,
     this.keepHistory = true,
+    this.enableNavigationAnalytics = true,
     this.navigationMode = StandardPageNavigationMode.moveToTop,
     LocalKey Function(
       R pageData,
@@ -391,6 +397,7 @@ base class StandardPageFactory<T extends StandardPage<R>, R extends Object?>
     super.groupRoot,
     super.group,
     super.keepHistory,
+    super.enableNavigationAnalytics,
     super.navigationMode,
     super.pageKey,
     super.pageBuilder,
@@ -413,6 +420,7 @@ base class SplashPageFactory<T extends StandardPage<void>>
     super.pageDataWhenNull,
     super.pageName,
     super.restorationId,
+    super.enableNavigationAnalytics,
   }) : super(
           group: 'splash',
           keepHistory: false,
@@ -429,6 +437,7 @@ base class StartupPageFactory<T extends StandardPage<StartupPageCompleter>>
     super.groupRoot,
     String? group,
     super.keepHistory,
+    super.enableNavigationAnalytics,
     super.navigationMode,
     super.pageKey,
     super.pageBuilder,
@@ -454,6 +463,7 @@ base class StandardErrorPageFactory<T extends StandardPage<ReportRecord>>
     super.groupRoot = false,
     super.group = StandardErrorPageFactory.errorGroup,
     super.keepHistory = true,
+    super.enableNavigationAnalytics,
     super.navigationMode = StandardPageNavigationMode.removeAll,
     super.pageKey,
     super.pageBuilder,
@@ -1264,7 +1274,7 @@ class StandardRouterDelegate extends RouterDelegate<StandardRouteData>
     _factoryTypeMap.clear();
     _standardPagesMap.clear();
 
-    final tWithDymmySplashPage =
+    final tWithDummySplashPage =
         pageFactories.whereType<SplashPageFactory>().isEmpty;
 
     for (var tFactory in pageFactories) {
@@ -1281,9 +1291,10 @@ class StandardRouterDelegate extends RouterDelegate<StandardRouteData>
         _standardPagesMap[tFactory.parentPageType]!.add(tFactory.pageType);
       }
     }
-    if (tWithDymmySplashPage) {
+    if (tWithDummySplashPage) {
       final tDummySplashPage = SplashPageFactory(
         create: (_) => _DummySplashPage(),
+        enableNavigationAnalytics: false,
       ).._delegate = this;
       _factoryTypeMap[_DummySplashPage] = tDummySplashPage;
       _standardPagesMap[_DummySplashPage] = [];
@@ -1318,7 +1329,7 @@ class StandardRouterDelegate extends RouterDelegate<StandardRouteData>
           Object?> tStandardPage;
 
       if (!_initialRouteProcessed) {
-        tStandardPage = (tWithDymmySplashPage)
+        tStandardPage = (tWithDummySplashPage)
             ? _factoryTypeMap[_DummySplashPage]!
             : pageFactories.whereType<SplashPageFactory>().first;
       } else if (pageFactories.first.parentPageType == null) {
