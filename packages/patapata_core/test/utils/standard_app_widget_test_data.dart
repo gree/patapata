@@ -82,6 +82,39 @@ class TestChangeNotifierData extends ChangeNotifier {
 }
 
 // Material Page
+class TestSplash extends StandardPage<void> {
+  @override
+  Widget buildPage(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(
+          l(context, 'Test Splash'),
+        ),
+      ),
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            Center(
+              child: Builder(
+                builder: (context) {
+                  return const Text("Test Splash Message");
+                },
+              ),
+            ),
+            TextButton(
+              key: const ValueKey(kProcessInitialRouteButton),
+              onPressed: () {
+                Router.of(context).processInitialRoute();
+              },
+              child: const Text('Go to Home Page'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
 class TestPageA extends StandardPage<void> {
   @override
   AnalyticsEvent? get analyticsSingletonEvent => testAnalytics;
@@ -180,9 +213,7 @@ class TestPageA extends StandardPage<void> {
             TextButton(
               key: const ValueKey(kGetStandardAppPluginRoute),
               onPressed: () {
-                getApp()
-                    .getPlugin<StandardAppPlugin>()
-                    ?.route('testPageData/10');
+                getApp().standardAppPlugin.route('testPageData/10');
               },
               child: const Text('Get StandardAppRouter Context'),
             ),
@@ -192,7 +223,7 @@ class TestPageA extends StandardPage<void> {
                 onPressed: () {
                   testText = context
                           .read<App>()
-                          .getPlugin<StandardAppPlugin>()!
+                          .standardAppPlugin
                           .generateLink<TestPageC, TestPageData>(
                             TestPageData(id: 9999, data: 'test page data'),
                           ) ??
@@ -631,12 +662,35 @@ class TestAnalyticsEvent extends AnalyticsEvent {
   });
 }
 
-class TestDataPlugin extends Plugin with StandardAppRoutePluginMixin {
+class TestNoLinkPlugin extends Plugin with StandardAppRoutePluginMixin {
   @override
   Future<StandardRouteData?> getInitialRouteData() async {
     return StandardRouteData(
       factory: null,
       pageData: TestPageData(id: 9999, data: 'test plugin data'),
+    );
+  }
+}
+
+class TestGoDefaultRootPagePlugin extends Plugin
+    with StandardAppRoutePluginMixin {
+  @override
+  Future<StandardRouteData?> getInitialRouteData() async {
+    return StandardRouteData(
+      factory: getApp().standardAppPlugin.delegate?.defaultRootPageFactory,
+      pageData: TestPageData(id: 9999, data: 'test plugin data'),
+    );
+  }
+}
+
+class TestGetInitialRoutePlugin extends Plugin
+    with StandardAppRoutePluginMixin {
+  @override
+  Future<StandardRouteData?> getInitialRouteData() async {
+    return StandardRouteData(
+      factory: app.standardAppPlugin.delegate!
+          .getPageFactory<TestPageH, TestPageData, void>(),
+      pageData: TestPageData(id: 70, data: 'initial route'),
     );
   }
 }
@@ -647,9 +701,7 @@ class TestDataParseRouteInformationPlugin extends Plugin
   Future<StandardRouteData?> parseRouteInformation(
       RouteInformation routeInformation) async {
     return SynchronousFuture(StandardRouteData(
-      factory: app
-          .getPlugin<StandardAppPlugin>()!
-          .delegate!
+      factory: app.standardAppPlugin.delegate!
           .getPageFactory<TestPageH, TestPageData, void>(),
       pageData: TestPageData(id: 70, data: 'parsed route'),
     ));
