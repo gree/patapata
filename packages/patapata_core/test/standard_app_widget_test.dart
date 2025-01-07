@@ -14,8 +14,147 @@ import 'utils/patapata_core_test_utils.dart';
 import 'utils/standard_app_widget_test_data.dart';
 import 'pages/startup_page.dart';
 
+class NoAutoProcessInitialRouteEnvironment extends Environment
+    with StandardAppEnvironment {
+  @override
+  bool get autoProcessInitialRoute => false;
+}
+
+class DefaultEnvironment extends Environment with StandardAppEnvironment {}
+
 void main() {
   testInitialize();
+
+  testWidgets("Standard Page Test, Initial Page", (WidgetTester tester) async {
+    final App tApp = createApp(
+      environment: DefaultEnvironment(),
+      appWidget: StandardMaterialApp(
+        onGenerateTitle: (context) => 'title',
+        pages: [
+          StandardPageFactory<TestPageA, void>(
+            create: (data) => TestPageA(),
+          ),
+        ],
+      ),
+    );
+
+    tApp.run();
+
+    await tApp.runProcess(() async {
+      await tester.pumpAndSettle();
+
+      expect(find.text('Test Title'), findsOneWidget);
+      expect(find.text('Test Message'), findsOneWidget);
+
+      await tester.pumpAndSettle();
+    });
+
+    tApp.dispose();
+  });
+
+  testWidgets("Standard Page Test, No auto processInitialRoute Test",
+      (WidgetTester tester) async {
+    final App tApp = createApp(
+      environment: NoAutoProcessInitialRouteEnvironment(),
+      appWidget: StandardMaterialApp(
+        onGenerateTitle: (context) => 'title',
+        pages: [
+          SplashPageFactory(
+            create: (data) => TestSplash(),
+          ),
+          StandardPageFactory<TestPageA, void>(
+            create: (data) => TestPageA(),
+          ),
+        ],
+      ),
+    );
+
+    tApp.run();
+
+    await tApp.runProcess(() async {
+      await tester.pumpAndSettle();
+
+      expect(find.text('Test Title'), findsNothing);
+      expect(find.text('Test Message'), findsNothing);
+
+      tApp.getPlugin<StandardAppPlugin>()!.delegate!.processInitialRoute();
+
+      await tester.pumpAndSettle();
+
+      expect(find.text('Test Title'), findsOneWidget);
+      expect(find.text('Test Message'), findsOneWidget);
+    });
+
+    tApp.dispose();
+  });
+
+  testWidgets("Standard Page with Splash Test, Initial Page",
+      (WidgetTester tester) async {
+    final App tApp = createApp(
+      appWidget: StandardMaterialApp(
+        onGenerateTitle: (context) => 'title',
+        pages: [
+          SplashPageFactory(
+            create: (data) => TestSplash(),
+          ),
+          StandardPageFactory<TestPageA, void>(
+            create: (data) => TestPageA(),
+          ),
+        ],
+      ),
+    );
+
+    tApp.run();
+
+    await tApp.runProcess(() async {
+      await tester.pumpAndSettle();
+
+      expect(find.text('Test Splash'), findsNothing);
+      expect(find.text('Test Splash Message'), findsNothing);
+
+      expect(find.text('Test Title'), findsOneWidget);
+      expect(find.text('Test Message'), findsOneWidget);
+    });
+
+    tApp.dispose();
+  });
+
+  testWidgets(
+      "Standard Page with Splash  Test, No auto processInitialRoute Test",
+      (WidgetTester tester) async {
+    final App tApp = createApp(
+      environment: NoAutoProcessInitialRouteEnvironment(),
+      appWidget: StandardMaterialApp(
+        onGenerateTitle: (context) => 'title',
+        pages: [
+          SplashPageFactory(
+            create: (data) => TestSplash(),
+          ),
+          StandardPageFactory<TestPageA, void>(
+            create: (data) => TestPageA(),
+          ),
+        ],
+      ),
+    );
+
+    tApp.run();
+
+    await tApp.runProcess(() async {
+      await tester.pumpAndSettle();
+
+      expect(find.text('Test Splash'), findsOneWidget);
+      expect(find.text('Test Splash Message'), findsOneWidget);
+
+      await tester.tap(find.byKey(const ValueKey(kProcessInitialRouteButton)));
+
+      await tester.pumpAndSettle();
+
+      expect(find.text('Test Title'), findsOneWidget);
+      expect(find.text('Test Message'), findsOneWidget);
+    });
+
+    tApp.dispose();
+  });
 
   testWidgets("Standard Page Test, Pages added", (WidgetTester tester) async {
     late TestChangeNotifierData tProvider;
@@ -462,6 +601,70 @@ void main() {
     expect(tExceptionCount, 1);
   });
 
+  testWidgets(
+      "Standard Page Test, UpdatePageFactories If the first page of pageFactories has a parentType.",
+      (WidgetTester tester) async {
+    int tExceptionCount = 0;
+    await runZonedGuarded(() async {
+      late TestChangeNotifierData tProvider;
+      final App tApp = createApp(
+        appWidget: ChangeNotifierProvider<TestChangeNotifierData>(
+          create: (context) => TestChangeNotifierData(
+            title: "title",
+            pages: [
+              StandardPageFactory<TestPageF, void>(
+                create: (data) => TestPageF(),
+              ),
+            ],
+          ),
+          child: Builder(builder: (context) {
+            tProvider = context.watch<TestChangeNotifierData>();
+            return StandardMaterialApp(
+              onGenerateTitle: (context) => tProvider.title,
+              pages: tProvider.pages,
+            );
+          }),
+        ),
+      );
+
+      tApp.run();
+
+      await tApp.runProcess(() async {
+        await tester.pumpAndSettle();
+
+        expect(find.text('Test title F'), findsOneWidget);
+        expect(find.text('Test Message F'), findsOneWidget);
+
+        // update widget using provider
+        tProvider.changeTitle('Change Test Title');
+
+        tProvider.changePages([
+          StandardPageFactory<TestPageB, void>(
+            create: (data) => TestPageB(),
+            parentPageType: TestPageA,
+          ),
+          StandardPageFactory<TestPageA, void>(
+            create: (data) => TestPageA(),
+          ),
+        ]);
+
+        await tester.pumpAndSettle();
+
+        expect(find.text('Test Title'), findsOneWidget);
+        expect(find.text('Test Message'), findsOneWidget);
+      });
+
+      tApp.dispose();
+    }, (error, stackTrace) {
+      if (error != 'Page deleted') {
+        throw error;
+      }
+      tExceptionCount++;
+    });
+
+    expect(tExceptionCount, 1);
+  });
+
   testWidgets("Standard Material App global Navigator Context Test",
       (WidgetTester tester) async {
     final App tApp = createApp(
@@ -609,6 +812,99 @@ void main() {
     });
 
     tApp.dispose();
+  });
+
+  testWidgets("Standard Page PageData Test. pageDataWhenNull",
+      (WidgetTester tester) async {
+    final App tApp = createApp(
+      appWidget: StandardCupertinoApp(
+        onGenerateTitle: (context) => 'Link Generate Test Title',
+        pages: [
+          StandardPageFactory<TestPageC, TestPageData>(
+            pageDataWhenNull: () => TestPageData(
+              id: 9999,
+              data: 'test page data',
+            ),
+            create: (data) => TestPageC(),
+          ),
+        ],
+      ),
+    );
+
+    tApp.run();
+
+    await tApp.runProcess(() async {
+      await tester.pumpAndSettle();
+
+      expect(find.text('Test Link Data is 9999'), findsOneWidget);
+    });
+
+    tApp.dispose();
+  });
+
+  testWidgets(
+      "Standard Page PageData Test. UpdatePageFactories pageDataWhenNull",
+      (WidgetTester tester) async {
+    int tExceptionCount = 0;
+    await runZonedGuarded(() async {
+      late TestChangeNotifierData tProvider;
+      final App tApp = createApp(
+        appWidget: ChangeNotifierProvider<TestChangeNotifierData>(
+          create: (context) => TestChangeNotifierData(
+            title: "title",
+            pages: [
+              StandardPageFactory<TestPageA, void>(
+                create: (data) => TestPageA(),
+              ),
+            ],
+          ),
+          child: Builder(builder: (context) {
+            tProvider = context.watch<TestChangeNotifierData>();
+            return StandardMaterialApp(
+              onGenerateTitle: (context) => tProvider.title,
+              pages: tProvider.pages,
+            );
+          }),
+        ),
+      );
+
+      tApp.run();
+
+      await tApp.runProcess(() async {
+        await tester.pumpAndSettle();
+
+        expect(find.text('Test Title'), findsOneWidget);
+        expect(find.text('Test Message'), findsOneWidget);
+
+        await tester.pumpAndSettle();
+
+        // update widget using provider
+        tProvider.changeTitle('Change Test Title');
+
+        tProvider.changePages([
+          StandardPageFactory<TestPageC, TestPageData>(
+            pageDataWhenNull: () => TestPageData(
+              id: 9999,
+              data: 'test page data',
+            ),
+            create: (data) => TestPageC(),
+          ),
+        ]);
+
+        await tester.pumpAndSettle();
+
+        expect(find.text('Test Link Data is 9999'), findsOneWidget);
+      });
+
+      tApp.dispose();
+    }, (error, stackTrace) {
+      if (error != 'Page deleted') {
+        throw error;
+      }
+      tExceptionCount++;
+    });
+
+    expect(tExceptionCount, 1);
   });
 
   testWidgets("Standard Page Link Generator And Change PageData Test",
@@ -1421,18 +1717,28 @@ void main() {
     tApp.dispose();
   });
 
-  testWidgets("Standard Page ProcessInitialRoute Test",
+  testWidgets("Standard Page Default Route Test. Link with an empty string",
       (WidgetTester tester) async {
-    Plugin tPlugin = TestDataPlugin();
     final App tApp = createApp(
-      plugins: [
-        tPlugin,
-      ],
       appWidget: StandardMaterialApp(
-        onGenerateTitle: (context) => 'ProcessInitialRoute Test Title',
+        onGenerateTitle: (context) => 'Test Title',
         pages: [
+          StandardPageFactory<TestPageH, TestPageData>(
+            create: (data) => TestPageH(),
+            links: {
+              r'testA': (match, uri) => TestPageData(
+                    id: 9999,
+                    data: 'test A',
+                  ),
+            },
+            linkGenerator: (pageData) => r'testA',
+          ),
           StandardPageFactory<TestPageA, void>(
             create: (data) => TestPageA(),
+            links: {
+              r'': (match, uri) {},
+            },
+            linkGenerator: (pageData) => r'',
           ),
         ],
       ),
@@ -1443,57 +1749,7 @@ void main() {
     await tApp.runProcess(() async {
       await tester.pumpAndSettle();
 
-      await tester.tap(find.byKey(const ValueKey(kProcessInitialRouteButton)));
-
-      await tester.pumpAndSettle();
-
-      final tStandardRouteData =
-          await tApp.getPlugin<TestDataPlugin>()?.getInitialRouteData();
-
-      await tester.pumpAndSettle();
-
-      final tTestPageData = tStandardRouteData?.pageData as TestPageData;
-
-      expect(tTestPageData, isNotNull);
-      expect(tTestPageData.id, 9999);
-      expect(tTestPageData.data, 'test plugin data');
-    });
-
-    tApp.dispose();
-  });
-
-  testWidgets("Standard Page ProcessInitialRoute Null Data Test",
-      (WidgetTester tester) async {
-    Plugin tPlugin = TestNullDataPlugin();
-    final App tApp = createApp(
-      plugins: [
-        tPlugin,
-      ],
-      appWidget: StandardMaterialApp(
-        onGenerateTitle: (context) => 'ProcessInitialRoute Test Title',
-        pages: [
-          StandardPageFactory<TestPageA, void>(
-            create: (data) => TestPageA(),
-          ),
-        ],
-      ),
-    );
-
-    tApp.run();
-
-    await tApp.runProcess(() async {
-      await tester.pumpAndSettle();
-
-      await tester.tap(find.byKey(const ValueKey(kProcessInitialRouteButton)));
-
-      await tester.pumpAndSettle();
-
-      final tStandardRouteData =
-          await tApp.getPlugin<TestNullDataPlugin>()!.getInitialRouteData();
-
-      await tester.pumpAndSettle();
-
-      expect(tStandardRouteData, isNull);
+      expect(find.text('Test Message'), findsOneWidget);
     });
 
     tApp.dispose();
@@ -1506,8 +1762,12 @@ void main() {
       appWidget: StandardMaterialApp(
         onGenerateTitle: (context) => 'Test Title',
         pages: [
-          StandardPageFactory<TestPageF, void>(
-            create: (data) => TestPageF(),
+          StandardPageFactory<TestPageA, void>(
+            create: (data) => TestPageA(),
+            links: {
+              r'': (match, uri) {},
+            },
+            linkGenerator: (pageData) => r'',
           ),
           StandardPageFactory<TestPageH, TestPageData>(
             create: (data) => TestPageH(),
@@ -1528,7 +1788,54 @@ void main() {
     await tApp.runProcess(() async {
       await tester.pumpAndSettle();
 
-      expect(find.text('Test Message F'), findsOneWidget);
+      expect(find.text('Test Message'), findsNothing);
+
+      expect(find.text('9999 test A'), findsOneWidget);
+    });
+
+    tApp.dispose();
+    tester.binding.platformDispatcher.clearDefaultRouteNameTestValue();
+  });
+
+  testWidgets("Standard Page Default Route Test. No Auto processInitialRoute",
+      (WidgetTester tester) async {
+    tester.binding.platformDispatcher.defaultRouteNameTestValue = '/testA';
+
+    final App tApp = createApp(
+      environment: NoAutoProcessInitialRouteEnvironment(),
+      appWidget: StandardMaterialApp(
+        onGenerateTitle: (context) => 'Test Title',
+        pages: [
+          SplashPageFactory(
+            create: (data) => TestSplash(),
+          ),
+          StandardPageFactory<TestPageA, void>(
+            create: (data) => TestPageA(),
+            links: {
+              r'': (match, uri) {},
+            },
+            linkGenerator: (pageData) => r'',
+          ),
+          StandardPageFactory<TestPageH, TestPageData>(
+            create: (data) => TestPageH(),
+            links: {
+              r'testA': (match, uri) => TestPageData(
+                    id: 9999,
+                    data: 'test A',
+                  ),
+            },
+            linkGenerator: (pageData) => r'testA',
+          ),
+        ],
+      ),
+    );
+
+    tApp.run();
+
+    await tApp.runProcess(() async {
+      await tester.pumpAndSettle();
+
+      expect(find.text('Test Splash'), findsOneWidget);
 
       tApp.getPlugin<StandardAppPlugin>()!.delegate!.processInitialRoute();
 
@@ -1546,11 +1853,19 @@ void main() {
     tester.binding.platformDispatcher.defaultRouteNameTestValue = '/testA';
 
     final App tApp = createApp(
+      environment: NoAutoProcessInitialRouteEnvironment(),
       appWidget: StandardMaterialApp(
         onGenerateTitle: (context) => 'Test Title',
         pages: [
+          SplashPageFactory(
+            create: (data) => TestSplash(),
+          ),
           StandardPageFactory<TestPageF, void>(
             create: (data) => TestPageF(),
+            links: {
+              r'': (match, uri) {},
+            },
+            linkGenerator: (pageData) => r'',
           ),
           StandardPageFactory<TestPageH, TestPageData>(
             create: (data) => TestPageH(),
@@ -1579,11 +1894,13 @@ void main() {
     await tApp.runProcess(() async {
       await tester.pumpAndSettle();
 
-      expect(find.text('Test Message F'), findsOneWidget);
+      expect(find.text('Test Splash'), findsOneWidget);
 
       tApp.getPlugin<StandardAppPlugin>()!.delegate!.processInitialRoute();
 
       await tester.pumpAndSettle();
+
+      expect(find.text('Test Message F'), findsOneWidget);
 
       expect(tGotIt, isTrue);
     });
@@ -1591,6 +1908,149 @@ void main() {
     tApp.dispose();
     tester.binding.platformDispatcher.clearDefaultRouteNameTestValue();
     tSub.cancel();
+  });
+
+  testWidgets(
+      "Standard Page Bad Links Test. Initial Page Not Found. To defaultRootPageFactory",
+      (WidgetTester tester) async {
+    tester.binding.platformDispatcher.defaultRouteNameTestValue = '/testA';
+
+    final App tApp = createApp(
+      appWidget: StandardMaterialApp(
+        onGenerateTitle: (context) => 'Test Title',
+        pages: [
+          SplashPageFactory(
+            create: (data) => TestSplash(),
+          ),
+          StandardPageFactory<TestPageA, void>(
+            create: (data) => TestPageA(),
+          ),
+          StandardPageFactory<TestPageH, TestPageData>(
+            create: (data) => TestPageH(),
+            links: {
+              r'testB': (match, uri) => TestPageData(
+                    id: 9999,
+                    data: 'test B',
+                  ),
+            },
+            group: 'test-group',
+            linkGenerator: (pageData) => r'testA',
+          ),
+        ],
+      ),
+    );
+
+    tApp.run();
+
+    await tApp.runProcess(() async {
+      await tester.pumpAndSettle();
+
+      expect(find.text('Test Title'), findsOneWidget);
+      expect(find.text('Test Message'), findsOneWidget);
+    });
+
+    tApp.dispose();
+    tester.binding.platformDispatcher.clearDefaultRouteNameTestValue();
+  });
+
+  testWidgets(
+      "Standard Page Bad Links Test. Initial Page Not Found. To defaultRootPageFactory. Bad Group Name",
+      (WidgetTester tester) async {
+    tester.binding.platformDispatcher.defaultRouteNameTestValue = '/testA';
+
+    final App tApp = createApp(
+      appWidget: StandardMaterialApp(
+        onGenerateTitle: (context) => 'Test Title',
+        pages: [
+          SplashPageFactory(
+            create: (data) => TestSplash(),
+          ),
+          StandardPageFactory<TestPageA, void>(
+            create: (data) => TestPageA(),
+            group: 'test-group',
+          ),
+          StandardPageFactory<TestPageH, TestPageData>(
+            create: (data) => TestPageH(),
+            links: {
+              r'testB': (match, uri) => TestPageData(
+                    id: 9999,
+                    data: 'test B',
+                  ),
+            },
+            group: 'test-group',
+            linkGenerator: (pageData) => r'testA',
+          ),
+        ],
+      ),
+    );
+
+    tApp.run();
+
+    await tApp.runProcess(() async {
+      await tester.pumpAndSettle();
+
+      expect(find.text('Test Splash'), findsOneWidget);
+    });
+
+    tApp.dispose();
+    tester.binding.platformDispatcher.clearDefaultRouteNameTestValue();
+  });
+
+  testWidgets("Standard Page Bad Links Test. Web Page Not Found.",
+      (WidgetTester tester) async {
+    int tExceptionCount = 0;
+    WebPageNotFound? tException;
+
+    await runZonedGuarded(() async {
+      StandardAppPlugin.debugIsWeb = true;
+      tester.binding.platformDispatcher.defaultRouteNameTestValue = '/testA';
+
+      final App tApp = createApp(
+        appWidget: StandardMaterialApp(
+          onGenerateTitle: (context) => 'Test Title',
+          pages: [
+            SplashPageFactory(
+              create: (data) => TestSplash(),
+            ),
+            StandardPageFactory<TestPageA, void>(
+              create: (data) => TestPageA(),
+            ),
+            StandardPageFactory<TestPageH, TestPageData>(
+              create: (data) => TestPageH(),
+              links: {
+                r'testB': (match, uri) => TestPageData(
+                      id: 9999,
+                      data: 'test B',
+                    ),
+              },
+              linkGenerator: (pageData) => r'testB',
+            ),
+          ],
+        ),
+      );
+
+      tApp.run();
+
+      await tApp.runProcess(() async {
+        await tester.pumpAndSettle();
+
+        expect(find.text('Test Splash'), findsOneWidget);
+      });
+
+      tApp.dispose();
+      tester.binding.platformDispatcher.clearDefaultRouteNameTestValue();
+      StandardAppPlugin.debugIsWeb = false;
+    }, (error, stackTrace) {
+      if (error is! WebPageNotFound) {
+        throw error;
+      }
+      tExceptionCount++;
+      tException = error;
+    });
+
+    expect(tExceptionCount, 1);
+    expect(tException?.logLevel, Level.INFO);
+    expect(tException?.userLogLevel, Level.SHOUT);
   });
 
   testWidgets("Standard Page OS Extra Route Test", (WidgetTester tester) async {
@@ -1622,12 +2082,6 @@ void main() {
 
       expect(find.text('Test Message F'), findsOneWidget);
 
-      tApp.getPlugin<StandardAppPlugin>()!.delegate!.processInitialRoute();
-
-      await tester.pumpAndSettle();
-
-      expect(find.text('Test Message F'), findsOneWidget);
-
       // https://github.com/flutter/flutter/blob/master/packages/flutter/test/widgets/router_test.dart#L815C14-L815C14
       await tester.binding.defaultBinaryMessenger.handlePlatformMessage(
         SystemChannels.navigation.name,
@@ -1646,7 +2100,8 @@ void main() {
     tApp.dispose();
   });
 
-  testWidgets("Standard Page Plugin Route Test", (WidgetTester tester) async {
+  testWidgets("Standard Page Plugin Route Test. parseRouteInformation Test",
+      (WidgetTester tester) async {
     final App tApp = createApp(
       plugins: [
         TestDataParseRouteInformationPlugin(),
@@ -1669,13 +2124,199 @@ void main() {
     await tApp.runProcess(() async {
       await tester.pumpAndSettle();
 
-      expect(find.text('Test Message F'), findsOneWidget);
+      expect(find.text('70 parsed route'), findsOneWidget);
+    });
 
-      tApp.getPlugin<StandardAppPlugin>()!.delegate!.processInitialRoute();
+    tApp.dispose();
+  });
 
+  testWidgets("Standard Page Plugin Route Test. getInitialRouteData Test",
+      (WidgetTester tester) async {
+    final App tApp = createApp(
+      plugins: [
+        TestGetInitialRoutePlugin(),
+      ],
+      appWidget: StandardMaterialApp(
+        onGenerateTitle: (context) => 'Test Title',
+        pages: [
+          StandardPageFactory<TestPageF, void>(
+            create: (data) => TestPageF(),
+          ),
+          StandardPageFactory<TestPageH, TestPageData>(
+            create: (data) => TestPageH(),
+          )
+        ],
+      ),
+    );
+
+    tApp.run();
+
+    await tApp.runProcess(() async {
       await tester.pumpAndSettle();
 
-      expect(find.text('70 parsed route'), findsOneWidget);
+      expect(find.text('70 initial route'), findsOneWidget);
+    });
+
+    tApp.dispose();
+  });
+
+  testWidgets(
+      "Standard Page Plugin Route Test. getInitialRouteData No Link Test",
+      (WidgetTester tester) async {
+    tester.binding.platformDispatcher.defaultRouteNameTestValue = '/testA';
+
+    final App tApp = createApp(
+      plugins: [
+        TestNoLinkPlugin(),
+      ],
+      appWidget: StandardMaterialApp(
+        onGenerateTitle: (context) => 'Test Title',
+        pages: [
+          SplashPageFactory(create: (data) => TestSplash()),
+          StandardPageFactory<TestPageA, void>(
+            create: (data) => TestPageA(),
+            links: {
+              r'': (match, uri) {},
+            },
+            linkGenerator: (pageData) => r'',
+          ),
+          StandardPageFactory<TestPageH, TestPageData>(
+            create: (data) => TestPageH(),
+            links: {
+              r'testA': (match, uri) => TestPageData(
+                    id: 9999,
+                    data: 'test A',
+                  ),
+            },
+            linkGenerator: (pageData) => r'testA',
+          ),
+        ],
+      ),
+    );
+
+    tApp.run();
+
+    await tApp.runProcess(() async {
+      await tester.pumpAndSettle();
+
+      expect(find.text('Test Splash'), findsOneWidget);
+    });
+
+    tApp.dispose();
+    tester.binding.platformDispatcher.clearDefaultRouteNameTestValue();
+  });
+
+  testWidgets("Standard Page Plugin Route Test. defaultRootPageFactory Test",
+      (WidgetTester tester) async {
+    final App tApp = createApp(
+      plugins: [
+        TestGoDefaultRootPagePlugin(),
+      ],
+      appWidget: StandardMaterialApp(
+        onGenerateTitle: (context) => 'Test Title',
+        pages: [
+          StandardPageFactory<TestPageA, void>(
+            create: (data) => TestPageA(),
+            links: {
+              r'': (match, uri) {},
+            },
+            group: 'test-group',
+            linkGenerator: (pageData) => r'',
+          ),
+          StandardPageFactory<TestPageH, TestPageData>(
+            create: (data) => TestPageH(),
+            links: {
+              r'testA': (match, uri) => TestPageData(
+                    id: 9999,
+                    data: 'test A',
+                  ),
+            },
+            linkGenerator: (pageData) => r'testA',
+          ),
+        ],
+      ),
+    );
+
+    tApp.run();
+
+    await tApp.runProcess(() async {
+      await tester.pumpAndSettle();
+
+      expect(find.text('9999 test plugin data'), findsOneWidget);
+    });
+
+    tApp.dispose();
+  });
+
+  testWidgets(
+      "Standard Page Plugin Route Test. defaultRootPageFactory Bad Group Name Test",
+      (WidgetTester tester) async {
+    final App tApp = createApp(
+      plugins: [
+        TestGoDefaultRootPagePlugin(),
+      ],
+      appWidget: StandardMaterialApp(
+        onGenerateTitle: (context) => 'Test Title',
+        pages: [
+          StandardPageFactory<TestPageA, void>(
+            create: (data) => TestPageA(),
+            links: {
+              r'': (match, uri) {},
+            },
+            group: 'test-group',
+            linkGenerator: (pageData) => r'',
+          ),
+          StandardPageFactory<TestPageH, TestPageData>(
+            create: (data) => TestPageH(),
+            links: {
+              r'testA': (match, uri) => TestPageData(
+                    id: 9999,
+                    data: 'test A',
+                  ),
+            },
+            group: 'test-group',
+            linkGenerator: (pageData) => r'testA',
+          ),
+        ],
+      ),
+    );
+
+    tApp.run();
+
+    await tApp.runProcess(() async {
+      await tester.pumpAndSettle();
+
+      expect(find.text('Test Title'), findsOneWidget);
+      expect(find.text('Test Message'), findsOneWidget);
+    });
+
+    tApp.dispose();
+  });
+
+  testWidgets("Standard Page Plugin Route Test. Null Data Test",
+      (WidgetTester tester) async {
+    Plugin tPlugin = TestNullDataPlugin();
+    final App tApp = createApp(
+      plugins: [
+        tPlugin,
+      ],
+      appWidget: StandardMaterialApp(
+        onGenerateTitle: (context) => 'ProcessInitialRoute Test Title',
+        pages: [
+          StandardPageFactory<TestPageA, void>(
+            create: (data) => TestPageA(),
+          ),
+        ],
+      ),
+    );
+
+    tApp.run();
+
+    await tApp.runProcess(() async {
+      await tester.pumpAndSettle();
+
+      expect(find.text('Test Title'), findsOneWidget);
+      expect(find.text('Test Message'), findsOneWidget);
     });
 
     tApp.dispose();
@@ -1718,8 +2359,6 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('Test Message F'), findsOneWidget);
-
-      tApp.getPlugin<StandardAppPlugin>()!.delegate!.processInitialRoute();
 
       expect(tGotIt, isTrue);
 
@@ -1780,6 +2419,7 @@ void main() {
       (WidgetTester tester) async {
     tester.binding.platformDispatcher.defaultRouteNameTestValue = '/testA';
     final App tApp = createApp(
+      environment: NoAutoProcessInitialRouteEnvironment(),
       appWidget: StandardMaterialApp(
         onGenerateTitle: (context) => 'StartupNavigatorMixin Test Title',
         pages: [
@@ -1788,6 +2428,9 @@ void main() {
           ),
           StartupPageFactory<StartupPageA>(
             create: (data) => StartupPageA(),
+          ),
+          StandardPageFactory<TestPageA, void>(
+            create: (data) => TestPageA(),
           ),
           StandardPageFactory<TestPageH, TestPageData>(
             create: (data) => TestPageH(),
@@ -1807,6 +2450,8 @@ void main() {
 
     await tApp.runProcess(() async {
       await tester.pumpAndSettle();
+
+      expect(find.text('SplashPage'), findsOneWidget);
 
       final tCompleter = Completer<bool>();
 
@@ -1834,6 +2479,93 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('SplashPage'), findsOneWidget);
+
+      tApp.getPlugin<StandardAppPlugin>()?.startupProcessInitialRoute();
+
+      await tester.pumpAndSettle();
+
+      expect(find.text('Test Title'), findsOneWidget);
+      expect(find.text('Test Message'), findsOneWidget);
+    });
+
+    tApp.dispose();
+    tester.binding.platformDispatcher.clearDefaultRouteNameTestValue();
+  });
+
+  testWidgets(
+      "StandardAppPlugin with StartupNavigatorMixin Test. Call startupOnReset in the middle of a sequence.",
+      (WidgetTester tester) async {
+    tester.binding.platformDispatcher.defaultRouteNameTestValue = '/testA';
+    final App tApp = createApp(
+      environment: NoAutoProcessInitialRouteEnvironment(),
+      appWidget: StandardMaterialApp(
+        onGenerateTitle: (context) => 'StartupNavigatorMixin Test Title',
+        pages: [
+          SplashPageFactory<SplashPage>(
+            create: (data) => SplashPage(),
+          ),
+          StartupPageFactory<StartupPageA>(
+            create: (data) => StartupPageA(),
+          ),
+          StandardPageFactory<TestPageA, void>(
+            create: (data) => TestPageA(),
+          ),
+          StandardPageFactory<TestPageH, TestPageData>(
+            create: (data) => TestPageH(),
+            links: {
+              r'testA': (match, uri) => TestPageData(
+                    id: 9999,
+                    data: 'test A',
+                  ),
+            },
+            linkGenerator: (pageData) => r'testA',
+          ),
+        ],
+      ),
+    );
+
+    tApp.run();
+
+    await tApp.runProcess(() async {
+      await tester.pumpAndSettle();
+
+      expect(find.text('SplashPage'), findsOneWidget);
+
+      final tCompleter = Completer<bool>();
+
+      tApp.getPlugin<StandardAppPlugin>()?.startupNavigateToPage(StartupPageA,
+          (result) {
+        tCompleter.complete(result as bool);
+      });
+
+      await tester.pumpAndSettle();
+
+      expect(find.text('StartupPageA'), findsOneWidget);
+
+      tApp.getPlugin<StandardAppPlugin>()?.startupOnReset();
+
+      await tester.pumpAndSettle();
+
+      expect(find.text('SplashPage'), findsOneWidget);
+
+      tApp.getPlugin<StandardAppPlugin>()?.startupNavigateToPage(StartupPageA,
+          (result) {
+        tCompleter.complete(result as bool);
+      });
+
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('Complete'));
+
+      final tResult = await tCompleter.future;
+
+      expect(tResult, true);
+
+      tApp.getPlugin<StandardAppPlugin>()?.startupProcessInitialRoute();
+
+      await tester.pumpAndSettle();
+
+      expect(find.text('9999 test A'), findsOneWidget);
     });
 
     tApp.dispose();
@@ -2004,6 +2736,7 @@ void main() {
     BuildContext? tContext;
 
     final App tApp = createApp(
+      // environment: NoAutoProcessInitialRouteEnvironment(),
       appWidget: StandardMaterialApp(
         onGenerateTitle: (context) => 'Test Title',
         pages: [

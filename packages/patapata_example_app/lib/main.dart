@@ -3,11 +3,14 @@
 // This source code is licensed under the MIT license found in the
 // LICENSE file in the root directory of this source tree.
 
+import 'package:flutter_web_plugins/url_strategy.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:patapata_core/patapata_core.dart';
 import 'package:patapata_core/patapata_core_libs.dart';
 import 'package:patapata_core/patapata_widgets.dart';
+import 'package:patapata_example_app/src/errors.dart';
 import 'package:patapata_example_app/src/pages/device_and_package_info_page.dart';
 import 'package:patapata_example_app/src/pages/standard_page_example_page.dart';
 import 'package:provider/provider.dart';
@@ -31,6 +34,9 @@ final _providerKey = GlobalKey(debugLabel: 'AppProviderKey');
 final logger = Logger('patapata.example');
 
 void main() {
+  if (kIsWeb) {
+    usePathUrlStrategy();
+  }
   App(
     environment: const Environment(),
     startupSequence: StartupSequence(
@@ -89,9 +95,10 @@ Widget _createAppWidget(BuildContext context, App<Environment> app) {
       pages: [
         // Splash screen page.
         // This uses a special factory that has good defaults for splash screens.
-        SplashPageFactory<SplashPage>(
-          create: (_) => SplashPage(),
-        ),
+        if (!kIsWeb)
+          SplashPageFactory<SplashPage>(
+            create: (_) => SplashPage(),
+          ),
         // Agreement page.
         // This uses a special factory that all StartupSequence pages should use.
         StartupPageFactory<AgreementPage>(
@@ -150,16 +157,21 @@ Widget _createAppWidget(BuildContext context, App<Environment> app) {
       onGenerateTitle: (context) => l(context, 'title'),
       pages: [
         // Splash screen page.
-        SplashPageFactory<SplashPage>(
-          create: (_) => SplashPage(),
-        ),
+        if (!kIsWeb)
+          SplashPageFactory<SplashPage>(
+            create: (_) => SplashPage(),
+          ),
         // Agreement page.
         StartupPageFactory<AgreementPage>(
           create: (_) => AgreementPage(),
         ),
         // Error page.
         StandardErrorPageFactory(
-          create: (_) => ErrorPage(),
+          create: (exception) => switch (exception.error) {
+            AppException _ => AppExceptionPage(),
+            WebPageNotFound _ => WebPageNotFoundPage(),
+            _ => UnknownExceptionPage(),
+          },
         ),
         // Top Page.
         StandardPageFactory<TopPage, void>(
@@ -167,32 +179,32 @@ Widget _createAppWidget(BuildContext context, App<Environment> app) {
           links: {
             r'': (match, uri) {},
           },
-          linkGenerator: (pageData) => '',
+          linkGenerator: (pageData) => '/',
           groupRoot: true,
         ),
         // LocalConfig Sample Page.
         StandardPageFactory<ConfigPage, void>(
           create: (_) => ConfigPage(),
           links: {
-            r'': (match, uri) {},
+            r'config': (match, uri) {},
           },
-          linkGenerator: (pageData) => '',
+          linkGenerator: (pageData) => '/config',
         ),
         // DeviceInfo and PackageInfo Sample Page.
         StandardPageFactory<DeviceAndPackageInfoPage, void>(
           create: (_) => DeviceAndPackageInfoPage(),
           links: {
-            r'': (match, uri) {},
+            r'package': (match, uri) {},
           },
-          linkGenerator: (pageData) => '',
+          linkGenerator: (pageData) => '/package',
         ),
         // Error Select Page.
         StandardPageFactory<ErrorSelectPage, void>(
           create: (_) => ErrorSelectPage(),
           links: {
-            r'': (match, uri) {},
+            r'error': (match, uri) {},
           },
-          linkGenerator: (pageData) => '',
+          linkGenerator: (pageData) => '/error',
         ),
         // Material Tab and pages.
         // TitlePage and TitleDetailsPage are pages related to the tabs on the HomePage.
@@ -222,10 +234,6 @@ Widget _createAppWidget(BuildContext context, App<Environment> app) {
         // The page with an example implementation of ScreenLayout.
         StandardPageFactory<ScreenLayoutExamplePage, void>(
           create: (data) => ScreenLayoutExamplePage(),
-        ),
-        // Error page.
-        StandardErrorPageFactory(
-          create: (data) => ErrorPage(),
         ),
         // StandardPage And PageData Sample Page.
         StandardPageFactory<StandardPageExamplePage, void>(

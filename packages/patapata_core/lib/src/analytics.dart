@@ -1135,6 +1135,14 @@ class AnalyticsNavigatorObserver extends NavigatorObserver {
   @override
   void didPush(Route<dynamic> route, Route<dynamic>? previousRoute) {
     if (route.isActive && route.isCurrent) {
+      if (route.settings is StandardPageInterface) {
+        final tFactory =
+            (route.settings as StandardPageInterface).factoryObject;
+        if (tFactory.enableNavigationAnalytics == false) {
+          return;
+        }
+      }
+
       _logger.finer('AnalyticsNavigatorObserver:didPush');
       _analytics._globalRouteContext.clear();
       _analytics.routeViewEvent(
@@ -1151,6 +1159,14 @@ class AnalyticsNavigatorObserver extends NavigatorObserver {
     }
 
     if (previousRoute.isActive && previousRoute.isCurrent) {
+      if (previousRoute.settings is StandardPageInterface) {
+        final tFactory =
+            (previousRoute.settings as StandardPageInterface).factoryObject;
+        if (tFactory.enableNavigationAnalytics == false) {
+          return;
+        }
+      }
+
       _logger.finer('AnalyticsNavigatorObserver:didPop');
       _analytics._globalRouteContext.clear();
       _analytics.routeViewEvent(
@@ -1167,6 +1183,14 @@ class AnalyticsNavigatorObserver extends NavigatorObserver {
     }
 
     if (previousRoute.isActive && previousRoute.isCurrent) {
+      if (previousRoute.settings is StandardPageInterface) {
+        final tFactory =
+            (previousRoute.settings as StandardPageInterface).factoryObject;
+        if (tFactory.enableNavigationAnalytics == false) {
+          return;
+        }
+      }
+
       _logger.finer('AnalyticsNavigatorObserver:didRemove');
 
       _analytics._globalRouteContext.clear();
@@ -1181,6 +1205,17 @@ class AnalyticsNavigatorObserver extends NavigatorObserver {
   void didReplace({Route<dynamic>? newRoute, Route<dynamic>? oldRoute}) {
     if (newRoute == null) {
       return;
+    }
+
+    if (newRoute.settings is StandardPageInterface) {
+      // It seems that there are no cases where StandardPage falls into this condition.
+      // coverage:ignore-start
+      final tFactory =
+          (newRoute.settings as StandardPageInterface).factoryObject;
+      if (tFactory.enableNavigationAnalytics == false) {
+        return;
+      }
+      // coverage:ignore-end
     }
 
     _logger.finer('AnalyticsNavigatorObserver:didReplace');
