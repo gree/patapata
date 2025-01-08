@@ -30,69 +30,54 @@ Packages with other changes:
 
 #### `patapata_apple_push_notifications` - `v1.2.0`
 
- - **FEAT**: update flutter.
+ - **FEAT**: support flutter 3.27.1.
 
 #### `patapata_core` - `v1.2.0`
 
- - **FIX**: add enableNavigationAnalytics Flag.
- - **FIX**: device_info_plus mock data.
+ - **FIX**: Added enableNavigationAnalytics to StandardPageWithResultFactory. The default is true.
  - **FIX**: fix an issue when StandardPage page data's type changes from nullable to non-nullable and null data is trying to be restored on route load.
- - **FIX**: Unnecessary code.
- - **FIX**: [patapata_firebase_analytics] Update dependencies.
- - **FIX**: update dependencies for device_info_plus.
- - **FIX**: update dependencies for package_info_plus.
- - **FIX**: Reviewed Document.
  - **FIX**: log_test fails on Windows.
  - **FIX**: update com.android.tools.build:gradle:8.1.0.
- - **FIX**: ignore: deprecated_member_use (todo).
- - **FIX**: update README.
- - **FIX**: Added Comments.
- - **FIX**: unnecessary_import.
  - **FIX**: When PatapataException.userLogLevel is set to SHOUT for an unknown error, goErrorPage is not called.
- - **FEAT**: processInitialRoute to run automatically.
- - **FEAT**: InfiniteScrollListView.
- - **FEAT**: update flutter.
- - **FEAT**: Support for PlatformDispatcher.onError.
+ - **FEAT**: support flutter 3.27.1.
+ - **FEAT**: StandardRouterDelegate.processInitialRoute to run automatically.
+ - **FEAT**: A new widget, InfiniteScrollListView, has been implemented to add infinite scroll functionality to Flutter’s ListView and GridView.
+ - **FEAT**: The logging system overrides PlatformDispatcher.onError. This ensures that all unknown exceptions, including those that occur outside of Patapata's Zone, are handled.
+ - **FEAT**: With the fix to PatapataException, the App instance is now retrieved from the Zone when creating exceptions. As a result, it is no longer a const property.
 
 #### `patapata_firebase_analytics` - `v1.2.0`
 
- - **FIX**: [patapata_firebase_analytics] Update dependencies.
- - **FEAT**: update flutter.
+ - **FEAT**: support flutter 3.27.1.
 
 #### `patapata_firebase_auth` - `v1.2.0`
 
- - **FIX**: [patapata_firebase_auth] Update dependencies.
- - **FEAT**: update flutter.
+ - **FEAT**: support flutter 3.27.1.
 
 #### `patapata_firebase_core` - `v1.2.0`
 
- - **FIX**: [patapata_firebase_core] Update dependencies.
- - **FEAT**: update flutter.
+ - **FEAT**: support flutter 3.27.1.
 
 #### `patapata_firebase_crashlytics` - `v1.2.0`
 
- - **FIX**: [patapata_firebase_crashlytics] Update dependencies.
- - **FEAT**: update flutter.
+ - **FEAT**: support flutter 3.27.1.
 
 #### `patapata_firebase_messaging` - `v1.2.0`
 
- - **FIX**: [patapata_firebase_messaging] Update dependencies.
  - **FIX**: update com.android.tools.build:gradle:8.1.0.
- - **FEAT**: update flutter.
+ - **FEAT**: support flutter 3.27.1.
 
 #### `patapata_firebase_remote_config` - `v1.2.0`
 
- - **FIX**: [patapata_firebase_remote_config] Update dependencies.
  - **FIX**: firebase remote config can not listen to remote config changes on the web.
- - **FEAT**: update flutter.
+ - **FEAT**: support flutter 3.27.1.
 
 #### `patapata_riverpod` - `v1.2.0`
 
- - **FEAT**: update flutter.
+ - **FEAT**: support flutter 3.27.1.
 
 #### `patapata_sentry` - `v1.2.0`
 
- - **FEAT**: update flutter.
+ - **FEAT**: support flutter 3.27.1.
 
 
 ## 2024-06-12

@@ -1,6 +1,6 @@
 ## 1.2.0
 
- - **FEAT**: update flutter.
+ - **FEAT**: support flutter 3.27.1.
 
 ## 1.1.0
 

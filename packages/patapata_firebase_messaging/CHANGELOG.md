@@ -1,8 +1,7 @@
 ## 1.2.0
 
- - **FIX**: [patapata_firebase_messaging] Update dependencies.
  - **FIX**: update com.android.tools.build:gradle:8.1.0.
- - **FEAT**: update flutter.
+ - **FEAT**: support flutter 3.27.1.
 
 ## 1.1.1
 

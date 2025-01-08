@@ -1,7 +1,6 @@
 ## 1.2.0
 
- - **FIX**: [patapata_firebase_analytics] Update dependencies.
- - **FEAT**: update flutter.
+ - **FEAT**: support flutter 3.27.1.
 
 ## 1.1.1
 
