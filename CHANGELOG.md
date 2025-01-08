@@ -3,6 +3,83 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 2025-01-08
+
+### Changes
+
+---
+
+Packages with breaking changes:
+
+ - There are no breaking changes in this release.
+
+Packages with other changes:
+
+ - [`patapata_apple_push_notifications` - `v1.2.0`](#patapata_apple_push_notifications---v120)
+ - [`patapata_core` - `v1.2.0`](#patapata_core---v120)
+ - [`patapata_firebase_analytics` - `v1.2.0`](#patapata_firebase_analytics---v120)
+ - [`patapata_firebase_auth` - `v1.2.0`](#patapata_firebase_auth---v120)
+ - [`patapata_firebase_core` - `v1.2.0`](#patapata_firebase_core---v120)
+ - [`patapata_firebase_crashlytics` - `v1.2.0`](#patapata_firebase_crashlytics---v120)
+ - [`patapata_firebase_messaging` - `v1.2.0`](#patapata_firebase_messaging---v120)
+ - [`patapata_firebase_remote_config` - `v1.2.0`](#patapata_firebase_remote_config---v120)
+ - [`patapata_riverpod` - `v1.2.0`](#patapata_riverpod---v120)
+ - [`patapata_sentry` - `v1.2.0`](#patapata_sentry---v120)
+
+---
+
+#### `patapata_apple_push_notifications` - `v1.2.0`
+
+ - **FEAT**: support flutter 3.27.1.
+
+#### `patapata_core` - `v1.2.0`
+
+ - **FIX**: Added enableNavigationAnalytics to StandardPageWithResultFactory. The default is true.
+ - **FIX**: fix an issue when StandardPage page data's type changes from nullable to non-nullable and null data is trying to be restored on route load.
+ - **FIX**: log_test fails on Windows.
+ - **FIX**: update com.android.tools.build:gradle:8.1.0.
+ - **FIX**: When PatapataException.userLogLevel is set to SHOUT for an unknown error, goErrorPage is not called.
+ - **FEAT**: support flutter 3.27.1.
+ - **FEAT**: StandardRouterDelegate.processInitialRoute to run automatically.
+ - **FEAT**: A new widget, InfiniteScrollListView, has been implemented to add infinite scroll functionality to Flutter’s ListView and GridView.
+ - **FEAT**: The logging system overrides PlatformDispatcher.onError. This ensures that all unknown exceptions, including those that occur outside of Patapata's Zone, are handled.
+ - **FEAT**: With the fix to PatapataException, the App instance is now retrieved from the Zone when creating exceptions. As a result, it is no longer a const property.
+
+#### `patapata_firebase_analytics` - `v1.2.0`
+
+ - **FEAT**: support flutter 3.27.1.
+
+#### `patapata_firebase_auth` - `v1.2.0`
+
+ - **FEAT**: support flutter 3.27.1.
+
+#### `patapata_firebase_core` - `v1.2.0`
+
+ - **FEAT**: support flutter 3.27.1.
+
+#### `patapata_firebase_crashlytics` - `v1.2.0`
+
+ - **FEAT**: support flutter 3.27.1.
+
+#### `patapata_firebase_messaging` - `v1.2.0`
+
+ - **FIX**: update com.android.tools.build:gradle:8.1.0.
+ - **FEAT**: support flutter 3.27.1.
+
+#### `patapata_firebase_remote_config` - `v1.2.0`
+
+ - **FIX**: firebase remote config can not listen to remote config changes on the web.
+ - **FEAT**: support flutter 3.27.1.
+
+#### `patapata_riverpod` - `v1.2.0`
+
+ - **FEAT**: support flutter 3.27.1.
+
+#### `patapata_sentry` - `v1.2.0`
+
+ - **FEAT**: support flutter 3.27.1.
+
+
 ## 2024-06-12
 
 ### Changes

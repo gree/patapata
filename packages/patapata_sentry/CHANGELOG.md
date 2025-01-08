@@ -1,3 +1,7 @@
+## 1.2.0
+
+ - **FEAT**: support flutter 3.27.1.
+
 ## 1.1.1
 
  - **FIX**: when running dart doc, some documentation is not generated.

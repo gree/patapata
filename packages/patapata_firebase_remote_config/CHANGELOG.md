@@ -1,3 +1,8 @@
+## 1.2.0
+
+ - **FIX**: firebase remote config can not listen to remote config changes on the web.
+ - **FEAT**: support flutter 3.27.1.
+
 ## 1.1.1
 
  - **FIX**: when running dart doc, some documentation is not generated.

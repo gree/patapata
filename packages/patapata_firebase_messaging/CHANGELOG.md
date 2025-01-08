@@ -1,3 +1,8 @@
+## 1.2.0
+
+ - **FIX**: update com.android.tools.build:gradle:8.1.0.
+ - **FEAT**: support flutter 3.27.1.
+
 ## 1.1.1
 
  - **FIX**: when running dart doc, some documentation is not generated.
