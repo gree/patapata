@@ -1,3 +1,8 @@
+## 1.2.0
+
+ - **FIX**: [patapata_firebase_auth] Update dependencies.
+ - **FEAT**: update flutter.
+
 ## 1.1.0
 
  - **FEAT**: Adapt to the Privacy Manifest.

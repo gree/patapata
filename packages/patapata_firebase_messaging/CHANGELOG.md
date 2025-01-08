@@ -1,3 +1,9 @@
+## 1.2.0
+
+ - **FIX**: [patapata_firebase_messaging] Update dependencies.
+ - **FIX**: update com.android.tools.build:gradle:8.1.0.
+ - **FEAT**: update flutter.
+
 ## 1.1.1
 
  - **FIX**: when running dart doc, some documentation is not generated.
