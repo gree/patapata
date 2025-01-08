@@ -814,6 +814,45 @@ void main() {
     tApp.dispose();
   });
 
+  testWidgets(
+      "Standard Page PageData Test. If you have a pageKey for a StandardPage that ignores pageData.",
+      (WidgetTester tester) async {
+    final App tApp = createApp(
+      appWidget: StandardCupertinoApp(
+        onGenerateTitle: (context) => 'Test Title',
+        pages: [
+          StandardPageFactory<TestPageA, void>(
+            create: (data) => TestPageA(),
+          ),
+          StandardPageFactory<TestPageC, TestPageData>(
+            pageKey: (_) => const ValueKey('TestPageC'),
+            create: (data) => TestPageC(),
+          ),
+        ],
+      ),
+    );
+
+    tApp.run();
+
+    await tApp.runProcess(() async {
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.byKey(const ValueKey(kGoPageDataButton)));
+
+      await tester.pumpAndSettle();
+
+      expect(find.text('Test Link Data is 10'), findsOneWidget);
+
+      await tester.tap(find.byKey(const ValueKey(kGoPageDataButton)));
+
+      await tester.pumpAndSettle();
+
+      expect(find.text('Test Link Data is 20'), findsOneWidget);
+    });
+
+    tApp.dispose();
+  });
+
   testWidgets("Standard Page PageData Test. pageDataWhenNull",
       (WidgetTester tester) async {
     final App tApp = createApp(
