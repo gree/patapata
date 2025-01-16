@@ -23,6 +23,7 @@ base class ExampleException extends AppException {
     super.fix,
     super.logLevel,
     super.userLogLevel,
+    super.overridableLocalization,
   });
 
   @override

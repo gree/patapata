@@ -141,6 +141,80 @@ class ErrorSelectPage extends StandardPage<void> {
             },
             child: Text(context.pl('maintenance')),
           ),
+          Padding(
+            padding: const EdgeInsets.all(25.0),
+            child: Center(
+              child: FilledButton(
+                onPressed: () {
+                  context.go<ErrorPageSpecificPage, void>(null);
+                },
+                child: Text(context.pl('specific')),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class ErrorPageSpecificPage extends StandardPage<void> {
+  @override
+  String localizationKey = 'pages.error_specific';
+
+  @override
+  Widget buildPage(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(context.pl('title')),
+      ),
+      body: ListView(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(25.0),
+            child: Center(
+              child: Text(
+                context.pl('body'),
+              ),
+            ),
+          ),
+          TextButton(
+            onPressed: () {
+              try {
+                throw ExampleException();
+              } on PatapataException catch (e) {
+                e.showDialog(context);
+                logger.severe(e.toString(), e);
+              }
+            },
+            child: Text(context.pl('example')),
+          ),
+          TextButton(
+            onPressed: () {
+              try {
+                throw ExampleException(
+                  overridableLocalization: false,
+                );
+              } on PatapataException catch (e) {
+                e.showDialog(context);
+                logger.severe(e.toString(), e);
+              }
+            },
+            child: Text(
+                '${context.pl('example')} (overridableLocalization: false)'),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(25.0),
+            child: Center(
+              child: FilledButton(
+                onPressed: () {
+                  context.go<ErrorSelectPage, void>(
+                      null, StandardPageNavigationMode.removeAbove);
+                },
+                child: Text(context.pl('back')),
+              ),
+            ),
+          ),
         ],
       ),
     );

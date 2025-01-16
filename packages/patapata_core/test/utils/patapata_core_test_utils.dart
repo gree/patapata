@@ -73,6 +73,12 @@ test:
   pl:
     title: LocalizationTest
     message: LocalizationTestMessage:{param}
+    errors:
+      pl:
+        '000':
+          title: PlPageErrorTitle:{prefix}{data}
+          message: PlPageErrorMessage:{prefix}{data}
+          fix: PlPageErrorFix:{prefix}{data}
 errors:
   test:
     '000':
@@ -84,6 +90,15 @@ errors:
         title: ErrorPageTitle
         message: ErrorPageMessage
         fix: ErrorPageFix
+  pl:
+    '000':
+      title: PlErrorTitle:{prefix}{data}
+      message: PlErrorMessage:{prefix}{data}
+      fix: PlErrorFix:{prefix}{data}
+    '111':
+      title: PlErrorTitle2:{prefix}{data}
+      message: PlErrorMessage2:{prefix}{data}
+      fix: PlErrorFix2:{prefix}{data}
 
 ''',
       'l10n/ja.yaml': '''
@@ -96,6 +111,12 @@ test:
   pl:
     title: ローカライズテスト
     message: ローカライズテストメッセージ:{param}
+    errors:
+      pl:
+        '000':
+          title: Plページエラー:{prefix}{data}
+          message: Plページメッセージ:{prefix}{data}
+          fix: Plページ修復:{prefix}{data}
 errors:
   test:
     '000':
@@ -107,6 +128,15 @@ errors:
         title: エラーページ:タイトル
         message: エラーページ:メッセージ
         fix: エラーページ:修復
+  pl:
+    '000':
+      title: Plエラー:{prefix}{data}
+      message: Plメッセージ:{prefix}{data}
+      fix: Pl修復:{prefix}{data}
+    '111':
+      title: Plエラー2:{prefix}{data}
+      message: Plメッセージ2:{prefix}{data}
+      fix: Pl修復2:{prefix}{data}
 ''',
       'l10n2/en.yaml': '''
 home:

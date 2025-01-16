@@ -32,6 +32,10 @@ mixin ErrorEnvironment {
 }
 
 /// Defines exceptions that occur in applications using patapata.
+///
+/// If [overridableLocalization] is true, the localization keys [localizedTitle],
+/// [localizedMessage], and [localizedFix] can be overridden by [StandardPageWithResult.localizationKey].
+/// The default is true.
 abstract class PatapataException {
   final App? _app;
 
@@ -115,9 +119,22 @@ abstract class PatapataException {
     this.localeFixData,
     this.fix,
     this.logLevel,
+    bool overridableLocalization = true,
     Level? userLogLevel,
   })  : _app = app ?? (Zone.current[#patapataApp] as App?),
-        _userLogLevel = userLogLevel;
+        _userLogLevel = userLogLevel {
+    final tPageLocalizationKey = (overridableLocalization)
+        ? (_app?.getPlugin<StandardAppPlugin>()?.delegate?.pageInstances.last
+                as StandardPageInterface?)
+            ?.standardPageKey
+            .currentState
+            ?.localizationKey
+        : null;
+
+    _overrideLocalizeKeyBase = tPageLocalizationKey?.isNotEmpty == true
+        ? '$tPageLocalizationKey.$_localizeKeyBase'
+        : '';
+  }
 
   /// Prefix for [code]
   /// Can be set by [ErrorEnvironment.errorReplacePrefixMap] with [namespace].
@@ -161,15 +178,27 @@ abstract class PatapataException {
   ///     '000':
   ///       title: ErrorTitle
   /// ```
+  ///
+  /// If [StandardPageWithResult.localizationKey] is set on the currently displayed page when this class is created,
+  /// you can override the default keys and display page-specific `title` by creating the following YAML file.
+  /// However, if `overridableLocalization` was set to false when created, the keys will not be overridden.
+  ///
+  /// Example: If [StandardPageWithResult.localizationKey] is `pages.home`, then
+  /// ```yaml
+  /// pages:
+  ///   home:
+  ///     errors:
+  ///       patapata:
+  ///         '000':
+  ///           title: Will be displayed
+  /// errors:
+  ///   patapata:
+  ///     '000':
+  ///       title: Will not be displayed
+  /// ```
   String get localizedTitle => hasLocalizedTitle
-      ? _l10n!.lookup(
-          _localizeTitleKey,
-          namedParameters: {
-            'prefix': prefix,
-            ...(localeTitleData ?? {}),
-          },
-        )
-      : _defaultTitleLocalize;
+      ? _localize(_localizeTitleKey, localeTitleData)
+      : _defaultTitle;
 
   /// Displays the error message localized by the [L10n] system.
   ///
@@ -182,15 +211,27 @@ abstract class PatapataException {
   ///     '000':
   ///       message: ErrorMessage
   /// ```
+  ///
+  /// If [StandardPageWithResult.localizationKey] is set on the currently displayed page when this class is created,
+  /// you can override the default keys and display page-specific `message` by creating the following YAML file.
+  /// However, if `overridableLocalization` was set to false when created, the keys will not be overridden.
+  ///
+  /// Example: If [StandardPageWithResult.localizationKey] is `pages.home`, then
+  /// ```yaml
+  /// pages:
+  ///   home:
+  ///     errors:
+  ///       patapata:
+  ///         '000':
+  ///           message: Will be displayed
+  /// errors:
+  ///   patapata:
+  ///     '000':
+  ///       message: Will not be displayed
+  /// ```
   String get localizedMessage => hasLocalizedMessage
-      ? _l10n!.lookup(
-          _localizeMessageKey,
-          namedParameters: {
-            'prefix': prefix,
-            ...(localeMessageData ?? {}),
-          },
-        )
-      : _defaultMessageLocalize;
+      ? _localize(_localizeMessageKey, localeMessageData)
+      : _defaultMessage;
 
   /// Displays the error treatment message localized by the [L10n] system.
   ///
@@ -203,27 +244,65 @@ abstract class PatapataException {
   ///     '000':
   ///       fix: ErrorFix
   /// ```
-  String get localizedFix => hasLocalizedFix
-      ? _l10n!.lookup(
-          _localizeFixKey,
-          namedParameters: {
-            'prefix': prefix,
-            ...(localeFixData ?? {}),
-          },
-        )
-      : _defaultFixLocalize;
+  ///
+  /// If [StandardPageWithResult.localizationKey] is set on the currently displayed page when this class is created,
+  /// you can override the default keys and display page-specific `fix` by creating the following YAML file.
+  /// However, if `overridableLocalization` was set to false when created, the keys will not be overridden.
+  ///
+  /// Example: If [StandardPageWithResult.localizationKey] is `pages.home`, then
+  /// ```yaml
+  /// pages:
+  ///   home:
+  ///     errors:
+  ///       patapata:
+  ///         '000':
+  ///           fix: Will be displayed
+  /// errors:
+  ///   patapata:
+  ///     '000':
+  ///       fix: Will not be displayed
+  /// ```
+  String get localizedFix =>
+      hasLocalizedFix ? _localize(_localizeFixKey, localeFixData) : _defaultFix;
 
   /// true if the localization key for [localizedTitle] is defined.
   bool get hasLocalizedTitle =>
-      _l10n?.containsMessageKey(_localizeTitleKey) ?? false;
+      hasOverrideLocalizedTitle ||
+      (_l10n?.containsMessageKey('$_localizeKeyBase.$_titleKey') ?? false);
 
   /// true if the localization key for [localizedMessage] is defined.
   bool get hasLocalizedMessage =>
-      _l10n?.containsMessageKey(_localizeMessageKey) ?? false;
+      hasOverrideLocalizedMessage ||
+      (_l10n?.containsMessageKey('$_localizeKeyBase.$_messageKey') ?? false);
 
   /// true if the localization key for [localizedFix] is defined.
   bool get hasLocalizedFix =>
-      _l10n?.containsMessageKey(_localizeFixKey) ?? false;
+      hasOverrideLocalizedFix ||
+      (_l10n?.containsMessageKey('$_localizeKeyBase.$_fixKey') ?? false);
+
+  /// true if the localization key for [localizedTitle] is overridden.
+  ///
+  /// For example, when this class is created and the currently displayed page has [StandardPageWithResult.localizationKey] set.
+  bool get hasOverrideLocalizedTitle =>
+      _overrideLocalizeKeyBase.isNotEmpty &&
+      (_l10n?.containsMessageKey('$_overrideLocalizeKeyBase.$_titleKey') ??
+          false);
+
+  /// true if the localization key for [localizedMessage] is overridden.
+  ///
+  /// For example, when this class is created and the currently displayed page has [StandardPageWithResult.localizationKey] set.
+  bool get hasOverrideLocalizedMessage =>
+      _overrideLocalizeKeyBase.isNotEmpty &&
+      (_l10n?.containsMessageKey('$_overrideLocalizeKeyBase.$_messageKey') ??
+          false);
+
+  /// true if the localization key for [localizedFix] is overridden.
+  ///
+  /// For example, when this class is created and the currently displayed page has [StandardPageWithResult.localizationKey] set.
+  bool get hasOverrideLocalizedFix =>
+      _overrideLocalizeKeyBase.isNotEmpty &&
+      (_l10n?.containsMessageKey('$_overrideLocalizeKeyBase.$_fixKey') ??
+          false);
 
   /// Returns ErrorWidget.
   ///
@@ -275,13 +354,24 @@ abstract class PatapataException {
     }
   }
 
-  String get _localizeTitleKey => 'errors.$namespace.$internalCode.title';
-  String get _localizeMessageKey => 'errors.$namespace.$internalCode.message';
-  String get _localizeFixKey => 'errors.$namespace.$internalCode.fix';
+  late final String _overrideLocalizeKeyBase;
 
-  String get _defaultTitleLocalize => 'Error: $code';
-  String get _defaultMessageLocalize => '$runtimeType: code=$code';
-  String get _defaultFixLocalize => 'OK';
+  String get _localizeKeyBase => 'errors.$namespace.$internalCode';
+
+  String get _localizeTitleKey =>
+      '${hasOverrideLocalizedTitle ? _overrideLocalizeKeyBase : _localizeKeyBase}.$_titleKey';
+  String get _localizeMessageKey =>
+      '${hasOverrideLocalizedMessage ? _overrideLocalizeKeyBase : _localizeKeyBase}.$_messageKey';
+  String get _localizeFixKey =>
+      '${hasOverrideLocalizedFix ? _overrideLocalizeKeyBase : _localizeKeyBase}.$_fixKey';
+
+  String get _titleKey => 'title';
+  String get _messageKey => 'message';
+  String get _fixKey => 'fix';
+
+  String get _defaultTitle => 'Error: $code';
+  String get _defaultMessage => '$runtimeType: code=$code';
+  String get _defaultFix => 'OK';
 
   L10n? get _l10n => _app?.getPlugin<I18nPlugin>()?.i18n.delegate.l10n;
 
@@ -290,6 +380,16 @@ abstract class PatapataException {
   ErrorEnvironment? get _environment => _app?.environment is ErrorEnvironment
       ? _app!.environment as ErrorEnvironment
       : null;
+
+  String _localize(String key, Map<String, String>? namedParameters) {
+    return _l10n!.lookup(
+      key,
+      namedParameters: {
+        'prefix': prefix,
+        ...(namedParameters ?? {}),
+      },
+    );
+  }
 
   @override
   String toString() {

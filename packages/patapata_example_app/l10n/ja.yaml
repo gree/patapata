@@ -43,6 +43,17 @@ pages:
     example: 通常のエラー
     network: ネットワークエラー({prefix})
     maintenance: メンテナンス中エラー
+    specific: ページ特有のエラー
+  error_specific:
+    title: ページ特有のエラー
+    body: 前ページの「通常のエラー」と同じ例外を発生させますが、表示されるメッセージが異なります。
+    example: テスト
+    back: 戻る
+    errors:
+      app:
+        '000':
+          title: ページ特有のエラー（{prefix}000）
+          message: ページ特有のエラーが発生しました。
   maintenance:
     title: サーバーメンテナンス
     message: 現在サーバーメンテンス中のため利用できません。トップページに戻ります。
