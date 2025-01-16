@@ -11,26 +11,27 @@ import 'package:patapata_core/patapata_widgets.dart';
 /// It appears after the splash screen. If the user does not agree, they will be taken back to the splash screen again.
 class AgreementPage extends StandardPage<StartupPageCompleter> {
   @override
+  String localizationKey = 'pages.agreement';
+
+  @override
   Widget buildPage(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(l(context, 'pages.agreement.title')),
+        title: Text(context.pl('title')),
       ),
       body: Column(
         children: [
           Center(
-            child: Text(
-              l(context, 'pages.agreement.body'),
-            ),
+            child: Text(context.pl('body')),
           ),
           TextButton(
-            child: Text(l(context, 'pages.agreement.yes')),
+            child: Text(context.pl('yes')),
             onPressed: () {
               pageData(null);
             },
           ),
           TextButton(
-            child: Text(l(context, 'pages.agreement.no')),
+            child: Text(context.pl('no')),
             onPressed: () {
               // Calling the sequence processing again will resume the sequence from the beginning.
               getApp().startupSequence?.resetMachine();

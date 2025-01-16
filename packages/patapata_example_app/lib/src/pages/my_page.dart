@@ -4,7 +4,6 @@
 // LICENSE file in the root directory of this source tree.
 
 import 'package:flutter/material.dart';
-import 'package:patapata_core/patapata_core.dart';
 import 'package:patapata_core/patapata_widgets.dart';
 import 'package:patapata_example_app/src/widgets/app_tab.dart';
 
@@ -21,10 +20,13 @@ class MyPage extends StandardPage<void> {
 /// [MyPage] is a StandardPage representing the [MyFavoritePage] tab in an application with a tabbed footer.
 class MyFavoritePage extends StandardPage<void> {
   @override
+  String localizationKey = 'pages.tab.my_page';
+
+  @override
   Widget buildPage(BuildContext context) {
     return AppTab(
       appBar: AppBar(
-        title: Text(l(context, 'pages.tab.my_page.title')),
+        title: Text(context.pl('title')),
         automaticallyImplyLeading: false,
         leading: const StandardPageBackButton(),
       ),
@@ -33,9 +35,7 @@ class MyFavoritePage extends StandardPage<void> {
           Center(
             child: Builder(
               builder: (context) {
-                return Text(
-                  l(context, 'pages.tab.my_page.body'),
-                );
+                return Text(context.pl('body'));
               },
             ),
           ),

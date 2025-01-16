@@ -543,6 +543,43 @@ class TestPageH extends StandardPage<TestPageData> {
   }
 }
 
+class TestPageLocalizationKey extends StandardPage<void> {
+  @override
+  String get localizationKey => 'test.pl';
+
+  String testMessage = '';
+
+  @override
+  Widget build(BuildContext context) {
+    testMessage = context.pl('message', {'param': 'a'});
+    return super.build(context);
+  }
+
+  @override
+  Widget buildPage(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(context.pl('title')),
+      ),
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            Center(
+              child: Text(testMessage),
+            ),
+            Center(
+              child: Text(context.pl('message', {'param': 'b'})),
+            ),
+            Builder(builder: (context) {
+              return Text(context.pl('message', {'param': 'c'}));
+            })
+          ],
+        ),
+      ),
+    );
+  }
+}
+
 class TestPageRemoveRoute extends StandardPage<void> {
   @override
   Widget buildPage(BuildContext context) {

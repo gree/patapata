@@ -70,6 +70,9 @@ notification:
   title: NotificationPage
 test:
   title: TestMessage:{param}
+  pl:
+    title: LocalizationTest
+    message: LocalizationTestMessage:{param}
 errors:
   test:
     '000':
@@ -90,6 +93,9 @@ notification:
   title: 通知
 test:
   title: テストメッセージ:{param}
+  pl:
+    title: ローカライズテスト
+    message: ローカライズテストメッセージ:{param}
 errors:
   test:
     '000':

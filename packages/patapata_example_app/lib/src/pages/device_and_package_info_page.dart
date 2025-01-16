@@ -11,6 +11,9 @@ import 'package:patapata_core/patapata_widgets.dart';
 /// This is a page demonstrating how to use DeviceInfo and PackageInfo.
 class DeviceAndPackageInfoPage extends StandardPage<void> {
   @override
+  String localizationKey = 'pages.device_and_package_info';
+
+  @override
   Widget buildPage(BuildContext context) {
     // Get the device model name.
     // If the platform is Web, you can retrieve the browser name.
@@ -31,14 +34,12 @@ class DeviceAndPackageInfoPage extends StandardPage<void> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(l(context, 'pages.device_and_package_info.title')),
+        title: Text(context.pl('title')),
       ),
       body: ListView(
         children: [
           Center(
-            child: Text(
-              l(context, 'pages.device_and_package_info.body'),
-            ),
+            child: Text(context.pl('body')),
           ),
           Table(
             border: TableBorder.all(),
@@ -47,8 +48,7 @@ class DeviceAndPackageInfoPage extends StandardPage<void> {
                 children: [
                   TableCell(
                     child: Center(
-                      child: Text(
-                          l(context, 'pages.device_and_package_info.model')),
+                      child: Text(context.pl('model')),
                     ),
                   ),
                   TableCell(
@@ -60,8 +60,7 @@ class DeviceAndPackageInfoPage extends StandardPage<void> {
                 children: [
                   TableCell(
                     child: Center(
-                      child: Text(
-                          l(context, 'pages.device_and_package_info.app_name')),
+                      child: Text(context.pl('app_name')),
                     ),
                   ),
                   TableCell(
@@ -74,8 +73,8 @@ class DeviceAndPackageInfoPage extends StandardPage<void> {
                 children: [
                   TableCell(
                     child: Center(
-                        child: Text(l(context,
-                            'pages.device_and_package_info.build_number'))),
+                      child: Text(context.pl('build_number')),
+                    ),
                   ),
                   TableCell(
                     // Get the build number from PackageInfo.
@@ -88,8 +87,8 @@ class DeviceAndPackageInfoPage extends StandardPage<void> {
                 children: [
                   TableCell(
                     child: Center(
-                        child: Text(l(context,
-                            'pages.device_and_package_info.build_signature'))),
+                      child: Text(context.pl('build_signature')),
+                    ),
                   ),
                   TableCell(
                     // Get the build signature from PackageInfo.
@@ -102,8 +101,8 @@ class DeviceAndPackageInfoPage extends StandardPage<void> {
                 children: [
                   TableCell(
                     child: Center(
-                        child: Text(l(context,
-                            'pages.device_and_package_info.package_name'))),
+                      child: Text(context.pl('package_name')),
+                    ),
                   ),
                   TableCell(
                     // Get the package name from PackageInfo.
@@ -116,8 +115,8 @@ class DeviceAndPackageInfoPage extends StandardPage<void> {
                 children: [
                   TableCell(
                     child: Center(
-                        child: Text(l(
-                            context, 'pages.device_and_package_info.version'))),
+                      child: Text(context.pl('version')),
+                    ),
                   ),
                   // Get the app version from PackageInfo.
                   TableCell(

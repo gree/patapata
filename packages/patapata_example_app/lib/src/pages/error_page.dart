@@ -80,10 +80,13 @@ class UnknownExceptionPage extends StandardPage<ReportRecord> {
 /// ErrorSelectPage is a page that allows you to select the type of error to display.
 class ErrorSelectPage extends StandardPage<void> {
   @override
+  String localizationKey = 'pages.error';
+
+  @override
   Widget buildPage(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(l(context, 'pages.error.title')),
+        title: Text(context.pl('title')),
       ),
       body: ListView(
         children: [
@@ -97,7 +100,7 @@ class ErrorSelectPage extends StandardPage<void> {
                 logger.severe(e.toString(), e);
               }
             },
-            child: Text(l(context, 'pages.error.example')),
+            child: Text(context.pl('example')),
           ),
           // Throw a network exception named ExampleNetworkException, defined in the sample app, and log it.
           // Specify the network status code in the statusCode argument of ExampleNetworkException.
@@ -110,7 +113,7 @@ class ErrorSelectPage extends StandardPage<void> {
                 logger.severe(e.toString(), e);
               }
             },
-            child: Text(l(context, 'pages.error.network', {'prefix': '404'})),
+            child: Text(context.pl('network', {'prefix': '404'})),
           ),
           TextButton(
             onPressed: () {
@@ -121,7 +124,7 @@ class ErrorSelectPage extends StandardPage<void> {
                 logger.severe(e.toString(), e);
               }
             },
-            child: Text(l(context, 'pages.error.network', {'prefix': '500'})),
+            child: Text(context.pl('network', {'prefix': '500'})),
           ),
           // Throw ExampleMaintenanceException, transition to the maintenance page, and navigate to ErrorSelectPage.
           TextButton(
@@ -136,7 +139,7 @@ class ErrorSelectPage extends StandardPage<void> {
                 logger.severe(e.toString(), e);
               }
             },
-            child: Text(l(context, 'pages.error.maintenance')),
+            child: Text(context.pl('maintenance')),
           ),
         ],
       ),
