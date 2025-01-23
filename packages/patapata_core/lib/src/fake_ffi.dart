@@ -12,3 +12,9 @@ class Pointer {}
 class Struct {}
 
 class Union {}
+
+final class DynamicLibrary {
+  static DynamicLibrary open(String name) {
+    throw UnimplementedError();
+  }
+}
