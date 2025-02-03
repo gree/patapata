@@ -4,7 +4,9 @@
 // LICENSE file in the root directory of this source tree.
 
 import 'dart:collection';
+import 'dart:math';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:patapata_core/patapata_annotation.dart';
 import 'package:patapata_core/patapata_core.dart';
@@ -471,26 +473,24 @@ abstract class Repository<T extends RepositoryModelBase<T, I>,
       final tDuration =
           (object as RepositoryModelCache).repositoryCacheDuration;
       if (tDuration != null) {
-        runZoned(
-          () {
-            _cacheDurationTimers[object] = Timer(
-              tDuration,
-              ((T object) {
-                // Create a clean closure with 0 references to outside.
-                return () {
-                  _logger.info(
-                      'Object cache duration expired: Have listeners: ${object._repositoryHasListeners}');
+        // [Web] Browsers' setTimeout internally treat the delay time as a 32-bit signed integer.
+        // Therefore, using a delay time exceeding 2,147,483,647 milliseconds (approximately 24.8 days)
+        // will cause an integer overflow, and the timer will execute immediately.
+        _cacheDurationTimers[object] = Timer(
+          Duration(
+            milliseconds: min(tDuration.inMilliseconds, ((1 << 31) - 1)),
+          ),
+          ((T object) {
+            // Create a clean closure with 0 references to outside.
+            return () {
+              _logger.info(
+                  'Object cache duration expired: Have listeners: ${object._repositoryHasListeners}');
 
-                  if (object._repositoryHasListeners) {
-                    refresh(object);
-                  }
-                };
-              })(object),
-            );
-          },
-          zoneValues: {
-            #sequentialWorkQueueNoWaitForAsync: true,
-          },
+              if (object._repositoryHasListeners) {
+                refresh(object);
+              }
+            };
+          })(object),
         );
       }
     }
@@ -632,6 +632,7 @@ abstract class Repository<T extends RepositoryModelBase<T, I>,
     I id,
     Type set, {
     RepositoryFetchPolicy fetchPolicy = RepositoryFetchPolicy.cacheFirst,
+    bool? synchronousCache,
   }) {
     assert(singleSetFetchers.containsKey(set) ||
         multiSetFetchers.containsKey(set));
@@ -648,8 +649,13 @@ abstract class Repository<T extends RepositoryModelBase<T, I>,
       }
 
       if (tObject?.repositorySets.contains(set) == true) {
+        final tSynchronousCache = synchronousCache ??
+            (Zone.current[#repositorySynchronousCache] as bool?) ??
+            false;
         // Return as quickly as possible.
-        return SynchronousErrorableFuture(tObject);
+        return (tSynchronousCache)
+            ? SynchronousErrorableFuture(tObject)
+            : Future.value(tObject);
       }
     }
 
@@ -693,6 +699,7 @@ abstract class Repository<T extends RepositoryModelBase<T, I>,
     List<I?> ids,
     Type set, {
     RepositoryFetchPolicy fetchPolicy = RepositoryFetchPolicy.cacheFirst,
+    bool? synchronousCache,
   }) {
     assert(multiSetFetchers.containsKey(set));
 
@@ -743,8 +750,13 @@ abstract class Repository<T extends RepositoryModelBase<T, I>,
     }
 
     if (tToFetch.isEmpty && tToWaitFor.isEmpty) {
+      final tSynchronousCache = synchronousCache ??
+          (Zone.current[#repositorySynchronousCache] as bool?) ??
+          false;
       // Return as quickly as possible.
-      return SynchronousErrorableFuture(tResults);
+      return (tSynchronousCache)
+          ? SynchronousErrorableFuture(tResults)
+          : Future.value(tResults);
     }
 
     final tCompleter = Completer<List<T?>>();
@@ -939,24 +951,28 @@ class _RepositoryCoreState<
     _error = null;
     _stackTrace = null;
 
-    widget.fetcher(widget.repository).then((data) {
-      _data = data;
+    runZoned(() {
+      widget.fetcher(widget.repository).then((data) {
+        _data = data;
 
-      return data;
-    }).catchError((e, stackTrace) {
-      _error = e;
-      _stackTrace = stackTrace;
+        return data;
+      }).catchError((e, stackTrace) {
+        _error = e;
+        _stackTrace = stackTrace;
 
-      throw e;
-    }).whenComplete(() {
-      _loading = false;
-      tracker.calledFinished = true;
+        throw e;
+      }).whenComplete(() {
+        _loading = false;
+        tracker.calledFinished = true;
 
-      if (tracker.callerFinished) {
-        if (mounted) {
-          setState(() {});
+        if (tracker.callerFinished) {
+          if (mounted) {
+            setState(() {});
+          }
         }
-      }
+      });
+    }, zoneValues: {
+      #repositorySynchronousCache: true,
     });
   }
 
@@ -1038,24 +1054,28 @@ class _RepositoryMultiCoreState<
     _error = null;
     _stackTrace = null;
 
-    widget.fetcher(widget.repository).then((data) {
-      _data = data;
+    runZoned(() {
+      widget.fetcher(widget.repository).then((data) {
+        _data = data;
 
-      return data;
-    }).catchError((e, stackTrace) {
-      _error = e;
-      _stackTrace = stackTrace;
+        return data;
+      }).catchError((e, stackTrace) {
+        _error = e;
+        _stackTrace = stackTrace;
 
-      throw e;
-    }).whenComplete(() {
-      _loading = false;
-      tracker.calledFinished = true;
+        throw e;
+      }).whenComplete(() {
+        _loading = false;
+        tracker.calledFinished = true;
 
-      if (tracker.callerFinished) {
-        if (mounted) {
-          setState(() {});
+        if (tracker.callerFinished) {
+          if (mounted) {
+            setState(() {});
+          }
         }
-      }
+      });
+    }, zoneValues: {
+      #repositorySynchronousCache: true,
     });
   }
 
