@@ -325,6 +325,11 @@ abstract class Repository<T extends RepositoryModelBase<T, I>,
   /// Standard maximum cache size.
   static const kDefaultMaxObjectCacheSize = 100;
 
+  /// Specifies the number of [fetch] operations that can be executed concurrently in [refreshMany] and [refreshAll].
+  ///
+  /// If the value is 0 or less, it will be treated as 1.
+  int get maxConcurrentFetches => 1;
+
   /// Maximum size of the cache.
   @protected
   int get maxObjectCacheSize => kDefaultMaxObjectCacheSize;
@@ -873,14 +878,18 @@ abstract class Repository<T extends RepositoryModelBase<T, I>,
           fetchPolicy: RepositoryFetchPolicy.noCache,
         );
       } else {
-        for (var j in i.value) {
-          // This could take a while. Should it be a Future.wait instead?
-          // Perhaps will batches of 10 or something?
-          await fetch(
-            j,
-            i.key,
-            fetchPolicy: RepositoryFetchPolicy.noCache,
-          );
+        final tMaxConcurrentFetches =
+            (maxConcurrentFetches > 0) ? maxConcurrentFetches : 1;
+        for (var j = 0; j < i.value.length; j += tMaxConcurrentFetches) {
+          final tSlice = i.value.skip(j).take(tMaxConcurrentFetches);
+          final tFutures = tSlice
+              .map((e) => fetch(
+                    e,
+                    i.key,
+                    fetchPolicy: RepositoryFetchPolicy.noCache,
+                  ))
+              .toList(growable: false);
+          await SynchronousErrorableFuture.wait(tFutures);
         }
       }
     }
