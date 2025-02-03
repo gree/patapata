@@ -122,10 +122,6 @@ class _RepositoryCacheMap<K, V> extends MapBase<K, V> {
     }
 
     if (ifAbsent != null) {
-      if (length > maximumSize) {
-        _removeOldest();
-      }
-
       return this[key] = ifAbsent();
     }
 
@@ -165,4 +161,10 @@ class _RepositoryCacheMap<K, V> extends MapBase<K, V> {
     _accessor.remove(tLast);
     _usedOrder.remove(tLast);
   }
+}
+
+/// @nodoc
+class TestableRepositoryCacheMap<K, V> extends _RepositoryCacheMap<K, V> {
+  @visibleForTesting
+  TestableRepositoryCacheMap({required super.maximumSize});
 }

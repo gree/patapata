@@ -307,6 +307,35 @@ void main() {
         throwsAssertionError,
       );
 
+      // fetch cache
+      bool tCacheFetchCalled = false;
+      TestModel? fCacheThen(TestModel? v) {
+        tCacheFetchCalled = true;
+        return v;
+      }
+
+      // default fetch cache
+      Future<TestModel?> tCacheFuture =
+          tRepository.fetch(1, TestModel).then(fCacheThen);
+      expect(tCacheFetchCalled, isFalse);
+      await tCacheFuture;
+      expect(tCacheFetchCalled, isTrue);
+      // synchronous fetch cache
+      tCacheFetchCalled = false;
+      tCacheFuture = tRepository
+          .fetch(1, TestModel, synchronousCache: true)
+          .then(fCacheThen);
+      expect(tCacheFetchCalled, isTrue);
+      await tCacheFuture;
+      // asynchronous fetch cache
+      tCacheFetchCalled = false;
+      tCacheFuture = tRepository
+          .fetch(1, TestModel, synchronousCache: false)
+          .then(fCacheThen);
+      expect(tCacheFetchCalled, isFalse);
+      await tCacheFuture;
+      expect(tCacheFetchCalled, isTrue);
+
       // test build
       tProvider.change<TestModel>([2], (data) async {
         data = data as TestModel;
@@ -392,6 +421,33 @@ void main() {
         () => tRepository.fetchMany([1, 2, 3], Filter1),
         throwsAssertionError,
       );
+
+      // fetch cache
+      bool tCacheFetchCalled = false;
+      List<TestModel?> fCacheThen(List<TestModel?> v) {
+        tCacheFetchCalled = true;
+        return v;
+      }
+
+      // default fetch cache
+      Future<List<TestModel?>> tCacheFuture =
+          tRepository.fetchMany([1, 2, 3], TestModel).then(fCacheThen);
+      expect(tCacheFetchCalled, isFalse);
+      await tCacheFuture;
+      expect(tCacheFetchCalled, isTrue);
+      // synchronous fetch cache
+      tCacheFetchCalled = false;
+      tCacheFuture = tRepository.fetchMany([1, 2, 3], TestModel,
+          synchronousCache: true).then(fCacheThen);
+      expect(tCacheFetchCalled, isTrue);
+      await tCacheFuture;
+      // asynchronous fetch cache
+      tCacheFetchCalled = false;
+      tCacheFuture = tRepository.fetchMany([1, 2, 3], TestModel,
+          synchronousCache: false).then(fCacheThen);
+      expect(tCacheFetchCalled, isFalse);
+      await tCacheFuture;
+      expect(tCacheFetchCalled, isTrue);
 
       // test build
       tProvider.change<TestModel>([4, 5, 6], (data) async {
