@@ -202,9 +202,10 @@ class Permissions with MethodChannelTestMixin {
         final tPlatform = FlutterLocalNotificationsPlugin()
             .resolvePlatformSpecificImplementation<
                 AndroidFlutterLocalNotificationsPlugin>()!;
-        tNotificationResult = (await tPlatform.requestNotificationsPermission() ?? true)
-            ? PermissionNotificationResult.authorized
-            : PermissionNotificationResult.denied;
+        tNotificationResult =
+            (await tPlatform.requestNotificationsPermission() ?? true)
+                ? PermissionNotificationResult.authorized
+                : PermissionNotificationResult.denied;
       } else if (defaultTargetPlatform == TargetPlatform.iOS) {
         final tPlatform = FlutterLocalNotificationsPlugin()
             .resolvePlatformSpecificImplementation<

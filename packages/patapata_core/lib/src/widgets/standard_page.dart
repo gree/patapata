@@ -322,7 +322,7 @@ base class StandardPageWithResultFactory<T extends StandardPageWithResult<R, E>,
 /// Page navigation is generally done using `context.go`.
 /// You pass the type of the specified page and the page data associated with that type during navigation.
 /// For pages like PageA that do not involve data transfer, you can navigate using `context.go<PageA, void>(null)`.
-/// For screens with PageBData class page data reception, you can navigate using context.go<PageB, PageBData>(PageBData());.
+/// For screens with PageBData class page data reception, you can navigate using `context.go<PageB, PageBData>(PageBData());`.
 /// For pages with PageBData class as page data, you can navigate using `context.go<PageB, PageBData>(PageBData());`.
 ///
 /// There is a concept called "group" that can be configured for each page.

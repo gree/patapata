@@ -3,7 +3,7 @@
 // This source code is licensed under the MIT license found in the
 // LICENSE file in the root directory of this source tree.
 
-import 'dart:ffi';
+import 'dart:ffi' if (dart.library.js_interop) 'fake_ffi.dart';
 import 'dart:io';
 import 'dart:math';
 import 'package:flutter/foundation.dart';

@@ -13,7 +13,7 @@ import 'package:flutter/services.dart';
 import 'package:logging/logging.dart';
 import 'package:stack_trace/stack_trace.dart';
 
-import 'dart:ffi' if (dart.library.html) 'fake_ffi.dart';
+import 'dart:ffi' if (dart.library.js_interop) 'fake_ffi.dart';
 
 import 'app.dart';
 import 'util.dart';
