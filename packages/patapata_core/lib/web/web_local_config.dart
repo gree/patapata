@@ -7,7 +7,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_web_plugins/flutter_web_plugins.dart';
 import 'package:patapata_core/web/patapata_web_plugin.dart';
 
-import 'dart:html' as html;
+import 'package:web/web.dart' as web;
 
 class WebLocalConfig extends PatapataPlugin {
   WebLocalConfig(this.registrar);
@@ -39,38 +39,38 @@ class WebLocalConfig extends PatapataPlugin {
   Future<dynamic> handleMethodCall(MethodCall call) async {
     switch (call.method) {
       case 'reset':
-        html.window.localStorage.remove(call.arguments as String);
+        web.window.localStorage.removeItem(call.arguments as String);
         break;
       case 'resetMany':
         var tArgs = call.arguments as List<String>;
         for (var arg in tArgs) {
-          html.window.localStorage.remove(arg);
+          web.window.localStorage.removeItem(arg);
         }
         break;
       case 'resetAll':
-        html.window.localStorage.clear();
+        web.window.localStorage.clear();
         break;
       case 'setBool':
         var tArgs = call.arguments as List<Object?>;
-        html.window.localStorage[tArgs[0] as String] =
-            'b${(tArgs[1] as bool) ? '1' : '0'}';
+        web.window.localStorage
+            .setItem(tArgs[0] as String, 'b${(tArgs[1] as bool) ? '1' : '0'}');
         break;
       case 'setInt':
         var tArgs = call.arguments as List<Object?>;
-        html.window.localStorage[tArgs[0] as String] = 'i${tArgs[1]}';
+        web.window.localStorage.setItem(tArgs[0] as String, 'i${tArgs[1]}');
         break;
       case 'setDouble':
         var tArgs = call.arguments as List<Object?>;
-        html.window.localStorage[tArgs[0] as String] = 'd${tArgs[1]}';
+        web.window.localStorage.setItem(tArgs[0] as String, 'd${tArgs[1]}');
         break;
       case 'setString':
         var tArgs = call.arguments as List<Object?>;
-        html.window.localStorage[tArgs[0] as String] = 's${tArgs[1]}';
+        web.window.localStorage.setItem(tArgs[0] as String, 's${tArgs[1]}');
         break;
       case 'setMany':
         var tArgs = (call.arguments as List<dynamic>).cast<List<String>>();
         for (var arg in tArgs) {
-          html.window.localStorage[arg[0]] = arg[1];
+          web.window.localStorage.setItem(arg[0], arg[1]);
         }
         break;
       default:
@@ -81,31 +81,22 @@ class WebLocalConfig extends PatapataPlugin {
   }
 
   void _sync() {
-    channel?.invokeMethod('syncAll', html.window.localStorage.map((key, value) {
-      Object tValue;
-
-      switch (value[0]) {
-        case 'b':
-          tValue = value.substring(1) == '1';
-
-          break;
-        case 'i':
-          tValue = int.tryParse(value.substring(1)) ?? 0;
-
-          break;
-        case 'd':
-          tValue = double.tryParse(value.substring(1)) ?? 0.0;
-
-          break;
-        case 's':
-          tValue = value.substring(1);
-
-          break;
-        default:
-          tValue = '';
+    final Map<String, Object> tData = {};
+    final tLength = web.window.localStorage.length;
+    for (int i = 0; i < tLength; i++) {
+      final tKey = web.window.localStorage.key(i);
+      if (tKey != null) {
+        final tValue = web.window.localStorage[tKey] ?? '';
+        tData[tKey] = switch (tValue[0]) {
+          'b' => tValue.substring(1) == '1',
+          'i' => int.tryParse(tValue.substring(1)) ?? 0,
+          'd' => double.tryParse(tValue.substring(1)) ?? 0.0,
+          's' => tValue.substring(1),
+          _ => '',
+        };
       }
+    }
 
-      return MapEntry(key, tValue);
-    }));
+    channel?.invokeMethod('syncAll', tData);
   }
 }

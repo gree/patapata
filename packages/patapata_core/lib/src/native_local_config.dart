@@ -8,7 +8,7 @@ import 'plugin.dart';
 
 import '../finder/local_config_finder.dart'
     if (dart.library.io) '../src/native_local_config_finder.dart'
-    if (dart.library.html) '../web/web_local_config_finder.dart';
+    if (dart.library.js_interop) '../web/web_local_config_finder.dart';
 
 /// This is an abstract class that utilizes conditional import functionality
 /// to handle [LocalConfigFinder] in both the app environment and web environment

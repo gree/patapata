@@ -13,6 +13,7 @@ scripts:
     run: |
       melos exec -c 1 -- \
         dart analyze . --fatal-infos
+        dart format -o none --set-exit-if-changed .
     description: |
       Run `dart analyze` in all packages.
        - Note: you can also rely on your IDEs Dart Analysis / Issues window.
