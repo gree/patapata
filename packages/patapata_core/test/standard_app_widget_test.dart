@@ -2976,4 +2976,36 @@ void main() {
 
     tApp.dispose();
   });
+
+  testWidgets('Test of localizationKey. context.pl works correctly.',
+      (widgetTester) async {
+    final App tApp = createApp(
+      appWidget: StandardMaterialApp(
+        onGenerateTitle: (context) => 'Test Title',
+        pages: [
+          StandardPageFactory<TestPageLocalizationKey, void>(
+            create: (data) => TestPageLocalizationKey(),
+          ),
+        ],
+      ),
+    );
+
+    await tApp.run();
+
+    await tApp.runProcess(() async {
+      await widgetTester.pumpAndSettle();
+
+      final tContext = StandardMaterialApp.globalNavigatorContext!;
+
+      expect(find.text(l(tContext, 'test.pl.title')), findsOneWidget);
+      expect(find.text(l(tContext, 'test.pl.message', {'param': 'a'})),
+          findsOneWidget);
+      expect(find.text(l(tContext, 'test.pl.message', {'param': 'b'})),
+          findsOneWidget);
+      expect(find.text(l(tContext, 'test.pl.message', {'param': 'c'})),
+          findsOneWidget);
+    });
+
+    tApp.dispose();
+  });
 }

@@ -21,10 +21,13 @@ class HomePage extends StandardPage<void> {
 /// [TitlePage] is a StandardPage representing the [HomePage] tab in an application with a tabbed footer.
 class TitlePage extends StandardPage<void> {
   @override
+  String localizationKey = 'pages.tab.home';
+
+  @override
   Widget buildPage(BuildContext context) {
     return AppTab(
       appBar: AppBar(
-        title: Text(l(context, 'pages.tab.home.title')),
+        title: Text(context.pl('title')),
         automaticallyImplyLeading: false,
         leading: const StandardPageBackButton(),
       ),
@@ -33,7 +36,7 @@ class TitlePage extends StandardPage<void> {
           Center(
             child: Builder(
               builder: (context) {
-                return Text(l(context, 'pages.tab.home.body'));
+                return Text(context.pl('body'));
               },
             ),
           ),
@@ -52,10 +55,13 @@ class TitlePage extends StandardPage<void> {
 /// [TitleDetailsPage] is a StandardPage that serves as a child of [TitlePage] in the [HomePage] tab of an application with a tabbed footer.
 class TitleDetailsPage extends StandardPage<void> {
   @override
+  String localizationKey = 'pages.tab.title_details';
+
+  @override
   Widget buildPage(BuildContext context) {
     return AppTab(
       appBar: AppBar(
-        title: Text(l(context, 'pages.tab.title_details.title')),
+        title: Text(context.pl('title')),
         automaticallyImplyLeading: false,
         leading: const StandardPageBackButton(),
       ),
@@ -64,9 +70,7 @@ class TitleDetailsPage extends StandardPage<void> {
           Center(
             child: Builder(
               builder: (context) {
-                return Text(
-                  l(context, 'pages.tab.title_details.body'),
-                );
+                return Text(context.pl('body'));
               },
             ),
           ),

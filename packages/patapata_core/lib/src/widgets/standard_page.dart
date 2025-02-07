@@ -844,6 +844,12 @@ abstract class StandardPageWithResult<T extends Object?, E extends Object?>
   @protected
   AnalyticsEvent? get analyticsSingletonEvent => null;
 
+  /// Localization key for the page.
+  ///
+  /// Used to localize with [pl] or `context.pl`.
+  /// Override this property if you want to localize.
+  String get localizationKey => '';
+
   @override
   @mustCallSuper
   void initState() {
@@ -997,6 +1003,23 @@ abstract class StandardPageWithResult<T extends Object?, E extends Object?>
         );
       }
     }
+  }
+
+  /// {@template patapata_widgets.StandardPageWithResult.pl}
+  /// Calls [l] with the specified [localizationKey].
+  ///
+  /// For example, if [localizationKey] is `pages.home` and [key] is `title`, it is localized as `pages.home.title`.
+  /// An assertion error occurs if [localizationKey] is not set.
+  /// {@endtemplate}
+  @protected
+  String pl(
+    String key, [
+    Map<String, Object>? namedParameters,
+  ]) {
+    assert(localizationKey.isNotEmpty,
+        'localizationKey is not set. Please override localizationKey.');
+
+    return l(context, '$localizationKey.$key', namedParameters);
   }
 
   @override
@@ -2035,6 +2058,27 @@ class StandardRouterDelegate extends RouterDelegate<StandardRouteData>
     }
 
     return tFactory;
+  }
+}
+
+/// An extension class that adds StandardPage functionality to [BuildContext].
+extension StandardPageContext on BuildContext {
+  /// {@macro patapata_widgets.StandardPageWithResult.pl}
+  ///
+  /// Throws an exception if [StandardPageWithResult] does not exist in the widget tree of the context.
+  String pl(
+    String key, [
+    Map<String, Object>? namedParameters,
+  ]) {
+    if (this is StatefulElement) {
+      final tElement = (this as StatefulElement);
+      if (tElement.state is StandardPageWithResult) {
+        final tState = tElement.state as StandardPageWithResult;
+        return tState.pl(key, namedParameters);
+      }
+    }
+
+    return Provider.of<StandardPageWithResult>(this).pl(key, namedParameters);
   }
 }
 

@@ -53,16 +53,18 @@ class _TestException extends PatapataException {
     super.logLevel,
     super.userLogLevel,
     super.fix,
+    this.internalCode = '000',
+    this.namespace = 'test',
   });
 
   @override
   String get defaultPrefix => 'TST';
 
   @override
-  String get internalCode => '000';
+  final String internalCode;
 
   @override
-  String get namespace => 'test';
+  final String namespace;
 }
 
 class _TestExceptionWithFix extends _TestException {
@@ -110,6 +112,23 @@ class _TestShoutException extends _TestException {
 
   @override
   String get namespace => 'test.shout';
+}
+
+class TestPageLocalizationKey extends StandardPage<void> {
+  @override
+  String get localizationKey => 'test.pl';
+
+  @override
+  Widget buildPage(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('title'),
+      ),
+      body: const Center(
+        child: Text('message'),
+      ),
+    );
+  }
 }
 
 class _TestPatapataCoreException extends PatapataCoreException {
@@ -430,5 +449,123 @@ void main() {
     expect('patapata', tException.namespace);
     expect('PPE', tException.prefix);
     expect('PPE101', tException.code);
+  });
+
+  testWidgets('Localization test using localizationKey.', (widgetTester) async {
+    final App tApp = createApp(
+      appWidget: StandardMaterialApp(
+        onGenerateTitle: (context) => 'Test Title',
+        pages: [
+          StandardPageFactory<TestPageLocalizationKey, void>(
+            create: (data) => TestPageLocalizationKey(),
+          ),
+        ],
+      ),
+    );
+
+    await tApp.run();
+
+    await tApp.runProcess(() async {
+      await widgetTester.pumpAndSettle();
+
+      final tContext = StandardMaterialApp.globalNavigatorContext!;
+
+      final tException = _TestException(
+        namespace: 'pl',
+        localeTitleData: {'data': '111'},
+        localeMessageData: {'data': '222'},
+        localeFixData: {'data': '333'},
+      );
+      expect(
+        tException.localizedTitle,
+        l(
+          tContext,
+          'test.pl.errors.pl.000.title',
+          {'prefix': 'TST', 'data': '111'},
+        ),
+      );
+      expect(
+        tException.localizedMessage,
+        l(
+          tContext,
+          'test.pl.errors.pl.000.message',
+          {'prefix': 'TST', 'data': '222'},
+        ),
+      );
+      expect(
+        tException.localizedFix,
+        l(
+          tContext,
+          'test.pl.errors.pl.000.fix',
+          {'prefix': 'TST', 'data': '333'},
+        ),
+      );
+
+      // internalCode `111` is not overridden
+      final tException2 = _TestException(
+        namespace: 'pl',
+        internalCode: '111',
+        localeTitleData: {'data': '111'},
+        localeMessageData: {'data': '222'},
+        localeFixData: {'data': '333'},
+      );
+      expect(
+        tException2.localizedTitle,
+        l(
+          tContext,
+          'errors.pl.111.title',
+          {'prefix': 'TST', 'data': '111'},
+        ),
+      );
+      expect(
+        tException2.localizedMessage,
+        l(
+          tContext,
+          'errors.pl.111.message',
+          {'prefix': 'TST', 'data': '222'},
+        ),
+      );
+      expect(
+        tException2.localizedFix,
+        l(
+          tContext,
+          'errors.pl.111.fix',
+          {'prefix': 'TST', 'data': '333'},
+        ),
+      );
+
+      // namespace `test` is not overridden
+      final tException3 = _TestException(
+        localeTitleData: {'data': '111'},
+        localeMessageData: {'data': '222'},
+        localeFixData: {'data': '333'},
+      );
+      expect(
+        tException3.localizedTitle,
+        l(
+          tContext,
+          'errors.test.000.title',
+          {'prefix': 'TST', 'data': '111'},
+        ),
+      );
+      expect(
+        tException3.localizedMessage,
+        l(
+          tContext,
+          'errors.test.000.message',
+          {'prefix': 'TST', 'data': '222'},
+        ),
+      );
+      expect(
+        tException3.localizedFix,
+        l(
+          tContext,
+          'errors.test.000.fix',
+          {'prefix': 'TST', 'data': '333'},
+        ),
+      );
+    });
+
+    tApp.dispose();
   });
 }

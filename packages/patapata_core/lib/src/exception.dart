@@ -74,6 +74,7 @@ abstract class PatapataCoreException extends PatapataException {
     super.fix,
     super.logLevel,
     super.userLogLevel,
+    super.overridableLocalization,
   }) : _exceptionCode = code;
 
   @override

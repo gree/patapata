@@ -43,6 +43,17 @@ pages:
     example: Normal Error
     network: Network Error({prefix})
     maintenance: Maintenance Error
+    specific: Page Specific Error
+  error_specific:
+    title: Page Specific Error
+    body: It raises the same exception as the “Normal Error” on the previous page, but the message displayed is different.
+    example: Test
+    back: Back
+    errors:
+      app:
+        '000':
+          title: Page Specific Error ({prefix}000)
+          message: Specific Error.
   maintenance:
     title: Server Maintenance
     message: Currently unavailable due to server maintenance. Returning to the Top Page.

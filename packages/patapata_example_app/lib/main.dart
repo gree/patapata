@@ -206,6 +206,9 @@ Widget _createAppWidget(BuildContext context, App<Environment> app) {
           },
           linkGenerator: (pageData) => '/error',
         ),
+        StandardPageFactory<ErrorPageSpecificPage, void>(
+          create: (_) => ErrorPageSpecificPage(),
+        ),
         // Material Tab and pages.
         // TitlePage and TitleDetailsPage are pages related to the tabs on the HomePage.
         // The parent of the tabs in Home is the HomePage,

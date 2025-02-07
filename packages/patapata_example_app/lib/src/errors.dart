@@ -20,6 +20,7 @@ abstract base class AppException extends PatapataException {
     super.fix,
     super.logLevel,
     super.userLogLevel,
+    super.overridableLocalization,
   });
 
   @override

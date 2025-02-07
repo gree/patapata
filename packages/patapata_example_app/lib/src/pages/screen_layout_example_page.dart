@@ -4,10 +4,12 @@
 // LICENSE file in the root directory of this source tree.
 
 import 'package:flutter/material.dart';
-import 'package:patapata_core/patapata_core.dart';
 import 'package:patapata_core/patapata_widgets.dart';
 
 class ScreenLayoutExamplePage extends StandardPage<void> {
+  @override
+  String localizationKey = 'pages.screen_layout_example';
+
   final _breakpoints = const ScreenLayoutBreakpoints(
     portraitStandardBreakpoint: 375.0,
     portraitConstrainedWidth: double.infinity,
@@ -17,31 +19,26 @@ class ScreenLayoutExamplePage extends StandardPage<void> {
   );
 
   String createSampleDescription(double width) {
-    String tDescription =
-        l(context, 'pages.screen_layout_example.base_description_before');
+    String tDescription = context.pl('base_description_before');
 
     if (width == 375) {
-      tDescription += l(
-        context,
-        'pages.screen_layout_example.description_case_equal',
+      tDescription += context.pl(
+        'description_case_equal',
         {'width': widget},
       );
     } else if (width > 375) {
-      tDescription += l(
-        context,
-        'pages.screen_layout_example.description_case_over',
+      tDescription += context.pl(
+        'description_case_over',
         {'width': widget},
       );
     } else {
-      tDescription += l(
-        context,
-        'pages.screen_layout_example.description_case_other',
+      tDescription += context.pl(
+        'description_case_other',
         {'width': widget},
       );
     }
 
-    tDescription +=
-        l(context, 'pages.screen_layout_example.base_description_before');
+    tDescription += context.pl('base_description_before');
 
     return tDescription;
   }
@@ -83,13 +80,13 @@ class ScreenLayoutExamplePage extends StandardPage<void> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(l(context, 'pages.screen_layout_example.title')),
+        title: Text(context.pl('title')),
       ),
       body: Center(
         child: ListView(
           children: [
             Center(
-              child: Text(l(context, 'pages.screen_layout_example.body')),
+              child: Text(context.pl('body')),
             ),
             Padding(
               padding: const EdgeInsets.all(8),
@@ -99,7 +96,7 @@ class ScreenLayoutExamplePage extends StandardPage<void> {
             ),
             Center(
               child: Text(
-                l(context, 'pages.screen_layout_example.sample_a'),
+                context.pl('sample_a'),
                 style: const TextStyle(fontSize: 24),
               ),
             ),
@@ -107,7 +104,7 @@ class ScreenLayoutExamplePage extends StandardPage<void> {
             const SizedBox(height: 32),
             Center(
               child: Text(
-                l(context, 'pages.screen_layout_example.sample_b'),
+                context.pl('sample_b'),
                 style: const TextStyle(fontSize: 24),
               ),
             ),
@@ -118,8 +115,7 @@ class ScreenLayoutExamplePage extends StandardPage<void> {
             const SizedBox(height: 32),
             Padding(
               padding: const EdgeInsets.all(8),
-              child:
-                  Text(l(context, 'pages.screen_layout_example.description')),
+              child: Text(context.pl('description')),
             ),
             Center(
               child: ScreenLayout(
@@ -132,7 +128,7 @@ class ScreenLayoutExamplePage extends StandardPage<void> {
             Padding(
               padding: const EdgeInsets.all(8),
               child: Text(
-                l(context, 'pages.screen_layout_example.description_example'),
+                context.pl('description_example'),
               ),
             ),
           ],
