@@ -5,6 +5,7 @@
 
 import 'package:flutter/foundation.dart';
 import 'package:patapata_core/patapata_core_libs.dart';
+import 'package:patapata_core/patapata_interface.dart';
 
 import 'exception.dart';
 import 'sequential_work_queue.dart';
@@ -25,7 +26,9 @@ class _DebugDynamicType<T> {
 /// it's value has been set or not.
 /// If it's value has not been set and it is accessed, an
 /// assertion will be thrown.
-class ProviderModelVariable<T> with ChangeNotifier {
+class ProviderModelVariable<T>
+    with ChangeNotifier
+    implements ProviderModelVariableInterface {
   T? _value;
   final ProviderModel _parent;
   bool _set;
@@ -325,7 +328,9 @@ class ConflictException extends PatapataCoreException {
 ///   );
 /// }
 /// ```
-abstract class ProviderModel<T> with ChangeNotifier {
+abstract class ProviderModel<T>
+    with ChangeNotifier
+    implements ProviderModelInterface {
   final ProviderLockKey _defaultLockKey = ProviderLockKey('BatchLockKey');
 
   Map<ProviderLockKey, SequentialWorkQueue>? _lockQueues;

@@ -29,6 +29,10 @@ import 'src/startup.dart';
 import 'src/pages/error_page.dart';
 import 'src/pages/splash_page.dart';
 import 'src/pages/agreement_page.dart';
+import 'src/repository/repository_example1.dart';
+import 'src/repository/repository_example2.dart';
+import 'src/repository/default_example.dart';
+import 'src/repository/object_example.dart';
 
 final _providerKey = GlobalKey(debugLabel: 'AppProviderKey');
 final logger = Logger('patapata.example');
@@ -238,13 +242,15 @@ Widget _createAppWidget(BuildContext context, App<Environment> app) {
         StandardPageFactory<ScreenLayoutExamplePage, void>(
           create: (data) => ScreenLayoutExamplePage(),
         ),
+        StandardPageFactory<RepositoryExample1, void>(
+          create: (data) => RepositoryExample1(),
+        ),
+        StandardPageFactory<RepositoryExample2, RepositoryExsamplePageData>(
+          create: (data) => RepositoryExample2(),
+        ),
         // StandardPage And PageData Sample Page.
         StandardPageFactory<StandardPageExamplePage, void>(
           create: (_) => StandardPageExamplePage(),
-          links: {
-            r'': (match, uri) {},
-          },
-          linkGenerator: (pageData) => '',
         ),
         // HasDataPage is a page that receives PageData and displays it.
         StandardPageFactory<HasDataPage, PageData>(
@@ -327,6 +333,12 @@ Widget _createAppWidget(BuildContext context, App<Environment> app) {
             ),
             ChangeNotifierProvider<ChangeListenableNumber>(
               create: (context) => ChangeListenableNumber(),
+            ),
+            Provider(
+              create: (context) => DataRepository(),
+            ),
+            Provider(
+              create: (context) => ObjectRepository(),
             ),
           ],
           child: child,
