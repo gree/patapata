@@ -186,10 +186,16 @@ class _InsertButton extends StatelessWidget {
           padding: EdgeInsets.zero,
           foregroundColor: tColors.onSecondaryContainer,
           backgroundColor: tColors.secondaryContainer,
-          disabledBackgroundColor: tColors.onSurface.withValues(alpha: 0.12),
-          hoverColor: tColors.onSecondaryContainer.withValues(alpha: 0.08),
-          focusColor: tColors.onSecondaryContainer.withValues(alpha: 0.12),
-          highlightColor: tColors.onSecondaryContainer.withValues(alpha: 0.12),
+          // In the latest Flutter, withValues should be used.
+          // However, it has not yet been implemented in Flutter 3.24.0.
+          // ignore: deprecated_member_use
+          disabledBackgroundColor: tColors.onSurface.withOpacity(0.12),
+          // ignore: deprecated_member_use
+          hoverColor: tColors.onSecondaryContainer.withOpacity(0.08),
+          // ignore: deprecated_member_use
+          focusColor: tColors.onSecondaryContainer.withOpacity(0.12),
+          // ignore: deprecated_member_use
+          highlightColor: tColors.onSecondaryContainer.withOpacity(0.12),
         ),
         onPressed: onPressed,
         child: const Text('insert recoard'),
