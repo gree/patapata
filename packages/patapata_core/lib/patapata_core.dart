@@ -24,6 +24,8 @@ export 'src/app.dart';
 export 'src/i18n.dart';
 export 'src/permissions.dart';
 export 'src/notifications.dart';
+export 'src/synchronous_future.dart';
+export 'src/repository.dart';
 export 'src/error.dart';
 export 'src/startup.dart';
 

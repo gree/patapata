@@ -1,0 +1,14 @@
+targets:
+  $default:
+    builders:
+      repository_sets_builder:
+        enabled: true
+
+builders:
+  repository_sets_builder:
+    import: 'package:patapata_builder/repository_sets_builder.dart'
+    builder_factories: ['repositoryBuilderFactory']
+    build_extensions: {'.dart': ['sets.g.part']}
+    auto_apply: dependents
+    build_to: cache
+    applies_builders: ['source_gen|combining_builder']
