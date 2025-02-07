@@ -9,10 +9,10 @@ ButtonStyle iconButtonDefaultStyle(ColorScheme color) => IconButton.styleFrom(
       padding: EdgeInsets.zero,
       foregroundColor: color.onSecondaryContainer,
       backgroundColor: color.secondaryContainer,
-      disabledBackgroundColor: color.onSurface.withOpacity(0.12),
-      hoverColor: color.onSecondaryContainer.withOpacity(0.08),
-      focusColor: color.onSecondaryContainer.withOpacity(0.12),
-      highlightColor: color.onSecondaryContainer.withOpacity(0.12),
+      disabledBackgroundColor: color.onSurface.withValues(alpha: 0.12),
+      hoverColor: color.onSecondaryContainer.withValues(alpha: 0.08),
+      focusColor: color.onSecondaryContainer.withValues(alpha: 0.12),
+      highlightColor: color.onSecondaryContainer.withValues(alpha: 0.12),
     );
 
 class AddButton extends StatelessWidget {

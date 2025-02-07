@@ -441,6 +441,7 @@ class _ObjectListenableState extends State<_ObjectListenable> {
         listenables: widget.listenables,
       ),
       builder: widget.builder,
+      child: widget.child,
     );
   }
 }

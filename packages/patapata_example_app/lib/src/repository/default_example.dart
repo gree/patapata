@@ -19,10 +19,10 @@ class DataRepository extends Repository<Data, int> {
   late final _multiSetFetchers =
       <Type, Future<List<Data?>> Function(List<int> ids)>{
     Data: (ids) {
-      return Future.value(List.generate(ids.length, (i) => Data.init(i)));
+      return Future.value(List.generate(ids.length, (i) => Data.init(ids[i])));
     },
     DataListSet: (ids) {
-      return Future.value(List.generate(ids.length, (i) => Data.init(i)));
+      return Future.value(List.generate(ids.length, (i) => Data.init(ids[i])));
     },
   };
 
@@ -86,13 +86,6 @@ class DefaultRepositoryWidget extends StatelessWidget {
   });
 
   final ids = const <int>[1, 2, 3];
-  final _explanation1 =
-      'RepositoryProvider is a suitable format for storing mutable data. There are constraints, such as the data model needing to inherit from ProviderModel.'
-      'However, it offers advantages such as easy access and modification of data from anywhere in the app, and optimization of rebuilds due to changes.';
-
-  final _explanation2 =
-      'The sample data structure is as follows. DataListSet is used on this screen.'
-      'translationDate cannot be accessed, but it is displayed for explanatory purposes.';
 
   @override
   Widget build(BuildContext context) {
@@ -100,11 +93,11 @@ class DefaultRepositoryWidget extends StatelessWidget {
       children: [
         Padding(
           padding: const EdgeInsets.all(8.0),
-          child: Text(_explanation1),
+          child: Text(context.pl('default_example.explanation1')),
         ),
         Padding(
           padding: const EdgeInsets.all(8.0),
-          child: Text(_explanation2),
+          child: Text(context.pl('default_example.explanation2')),
         ),
         const DataStructure(),
         for (final id in ids)
