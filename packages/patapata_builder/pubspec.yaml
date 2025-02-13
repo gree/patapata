@@ -1,6 +1,8 @@
 name: patapata_builder
 version: 1.0.0
-description: todo
+description: This package is a plugin for Patapata that uses build_runner to generate classes used in Patapata app.
+homepage: https://github.com/gree/patapata
+repository: https://github.com/gree/patapata/tree/main/packages/patapata_builder
 
 environment:
   sdk: '>=3.0.0 <4.0.0'
