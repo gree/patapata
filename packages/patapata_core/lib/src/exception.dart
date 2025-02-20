@@ -36,6 +36,9 @@ enum PatapataCoreExceptionCode {
 
   /// [WebPageNotFound]
   PPE601,
+
+  /// [RepositoryCacheSizeOverflow]
+  PPE701,
 }
 
 /// Extension to split [PatapataCoreExceptionCode] into
