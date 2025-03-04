@@ -63,7 +63,7 @@ mixin RepositoryModelBase<T extends RepositoryModelBase<T, I>,
   /// }
   /// ```
   ///
-  /// If you prepare data using global (such as riverpod), there is no need to override it.
+  /// If you prepare data using some kind of global state, there is no need to override it.
   /// However, since the repository system needs to understand how to retrieve data,
   /// please specify that method in [RepositoryProvider.reader].
   Widget providersBuilder(Widget child);
@@ -126,7 +126,7 @@ mixin RepositoryModelBase<T extends RepositoryModelBase<T, I>,
 }
 
 /// When creating a repository model that requires change notifications, mix-in this class.
-/// It is assumed that the inheriting class is a [ProviderModel].
+/// The inheriting class must be a [ProviderModel].
 mixin RepositoryModel<T extends RepositoryModelBase<T, I>, I extends Object>
     on ProviderModel<T> implements RepositoryModelBase<T, I> {
   /// Updates the variables held by the repository.

@@ -222,7 +222,7 @@ class _RepositoryMultiCoreState<
 ///
 /// Please pass the means to access [Repository] to [reader].
 /// For example, when obtaining it through [BuildContext] and with the library provider,
-/// it will be "() => context.read<Repository>()".
+/// it would be `() => context.read<Repository>()`.
 class RepositoryProvider<T extends RepositoryModelBase<T, I>, I extends Object,
     R extends Repository<T, I>> extends StatelessWidget {
   final I id;
