@@ -143,8 +143,12 @@ void main() {
       });
 
       await expectLater(tFuture, completion(42));
-      expect(tOnTimeoutCalled, isFalse,
-          reason: 'SynchronousErrorableFuture は同期的に値を返すため onTimeout は発火しない');
+      expect(
+        tOnTimeoutCalled,
+        isFalse,
+        reason:
+            'SynchronousErrorableFuture returns a value synchronously, so onTimeout does not trigger.',
+      );
     });
 
     test('timeout() should return the original error immediately', () async {
@@ -293,8 +297,12 @@ void main() {
       });
 
       await expectLater(tFuture, throwsA('error message'));
-      expect(tCompleted, isTrue,
-          reason: 'エラーが発生しても whenComplete() のアクションは実行されるべき');
+      expect(
+        tCompleted,
+        isTrue,
+        reason:
+            'The action in whenComplete() should be executed even if an error occurs.',
+      );
     });
 
     test('whenComplete() should replace future error if action throws an error',
@@ -338,7 +346,11 @@ void main() {
         tThenCalled = true;
       });
 
-      expect(tThenCalled, isTrue, reason: 'then() が同期的に呼ばれるべき');
+      expect(
+        tThenCalled,
+        isTrue,
+        reason: 'then() should be called synchronously.',
+      );
     });
 
     test('Future.value should not return synchronously in then()', () {
@@ -349,7 +361,11 @@ void main() {
         tThenCalled = true;
       });
 
-      expect(tThenCalled, isFalse, reason: '通常の Future は非同期的に then() を実行する');
+      expect(
+        tThenCalled,
+        isFalse,
+        reason: 'A normal Future executes then() asynchronously.',
+      );
     });
 
     test('should return error synchronously in catchError()', () {
@@ -361,7 +377,11 @@ void main() {
         return 0;
       });
 
-      expect(tErrorCaught, isTrue, reason: 'catchError() が同期的に実行されるべき');
+      expect(
+        tErrorCaught,
+        isTrue,
+        reason: 'catchError() should be executed synchronously.',
+      );
     });
 
     test('Future.error should not return synchronously in catchError()', () {
@@ -373,8 +393,11 @@ void main() {
         return 0;
       });
 
-      expect(tErrorCaught, isFalse,
-          reason: '通常の Future は非同期的に catchError() を実行する');
+      expect(
+        tErrorCaught,
+        isFalse,
+        reason: 'A normal Future executes catchError() asynchronously.',
+      );
     });
   });
 }
