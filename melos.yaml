@@ -132,6 +132,7 @@ scripts:
         --ignore "**/*.yml" \
         --ignore "**/*.yaml" \
         --ignore "**/*.xml" \
+        --ignore "**/*.g.dart" \
         --ignore "**/*.sh" \
         --ignore "**/*.html" \
         --ignore "**/*.js" \
@@ -171,6 +172,7 @@ scripts:
         --ignore "**/*.yml" \
         --ignore "**/*.yaml" \
         --ignore "**/*.xml" \
+        --ignore "**/*.g.dart" \
         --ignore "**/*.sh" \
         --ignore "**/*.html" \
         --ignore "**/*.js" \

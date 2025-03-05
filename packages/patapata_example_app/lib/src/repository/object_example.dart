@@ -6,6 +6,7 @@
 import 'package:flutter/material.dart';
 import 'package:patapata_core/patapata_core.dart';
 import 'package:patapata_core/patapata_core_libs.dart';
+import 'package:patapata_core/patapata_widgets.dart';
 import 'package:provider/provider.dart';
 
 const int _maxObjectCacheSize = 100;
@@ -67,11 +68,11 @@ class ObjectRepository extends Repository<ImmutableData, int> {
 
 class ObjectProvider<S extends Object?> extends StatelessWidget {
   const ObjectProvider({
-    Key? key,
+    super.key,
     required this.ids,
     required this.builder,
     this.notify = true,
-  }) : super(key: key);
+  });
 
   final List<int> ids;
   final bool notify;
@@ -80,12 +81,12 @@ class ObjectProvider<S extends Object?> extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return RepositoryMultiObserver<ImmutableData, int, ObjectRepository>(
-      key: ValueKey(Object.hash(ids, S)),
+      key: ValueKey(Object.hashAll(ids)),
       fetcher: (repository) => repository.fetchMany(ids, S),
       repository: context.read<ObjectRepository>(),
       notify: notify,
       builder: builder,
-      //child: const SizedBox.shrink(),
+      // child: const SizedBox.shrink(),
     );
   }
 }
@@ -101,11 +102,6 @@ class ObjectRepositoryWidget extends StatefulWidget {
 
 class ObjectRepositoryWidgetState extends State<ObjectRepositoryWidget> {
   final _recoardIds = <int>[1, 2, 3];
-  final _explanation =
-      'ObjectProvider is a suitable format for storing immutable data or data with infrequent changes.'
-      'It is more convenient to use than RepositoryProvider because there are no constraints on the type of data to store.'
-      'While it notifies changes to the child hierarchy if the data type is Listenable, for data with frequent changes,'
-      'it is recommended to use RepositoryProvider from an optimization perspective.';
 
   @override
   Widget build(BuildContext context) {
@@ -113,7 +109,7 @@ class ObjectRepositoryWidgetState extends State<ObjectRepositoryWidget> {
       children: [
         Padding(
           padding: const EdgeInsets.all(8.0),
-          child: Text(_explanation),
+          child: Text(context.pl('object_example.explanation1')),
         ),
         StatefulBuilder(builder: (context, setState) {
           return SizedBox(
@@ -190,9 +186,15 @@ class _InsertButton extends StatelessWidget {
           padding: EdgeInsets.zero,
           foregroundColor: tColors.onSecondaryContainer,
           backgroundColor: tColors.secondaryContainer,
+          // In the latest Flutter, withValues should be used.
+          // However, it has not yet been implemented in Flutter 3.24.0.
+          // ignore: deprecated_member_use
           disabledBackgroundColor: tColors.onSurface.withOpacity(0.12),
+          // ignore: deprecated_member_use
           hoverColor: tColors.onSecondaryContainer.withOpacity(0.08),
+          // ignore: deprecated_member_use
           focusColor: tColors.onSecondaryContainer.withOpacity(0.12),
+          // ignore: deprecated_member_use
           highlightColor: tColors.onSecondaryContainer.withOpacity(0.12),
         ),
         onPressed: onPressed,

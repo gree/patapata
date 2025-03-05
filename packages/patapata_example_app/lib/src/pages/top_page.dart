@@ -47,7 +47,7 @@ class TopPage extends StandardPage<void> {
             onPressed: () {
               context.go<RepositoryExample1, void>(null);
             },
-            child: const Text('Go to Repository Example'),
+            child: Text(context.pl('go_to_repository_system')),
           ),
           TextButton(
             onPressed: () {

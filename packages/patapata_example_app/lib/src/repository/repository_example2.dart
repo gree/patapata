@@ -4,7 +4,6 @@
 // LICENSE file in the root directory of this source tree.
 
 import 'package:flutter/material.dart';
-import 'package:patapata_core/patapata_core.dart';
 import 'package:patapata_core/patapata_widgets.dart';
 import 'package:provider/provider.dart';
 
@@ -21,39 +20,27 @@ class RepositoryExsamplePageData {
 }
 
 class RepositoryExample2 extends StandardPage<RepositoryExsamplePageData> {
-  final _explanation1 =
-      'On this screen, DataListSet is used. The original class is also treated as a set that allows access to all variables.';
-
-  final _explanation2 =
-      'On the previous screen, access to counter2 and translationDate was prohibited in the set.'
-      'Additionally, translationDate was not initialized.'
-      'When transitioning to this screen, translationDate was updated, making it accessible.';
-
-  final _explanation3 =
-      'Pressing the reset button will reset the data, but you may notice that translationDate is not reset.'
-      'This is because when updating the data through the repository, translationDate was passed without initialization.'
-      'Conversely, when transitioning to this screen, only translationDate was initialized.'
-      'In this way, when updating data on the repository, it is possible to merge data on the cache with information by not initializing parts in the model.'
-      'Of course, it is also possible to update variables directly as usual.';
+  @override
+  String get localizationKey => 'pages.repository_example2';
 
   @override
   Widget buildPage(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(l(context, 'Repository Example')),
+        title: Text(context.pl('title')),
       ),
       body: ListView(
         children: [
           Padding(
             padding: const EdgeInsets.all(8),
-            child: Text(_explanation1),
+            child: Text(context.pl('explanation1')),
           ),
           const Center(
             child: DataStructure(),
           ),
           Padding(
             padding: const EdgeInsets.all(8),
-            child: Text(_explanation2),
+            child: Text(context.pl('explanation2')),
           ),
           DataProvider<Data>(
             ids: [pageData.id],
@@ -129,7 +116,7 @@ class RepositoryExample2 extends StandardPage<RepositoryExsamplePageData> {
           ),
           Padding(
             padding: const EdgeInsets.all(8),
-            child: Text(_explanation3),
+            child: Text(context.pl('explanation3')),
           ),
         ],
       ),
