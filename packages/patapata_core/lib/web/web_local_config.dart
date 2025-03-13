@@ -86,7 +86,7 @@ class WebLocalConfig extends PatapataPlugin {
     for (int i = 0; i < tLength; i++) {
       final tKey = web.window.localStorage.key(i);
       if (tKey != null) {
-        final tValue = web.window.localStorage[tKey] ?? '';
+        final tValue = web.window.localStorage.getItem(tKey) ?? '';
         tData[tKey] = switch (tValue[0]) {
           'b' => tValue.substring(1) == '1',
           'i' => int.tryParse(tValue.substring(1)) ?? 0,
