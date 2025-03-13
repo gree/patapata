@@ -28,6 +28,7 @@ pages:
     body: This is the sample top page of Patapata.
     go_to_config: Config Sample
     go_to_screen_layout: ScreenLayout Sample
+    go_to_repository_system: Repository Sample
     go_to_standard_page: StandardPage Sample
     go_to_device_and_pakage_info: Device And PackageInfo Sample
     go_to_error: Error Sample
@@ -111,3 +112,42 @@ pages:
       It is also effective to enclose the ScreenLayout widget with a ConstrainedBox or similar approach to restrict the size. 
       Please choose the appropriate approach based on the situation in your widget tree. 
     description_example: In the above example, the value of ConstrainedWidth is set to 200. This limits the actual size to 200, but it can be observed that the relative shape of the content is preserved.
+  repository_example1:
+    title: Repository Example
+    explanation: |
+      A Repository is a feature designed to accumulate data, as the name suggests. It provides essential functionalities for handling information in the app, such as adding, updating, retrieving, and synchronizing with Web APIs. It also allows setting cache time for information, imposing limits on accumulation, and clearing old information with LRU, among other capabilities. Once configured, you can interact with information from anywhere in the app through the BuildContext.
+
+      It provides the following features:
+
+      1. Information Encapsulation
+        For example, consider a social networking service (SNS). On the list screen, you may only need "title" and "date." However, on the detailed screen, heavy information such as "body" is required. To optimize, Web APIs are likely prepared separately for each. When dealing with them in the app, most cases involve handling them on the same data class and initializing unretrieved information with empty strings or null. However, since the data exists, there is a risk of accessing "body" on the list screen. To prevent this, the concept of "sets" is provided. Although it's the same data class, by accessing information through "sets," you can block unnecessary information. By blocking access at the code level, it's possible to prevent programmer confusion. In the example, by preparing a "set" for the list screen, you can prevent access to "body" on the list screen. The mechanism of "sets" is complex, but a builder for "sets" is provided, making it easy to create. For preparation for building and detailed usage, please refer to the Example.
+
+      2. Information Update and Optimization of Widget Rebuilds
+        Continuing with the SNS example, if you press the "like button," the overall number of likes is updated, and the widget is rebuilt. If nothing is done, all widgets associated with the data class will be rebuilt. To prevent this, widgets are built on a "set" basis. Regarding this, using the "sets" from 1 enables automatic optimization.
+    default_example:
+      explanation1: |
+        RepositoryProvider is a suitable format for storing mutable data. There are constraints, such as the data model needing to inherit from ProviderModel.
+        However, it offers advantages such as easy access and modification of data from anywhere in the app, and optimization of rebuilds due to changes.
+      explanation2: |
+        The sample data structure is as follows. DataListSet is used on this screen.
+        translationDate cannot be accessed, but it is displayed for explanatory purposes.
+    object_example:
+      explanation1: |
+        ObjectProvider is a suitable format for storing immutable data or data with infrequent changes.
+        It is more convenient to use than RepositoryProvider because there are no constraints on the type of data to store.
+        While it notifies changes to the child hierarchy if the data type is Listenable, for data with frequent changes,
+        it is recommended to use RepositoryProvider from an optimization perspective.
+  repository_example2:
+    title: Repository Example
+    explanation1: |
+      On this screen, DataListSet is used. The original class is also treated as a set that allows access to all variables.
+    explanation2: |
+      On the previous screen, access to counter2 and translationDate was prohibited in the set.
+      Additionally, translationDate was not initialized.
+      When transitioning to this screen, translationDate was updated, making it accessible.
+    explanation3: |
+      Pressing the reset button will reset the data, but you may notice that translationDate is not reset.
+      This is because when updating the data through the repository, translationDate was passed without initialization.
+      Conversely, when transitioning to this screen, only translationDate was initialized.
+      In this way, when updating data on the repository, it is possible to merge data on the cache with information by not initializing parts in the model.
+      Of course, it is also possible to update variables directly as usual.

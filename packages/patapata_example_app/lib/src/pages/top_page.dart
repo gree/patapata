@@ -8,6 +8,7 @@ import 'package:patapata_core/patapata_widgets.dart';
 import 'package:patapata_example_app/src/pages/device_and_package_info_page.dart';
 import 'package:patapata_example_app/src/pages/error_page.dart';
 import 'package:patapata_example_app/src/pages/standard_page_example_page.dart';
+import 'package:patapata_example_app/src/repository/repository_example1.dart';
 
 import 'config_page.dart';
 import 'screen_layout_example_page.dart';
@@ -41,6 +42,12 @@ class TopPage extends StandardPage<void> {
               context.go<ScreenLayoutExamplePage, void>(null);
             },
             child: Text(context.pl('go_to_screen_layout')),
+          ),
+          TextButton(
+            onPressed: () {
+              context.go<RepositoryExample1, void>(null);
+            },
+            child: Text(context.pl('go_to_repository_system')),
           ),
           TextButton(
             onPressed: () {
