@@ -56,10 +56,10 @@ class NotificationsPlugin extends Plugin with StandardAppRoutePluginMixin {
   );
 
   // coverage:ignore-start
-  static void initializeNotificationsForBackgroundIsolate() {
+  static Future<void> initializeNotificationsForBackgroundIsolate() async {
     try {
       final tPlugin = FlutterLocalNotificationsPlugin();
-      tPlugin.initialize(
+      await tPlugin.initialize(
         const InitializationSettings(
           android: AndroidInitializationSettings('@mipmap/ic_launcher'),
           iOS: DarwinInitializationSettings(
@@ -98,13 +98,31 @@ class NotificationsPlugin extends Plugin with StandardAppRoutePluginMixin {
       return false;
     }
 
+    if (kIsTest) {
+      // Any written tests done on the [FlutterLocalNotificationsPlugin]
+      // will need to manually call the registerWith() method that has been added to each implementation.
+      switch (defaultTargetPlatform) {
+        case TargetPlatform.android:
+          AndroidFlutterLocalNotificationsPlugin.registerWith();
+          break;
+        case TargetPlatform.iOS:
+          IOSFlutterLocalNotificationsPlugin.registerWith();
+          break;
+        case TargetPlatform.macOS:
+          MacOSFlutterLocalNotificationsPlugin.registerWith();
+          break;
+        default:
+          break;
+      }
+    }
+
     final tEnvironment = app.environment is NotificationsEnvironment
         ? app.environment as NotificationsEnvironment
         : null;
 
     try {
       final tPlugin = FlutterLocalNotificationsPlugin();
-      tPlugin.initialize(
+      await tPlugin.initialize(
         InitializationSettings(
           android: AndroidInitializationSettings(
               tEnvironment?.notificationsAndroidDefaultIcon ??

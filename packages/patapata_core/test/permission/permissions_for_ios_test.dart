@@ -4,6 +4,7 @@
 // LICENSE file in the root directory of this source tree.
 
 import 'package:flutter/foundation.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:patapata_core/patapata_core.dart';
 
@@ -12,6 +13,7 @@ import '../utils/patapata_core_test_utils.dart';
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
   debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
+  IOSFlutterLocalNotificationsPlugin.registerWith();
 
   test('trackingRequested for iOS', () async {
     late App app;
