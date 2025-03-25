@@ -16,7 +16,7 @@ dependencies:
 
   patapata_firebase_core: ^1.2.0
 
-  firebase_remote_config: ^5.1.5
+  firebase_remote_config: ^5.4.2
 
 dev_dependencies:
   flutter_test:
