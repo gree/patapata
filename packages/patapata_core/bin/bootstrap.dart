@@ -1193,21 +1193,33 @@ errors:
 
   final tPubspecDocument = YamlEditor(tPubspecFile.readAsStringSync());
 
-  tPubspecDocument.parseAt(
+  final tFlutterNode = tPubspecDocument.parseAt(
+    ['flutter'],
+    orElse: () {
+      tPubspecDocument.update(['flutter'], null);
+      return tPubspecDocument.parseAt(['flutter']);
+    },
+  );
+
+  final tAssetsNode = tPubspecDocument.parseAt(
     ['flutter', 'assets'],
     orElse: () {
-      tPubspecDocument.update([
-        'flutter'
-      ], {
-        'assets': [],
-      });
+      if (tFlutterNode.value is Map) {
+        tPubspecDocument.update(['flutter', 'assets'], []);
+      } else {
+        tPubspecDocument.update(['flutter'], {'assets': []});
+      }
 
       return tPubspecDocument.parseAt(['flutter', 'assets']);
     },
   );
 
+  final tAssetsList = tAssetsNode.value as List;
   for (final tLocale in results['locale'] as List<String>) {
-    tPubspecDocument.appendToList(['flutter', 'assets'], 'l10n/$tLocale.yaml');
+    final tPath = 'l10n/$tLocale.yaml';
+    if (!tAssetsList.contains(tPath)) {
+      tPubspecDocument.appendToList(['flutter', 'assets'], tPath);
+    }
   }
 
   tPubspecFile.writeAsStringSync(tPubspecDocument.toString());
