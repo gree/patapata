@@ -13,6 +13,8 @@ It integrates with Firebase Authentication and supports user authentication func
 
 This plugin requires the [patapata_firebase_core](https://pub.dev/packages/patapata_firebase_core) plugin to be installed and activated.
 
+[Android] This plugin requires minSdk 23 or higher.
+
 ---
 
 Due to a bug in the FlutterFire CLI, the stable version of 0.2.7 (at the time of writing this README) does not write out the required paramaters to run firebase_auth correctly.
