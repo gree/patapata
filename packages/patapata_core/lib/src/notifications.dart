@@ -98,6 +98,7 @@ class NotificationsPlugin extends Plugin with StandardAppRoutePluginMixin {
       return false;
     }
 
+    // coverage:ignore-start
     if (kIsTest) {
       // Any written tests done on the [FlutterLocalNotificationsPlugin]
       // will need to manually call the registerWith() method that has been added to each implementation.
@@ -115,6 +116,7 @@ class NotificationsPlugin extends Plugin with StandardAppRoutePluginMixin {
           break;
       }
     }
+    // coverage:ignore-end
 
     final tEnvironment = app.environment is NotificationsEnvironment
         ? app.environment as NotificationsEnvironment
