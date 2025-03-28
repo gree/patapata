@@ -16,7 +16,7 @@ dependencies:
 
   patapata_firebase_core: ^1.2.0
 
-  firebase_crashlytics: ^4.1.5
+  firebase_crashlytics: ^4.3.4
   stack_trace: ^1.11.0
 
 dev_dependencies:
