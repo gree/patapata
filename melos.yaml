@@ -142,6 +142,7 @@ scripts:
         --ignore "**/*.rb" \
         --ignore "**/*.txt" \
         --ignore "**/*.cmake" \
+        --ignore "**/*.gradle.kts" \
         --ignore "**/doc/**" \
         --ignore "**/.dart_tool/**" \
         --ignore "**/Runner/MainFlutterWindow.swift" \
@@ -182,6 +183,7 @@ scripts:
         --ignore "**/*.rb" \
         --ignore "**/*.txt" \
         --ignore "**/*.cmake" \
+        --ignore "**/*.gradle.kts" \
         --ignore "**/doc/**" \
         --ignore "**/.dart_tool/**" \
         --ignore "**/Runner/MainFlutterWindow.swift" \

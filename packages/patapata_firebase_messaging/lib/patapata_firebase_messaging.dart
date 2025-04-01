@@ -462,7 +462,7 @@ Future<void> _showNotificationFromFirebaseRemoteMessage(
 @pragma('vm:entry-point')
 Future<void> _onBackgroundMessage(firebase.RemoteMessage message) async {
   WidgetsFlutterBinding.ensureInitialized();
-  NotificationsPlugin.initializeNotificationsForBackgroundIsolate();
+  await NotificationsPlugin.initializeNotificationsForBackgroundIsolate();
   await _showNotificationFromFirebaseRemoteMessage(message,
       fromBackground: true);
 }

@@ -19,8 +19,10 @@ jobs:
         channel: 'stable'
 
     - name: Install dependencies
-      run: flutter pub get
-      working-directory: ./packages/patapata_core
+      run: |-
+        flutter pub get
+        dart pub global activate melos
+        melos bootstrap
 
     - name: Run tests for coverage
       run: flutter test --dart-define=IS_TEST=true --no-pub --coverage
