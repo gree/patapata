@@ -14,7 +14,13 @@ Currently, it only includes [repository_sets_builder](https://github.com/gree/pa
 
 ## Getting started
 
-It will be automatically added when you introduce [Patapata](https://pub.dev/packages/patapata_core).
+1. Add the dependency to your `pubspec.yaml` file
+
+```yaml
+dev_dependencies:
+  patapata_builder: ^1.0.0
+  build_runner: ^2.4.13
+```
 
 ### Repository_sets_builder
 
