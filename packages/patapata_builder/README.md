@@ -10,7 +10,7 @@
 ## About
 This package extends the functionality of [Patapata](https://pub.dev/packages/patapata_core) using build_runner.
 
-Currently, it only includes [repository_sets_builder](https://github.com/gree/patapata/blob/main/packages/patapata_builder/lib/repository_sets_builder.dart), which extends [repository](https://github.com/gree/patapata/blob/main/packages/patapata_core/lib/src/repository.dart).
+Currently, it only includes [repository_sets_builder](https://github.com/gree/patapata/blob/main/packages/patapata_builder/lib/src/repository_sets_builder.dart), which extends [repository](https://github.com/gree/patapata/blob/main/packages/patapata_core/lib/src/repository.dart).
 
 ## Getting started
 
@@ -24,7 +24,7 @@ dev_dependencies:
 
 ### Repository_sets_builder
 
-[repository_sets_builder](https://github.com/gree/patapata/blob/main/packages/patapata_builder/lib/repository_sets_builder.dart) adds the concept of filters to the objects stored in a [repository](https://github.com/gree/patapata/blob/main/packages/patapata_core/lib/src/repository.dart).
+[repository_sets_builder](https://github.com/gree/patapata/blob/main/packages/patapata_builder/lib/src/repository_sets_builder.dart) adds the concept of filters to the objects stored in a [repository](https://github.com/gree/patapata/blob/main/packages/patapata_core/lib/src/repository.dart).
 Normally, the type of an object retrieved from a [repository](https://github.com/gree/patapata/blob/main/packages/patapata_core/lib/src/repository.dart) remains the same regardless of the hierarchy level it is retrieved from.
 However, this can be inconvenient in some cases.
 
@@ -32,7 +32,7 @@ For example, consider a case where the same type of object is stored at differen
 At the parent level, only Data A is stored, while at the child level, Data B is stored.
 If you try to access Data B from the parent level, it does not exist—however, it’s unclear whether it is truly null or simply not retrieved at that level.
 
-To solve this, [repository_sets_builder](https://github.com/gree/patapata/blob/main/packages/patapata_builder/lib/repository_sets_builder.dart) provides filters that apply access restrictions based on the hierarchy level.
+To solve this, [repository_sets_builder](https://github.com/gree/patapata/blob/main/packages/patapata_builder/lib/src/repository_sets_builder.dart) provides filters that apply access restrictions based on the hierarchy level.
 This makes it possible to clearly define which data should be accessible at each level, avoiding ambiguity and improving data integrity.
 
 ```dart
