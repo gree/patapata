@@ -30,7 +30,7 @@ However, this can be inconvenient in some cases.
 
 For example, consider a case where the same type of object is stored at different levels of a hierarchy.
 At the parent level, only Data A is stored, while at the child level, Data B is stored.
-If you try to access Data B from the parent level, it does not exist—however, it’s unclear whether it is truly null or simply not retrieved at that level.
+If you try to access Data B from the parent level, it does not exist. However, it’s unclear whether it is truly null or simply not retrieved at that level.
 
 To solve this, [repository_sets_builder](https://github.com/gree/patapata/blob/main/packages/patapata_builder/lib/src/repository_sets_builder.dart) provides filters that apply access restrictions based on the hierarchy level.
 This makes it possible to clearly define which data should be accessible at each level, avoiding ambiguity and improving data integrity.
@@ -83,4 +83,4 @@ Check out the [CONTRIBUTING](https://github.com/gree/patapata/blob/main/CONTRIBU
 
 ## License
 
-[See the LICENSE file](https://github.com/gree/patapata/blob/main/packages/patapata_adjust/LICENSE)
+[See the LICENSE file](https://github.com/gree/patapata/blob/main/packages/patapata_builder/LICENSE)
