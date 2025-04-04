@@ -1,3 +1,7 @@
+## 1.2.1
+
+ - **DOCS**: Updated README for minimum version.
+
 ## 1.2.0
 
  - **FEAT**: support flutter 3.27.1.

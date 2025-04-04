@@ -1,3 +1,8 @@
+## 1.3.0
+
+ - **FEAT**: Update a dependency.
+ - **FEAT**: support flutter 3.29.0.
+
 ## 1.2.0
 
  - **FIX**: update com.android.tools.build:gradle:8.1.0.

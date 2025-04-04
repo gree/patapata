@@ -1,3 +1,7 @@
+## 1.3.0
+
+ - **FEAT**: Update a dependency.
+
 ## 1.2.0
 
  - **FIX**: firebase remote config can not listen to remote config changes on the web.
