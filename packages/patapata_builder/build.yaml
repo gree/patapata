@@ -6,7 +6,7 @@ targets:
 
 builders:
   repository_sets_builder:
-    import: 'package:patapata_builder/repository_sets_builder.dart'
+    import: 'package:patapata_builder/patapata_builder.dart'
     builder_factories: ['repositoryBuilderFactory']
     build_extensions: {'.dart': ['sets.g.part']}
     auto_apply: dependents
