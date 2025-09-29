@@ -72,6 +72,10 @@ void main() {
           'securityPatch');
       expect(deviceInfoPlugin.androidDeviceInfo!.serialNumber, 'SERIAL');
       expect(deviceInfoPlugin.androidDeviceInfo!.isLowRamDevice, isFalse);
+      expect(deviceInfoPlugin.androidDeviceInfo!.freeDiskSize, 1024);
+      expect(deviceInfoPlugin.androidDeviceInfo!.totalDiskSize, 2024);
+      expect(deviceInfoPlugin.androidDeviceInfo!.physicalRamSize, 8192);
+      expect(deviceInfoPlugin.androidDeviceInfo!.availableRamSize, 4096);
     });
 
     test('setMockAndroidDeviceInfo with arguments', () async {
@@ -106,6 +110,10 @@ void main() {
         },
         serialNumber: '',
         isLowRamDevice: false,
+        freeDiskSize: 0,
+        totalDiskSize: 0,
+        physicalRamSize: 0,
+        availableRamSize: 0,
       );
 
       await deviceInfoPlugin.init(app);
@@ -141,6 +149,10 @@ void main() {
       expect(deviceInfoPlugin.androidDeviceInfo!.version.securityPatch, '');
       expect(deviceInfoPlugin.androidDeviceInfo!.serialNumber, '');
       expect(deviceInfoPlugin.androidDeviceInfo!.isLowRamDevice, isFalse);
+      expect(deviceInfoPlugin.androidDeviceInfo!.freeDiskSize, 0);
+      expect(deviceInfoPlugin.androidDeviceInfo!.totalDiskSize, 0);
+      expect(deviceInfoPlugin.androidDeviceInfo!.physicalRamSize, 0);
+      expect(deviceInfoPlugin.androidDeviceInfo!.availableRamSize, 0);
     });
   });
 
@@ -184,6 +196,10 @@ void main() {
       expect(deviceInfoPlugin.iosDeviceInfo!.isiOSAppOnMac, isTrue);
       expect(deviceInfoPlugin.iosDeviceInfo!.identifierForVendor,
           'identifierForVendor');
+      expect(deviceInfoPlugin.iosDeviceInfo!.freeDiskSize, 1024);
+      expect(deviceInfoPlugin.iosDeviceInfo!.totalDiskSize, 2024);
+      expect(deviceInfoPlugin.iosDeviceInfo!.physicalRamSize, 8192);
+      expect(deviceInfoPlugin.iosDeviceInfo!.availableRamSize, 4096);
     });
 
     test('setMockIosDeviceInfo with arguments', () async {
@@ -204,6 +220,10 @@ void main() {
         isiOSAppOnMac: false,
         localizedModel: '',
         identifierForVendor: '',
+        freeDiskSize: 0,
+        totalDiskSize: 0,
+        physicalRamSize: 0,
+        availableRamSize: 0,
       );
       await deviceInfoPlugin.init(app);
 
@@ -224,6 +244,10 @@ void main() {
       expect(deviceInfoPlugin.iosDeviceInfo!.isPhysicalDevice, isFalse);
       expect(deviceInfoPlugin.iosDeviceInfo!.isiOSAppOnMac, isFalse);
       expect(deviceInfoPlugin.iosDeviceInfo!.identifierForVendor, '');
+      expect(deviceInfoPlugin.iosDeviceInfo!.freeDiskSize, 0);
+      expect(deviceInfoPlugin.iosDeviceInfo!.totalDiskSize, 0);
+      expect(deviceInfoPlugin.iosDeviceInfo!.physicalRamSize, 0);
+      expect(deviceInfoPlugin.iosDeviceInfo!.availableRamSize, 0);
     });
   });
 

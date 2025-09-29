@@ -37,10 +37,10 @@ SPEC CHECKSUMS:
   connectivity_plus: 0a976dfd033b59192912fa3c6c7b54aab5093802
   device_info_plus: 1b14eed9bf95428983aed283a8d51cce3d8c4215
   flutter_local_notifications: 4ccab5b7a22835214a6672e3f9c5e8ae207dab36
-  FlutterMacOS: 8f6f14fa908a6fb3fba0cd85dbd81ec4b251fb24
+  FlutterMacOS: d0db08ddef1a9af05a5ec4b724367152bb0500b1
   package_info_plus: 12f1c5c2cfe8727ca46cbd0b26677728972d9a5b
   patapata_core: 459caffd5e7e8c51a8de551f6bf5cdc81c845994
 
-PODFILE CHECKSUM: 7eb978b976557c8c1cd717d8185ec483fd090a82
+PODFILE CHECKSUM: 54d867c82ac51cbd61b565781b9fada492027009
 
 COCOAPODS: 1.16.2

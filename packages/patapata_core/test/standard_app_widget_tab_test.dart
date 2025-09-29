@@ -587,8 +587,10 @@ class _TestTitlePage extends StandardPage<void> {
       appBar: AppBar(
         title: const Text("Test Title Page"),
         automaticallyImplyLeading: false,
-        leading: const StandardPageBackButton(
-          key: ValueKey(_kTestStandardPageBackButton),
+        // Purposely not using `const` to improve code coverage.
+        // ignore: prefer_const_constructors
+        leading: StandardPageBackButton(
+          key: const ValueKey(_kTestStandardPageBackButton),
         ),
       ),
       body: ListView(
