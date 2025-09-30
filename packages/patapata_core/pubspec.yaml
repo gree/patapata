@@ -41,6 +41,7 @@ dependencies:
   xml: ^6.3.0
   yaml_edit: ^2.1.1
   web: ^1.1.0
+  vector_math: ^2.2.0
 
 dev_dependencies:
   test: ">=1.20.0"

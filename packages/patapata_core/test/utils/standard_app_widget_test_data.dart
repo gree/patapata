@@ -54,7 +54,7 @@ class TestChangeNotifierData extends ChangeNotifier {
   String title = '';
   List<StandardPageFactory> pages = [];
   Widget Function(BuildContext context, Widget? child)? routableBuilder;
-  bool Function(Route<dynamic> route, dynamic result)? willPopPage;
+  void Function(Page page)? onDidRemovePage;
 
   void changeTitle(String title) {
     this.title = title;
@@ -73,10 +73,10 @@ class TestChangeNotifierData extends ChangeNotifier {
     notifyListeners();
   }
 
-  void changeWillPopPage(
-    bool Function(Route<dynamic> route, dynamic result)? willPopPage,
+  void changeOnDidRemovePage(
+    void Function(Page page)? onDidRemovePage,
   ) {
-    this.willPopPage = willPopPage;
+    this.onDidRemovePage = onDidRemovePage;
     notifyListeners();
   }
 }
@@ -533,6 +533,29 @@ class TestPageH extends StandardPage<TestPageData> {
               child: Builder(
                 builder: (context) {
                   return Text('${pageData.id} ${pageData.data}');
+                },
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class TestPageI extends StandardPage<void> {
+  @override
+  Widget buildPage(BuildContext context) {
+    return CupertinoPageScaffold(
+      // If middle/largeTitle is not specified, it is automatically set from CupertinoPageRoute.title.
+      navigationBar: const CupertinoNavigationBar(),
+      child: SingleChildScrollView(
+        child: Column(
+          children: [
+            Center(
+              child: Builder(
+                builder: (context) {
+                  return const Text('Test Message I');
                 },
               ),
             ),

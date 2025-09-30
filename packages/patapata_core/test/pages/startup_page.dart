@@ -135,7 +135,7 @@ class StartupModalPageA extends StatelessWidget {
           ),
           TextButton(
             onPressed: () {
-              Navigator.of(context).removeRoute(ModalRoute.of(context)!);
+              context.removeRoute();
             },
             child: const Text('Remove'),
           ),
@@ -180,7 +180,7 @@ class StartupModalPageB extends StatelessWidget {
           ),
           TextButton(
             onPressed: () {
-              Navigator.of(context).removeRoute(ModalRoute.of(context)!);
+              context.removeRoute();
             },
             child: const Text('Remove'),
           ),
@@ -207,7 +207,7 @@ class StartupModalPageC extends StatelessWidget {
         children: [
           TextButton(
             onPressed: () {
-              Navigator.of(context).removeRoute(ModalRoute.of(context)!);
+              context.removeRoute();
             },
             child: const Text('Remove'),
           ),

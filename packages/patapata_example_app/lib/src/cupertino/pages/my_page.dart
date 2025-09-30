@@ -6,36 +6,100 @@
 import 'package:flutter/cupertino.dart';
 import 'package:patapata_core/patapata_core.dart';
 import 'package:patapata_core/patapata_widgets.dart';
-import 'package:patapata_example_app/src/cupertino/widgets/app_tab.dart';
+import 'package:patapata_example_app/src/cupertino/widgets/app_container.dart';
+import 'package:patapata_example_app/src/cupertino/pages/home_page.dart';
+import 'package:provider/provider.dart';
 
-/// This sample transforms the MyPage, designed with Material's design, into Cupertino's design.
-/// The structure remains the same as MyPage.
-class CupertinoMyPage extends StandardPage<void> {
+class CupertinoMyPageParent extends StandardPageWithNestedNavigator {
+  @override
+  void onActive(bool first) {
+    super.onActive(first);
+
+    context.read<CupertinoAppContainer>().selectedFooterType =
+        CupertinoMyPageParent;
+  }
+
   @override
   Widget buildPage(BuildContext context) {
-    // When creating an application with features like a footer, please return childNavigator in the buildPage method.
-    return childNavigator ?? const SizedBox.shrink();
+    return nestedPages;
   }
 }
 
-/// This sample transforms the MyFavoritePage, designed with Material's design, into Cupertino's design.
-/// The basic structure remains the same as MyFavoritePage, but it uses an AppBar tailored for Cupertino.
-class CupertinoMyFavoritePage extends StandardPage<void> {
+class CupertinoMyPage extends StandardPage<void> {
+  @override
+  String localizationKey = 'pages.tab.my_page';
+
   @override
   Widget buildPage(BuildContext context) {
-    return CupertinoAppBar(
-      body: ListView(
-        children: [
-          Center(
-            child: Builder(
-              builder: (context) {
-                return Text(
-                  l(context, 'pages.tab.my_page.body'),
-                );
+    return CupertinoPageScaffold(
+      navigationBar: CupertinoNavigationBar(
+        middle: Text(context.pl('title')),
+        backgroundColor: CupertinoColors.systemGrey,
+      ),
+      child: Container(
+        color: CupertinoColors.white,
+        child: ListView(
+          children: [
+            Text(context.pl('body')),
+            CupertinoButton(
+              child: Text(l(context, 'pages.tab.test_page_b.title')),
+              onPressed: () {
+                context.go<CupertinoTestPageB, void>(null);
               },
             ),
-          ),
-        ],
+            CupertinoButton(
+              child: Text(l(context, 'pages.tab.test_page_a.title')),
+              onPressed: () {
+                context.go<CupertinoTestPageA, void>(null);
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class CupertinoTestPageB extends StandardPage<void> {
+  @override
+  String localizationKey = 'pages.tab.test_page_b';
+
+  @override
+  Widget buildPage(BuildContext context) {
+    return CupertinoPageScaffold(
+      navigationBar: CupertinoNavigationBar(
+        middle: Text(context.pl('title')),
+        backgroundColor: CupertinoColors.systemGrey,
+      ),
+      child: Container(
+        color: CupertinoColors.systemBlue,
+        child: ListView(
+          children: [
+            Text(context.pl('body')),
+            CupertinoButton(
+              child: Text(
+                l(context, 'pages.tab.test_page_c.title'),
+                style: TextStyle(
+                  color: CupertinoColors.white,
+                ),
+              ),
+              onPressed: () {
+                context.go<CupertinoTestPageC, void>(null);
+              },
+            ),
+            CupertinoButton(
+              child: Text(
+                l(context, 'pages.tab.test_page_a.title'),
+                style: TextStyle(
+                  color: CupertinoColors.white,
+                ),
+              ),
+              onPressed: () {
+                context.go<CupertinoTestPageA, void>(null);
+              },
+            ),
+          ],
+        ),
       ),
     );
   }

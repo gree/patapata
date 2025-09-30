@@ -551,9 +551,6 @@ class App<T extends Object> {
     ));
   }
 
-  late final StartupNavigatorObserver _startupNavigatorObserver =
-      StartupNavigatorObserver(startupSequence: startupSequence!);
-
   /// A list of all [NavigatorObserver]s to use in a [Navigator]
   /// from all the [Plugin]s registered to this [App].
   /// The [Analytics] and [StartupSequence] system also relies on setting these to any
@@ -561,7 +558,8 @@ class App<T extends Object> {
   List<NavigatorObserver> get navigatorObservers => [
         for (var v in _plugins) ...v.navigatorObservers,
         AnalyticsNavigatorObserver(analytics: analytics),
-        if (startupSequence != null) _startupNavigatorObserver,
+        if (startupSequence != null)
+          StartupNavigatorObserver(startupSequence: startupSequence!),
       ];
 
   static const _forceRemoveNativeSplashScreenDuration =

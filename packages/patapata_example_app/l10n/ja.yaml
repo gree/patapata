@@ -79,15 +79,25 @@ pages:
     change_page_data_type: PageDataの型を変更
     change_page_data_result: 現在のPageDataの値:{prefix} 
   tab:
+    title: Tab サンプル
     home:
       title: ホーム
-      body: ここはホームのタブです。
-    title_details:
-      title: タイトル詳細
-      body: ここはタイトル詳細のタブです。
+      body: このページはホームタブのトップページです。
     my_page:
       title: マイページ
-      body: ここはマイページのタブです。
+      body: このページはマイページタブのトップページです。
+    test_page_a:
+      title: テストページA
+      body: このページはホームタブ上に表示されるページです。
+    test_page_b:
+      title: テストページB
+      body: このページはマイページタブ上に表示されるページです。
+    test_page_c:
+      title: テストページC
+      body: このページは遷移時にアクティブとなっているタブ上に表示されるページです。
+    test_page_d:
+      title: テストページD
+      body: このページはテストページCの子ページです。
   screen_layout_example:
     title: ScreenLayout サンプル
     body: ここはScreenLayoutのサンプルページです。

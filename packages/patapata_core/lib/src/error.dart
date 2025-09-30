@@ -124,8 +124,11 @@ abstract class PatapataException {
   })  : _app = app ?? (Zone.current[#patapataApp] as App?),
         _userLogLevel = userLogLevel {
     final tPageLocalizationKey = (overridableLocalization)
-        ? (_app?.getPlugin<StandardAppPlugin>()?.delegate?.pageInstances.last
-                as StandardPageInterface?)
+        ? _app
+            ?.getPlugin<StandardAppPlugin>()
+            ?.delegate
+            ?.pageInstances
+            .lastOrNull
             ?.standardPageKey
             .currentState
             ?.localizationKey

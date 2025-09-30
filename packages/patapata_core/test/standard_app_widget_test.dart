@@ -558,7 +558,7 @@ void main() {
               onGenerateTitle: (context) => tProvider.title,
               pages: tProvider.pages,
               routableBuilder: tProvider.routableBuilder,
-              willPopPage: tProvider.willPopPage,
+              onDidRemovePage: tProvider.onDidRemovePage,
             );
           }),
         ),
@@ -581,9 +581,7 @@ void main() {
         tProvider.changeRoutableBuilder((context, child) {
           return child!;
         });
-        tProvider.changeWillPopPage((route, result) {
-          return false;
-        });
+        tProvider.changeOnDidRemovePage((page) {});
 
         await tester.pumpAndSettle();
 
@@ -601,68 +599,60 @@ void main() {
     expect(tExceptionCount, 1);
   });
 
-  testWidgets(
-      "Standard Page Test, UpdatePageFactories If the first page of pageFactories has a parentType.",
+  testWidgets("Standard Page Test, On did remove page",
       (WidgetTester tester) async {
-    int tExceptionCount = 0;
-    await runZonedGuarded(() async {
-      late TestChangeNotifierData tProvider;
-      final App tApp = createApp(
-        appWidget: ChangeNotifierProvider<TestChangeNotifierData>(
-          create: (context) => TestChangeNotifierData(
-            title: "title",
-            pages: [
-              StandardPageFactory<TestPageF, void>(
-                create: (data) => TestPageF(),
-              ),
-            ],
-          ),
-          child: Builder(builder: (context) {
-            tProvider = context.watch<TestChangeNotifierData>();
-            return StandardMaterialApp(
-              onGenerateTitle: (context) => tProvider.title,
-              pages: tProvider.pages,
-            );
-          }),
+    late TestChangeNotifierData tProvider;
+    final App tApp = createApp(
+      appWidget: ChangeNotifierProvider<TestChangeNotifierData>(
+        create: (context) => TestChangeNotifierData(
+          title: "title",
+          pages: [
+            StandardPageFactory<TestPageA, void>(
+              create: (data) => TestPageA(),
+            ),
+            StandardPageFactory<TestPageB, void>(
+              create: (data) => TestPageB(),
+            ),
+          ],
         ),
-      );
+        child: Builder(builder: (context) {
+          tProvider = context.watch<TestChangeNotifierData>();
 
-      tApp.run();
+          return StandardMaterialApp(
+            onGenerateTitle: (context) => tProvider.title,
+            pages: tProvider.pages,
+            onDidRemovePage: tProvider.onDidRemovePage,
+          );
+        }),
+      ),
+    );
 
-      await tApp.runProcess(() async {
-        await tester.pumpAndSettle();
+    await tApp.run();
 
-        expect(find.text('Test title F'), findsOneWidget);
-        expect(find.text('Test Message F'), findsOneWidget);
+    await tApp.runProcess(() async {
+      await tester.pumpAndSettle();
 
-        // update widget using provider
-        tProvider.changeTitle('Change Test Title');
-
-        tProvider.changePages([
-          StandardPageFactory<TestPageB, void>(
-            create: (data) => TestPageB(),
-            parentPageType: TestPageA,
-          ),
-          StandardPageFactory<TestPageA, void>(
-            create: (data) => TestPageA(),
-          ),
-        ]);
-
-        await tester.pumpAndSettle();
-
-        expect(find.text('Test Title'), findsOneWidget);
-        expect(find.text('Test Message'), findsOneWidget);
+      Page? tRemovedPage;
+      tProvider.changeOnDidRemovePage((page) {
+        tRemovedPage = page;
       });
 
-      tApp.dispose();
-    }, (error, stackTrace) {
-      if (error != 'Page deleted') {
-        throw error;
-      }
-      tExceptionCount++;
+      await tester.tap(find.byKey(const ValueKey(kTestButton)));
+
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.byKey(const ValueKey(kOnPopButton)));
+
+      await tester.pumpAndSettle();
+
+      expect(find.text('Test Title'), findsOneWidget);
+      expect(find.text('Test Message'), findsOneWidget);
+
+      expect(tRemovedPage, isA<StandardPageInterface>());
+      expect(tRemovedPage?.name, 'TestPageB');
     });
 
-    expect(tExceptionCount, 1);
+    tApp.dispose();
   });
 
   testWidgets("Standard Material App global Navigator Context Test",
@@ -712,9 +702,52 @@ void main() {
     tApp.dispose();
   });
 
-  testWidgets("Standard Page Context Go Test", (WidgetTester tester) async {
+  testWidgets("Standard Cupertino Page Test. with StandardCupertinoPage.title",
+      (WidgetTester tester) async {
     final App tApp = createApp(
       appWidget: StandardCupertinoApp(
+        onGenerateTitle: (context) => 'Generate Test Title',
+        pages: [
+          StandardPageFactory<TestPageI, void>(
+            create: (data) => TestPageI(),
+            pageBuilder: (
+              child,
+              name,
+              pageData,
+              pageKey,
+              restorationId,
+              standardPageKey,
+              factoryObject,
+            ) {
+              return StandardCupertinoPage(
+                child: child,
+                name: name,
+                restorationId: restorationId,
+                standardPageKey: standardPageKey,
+                factoryObject: factoryObject,
+                title: 'Test CupertinoPage title',
+              );
+            },
+          ),
+        ],
+      ),
+    );
+
+    await tApp.run();
+
+    await tApp.runProcess(() async {
+      await tester.pumpAndSettle();
+
+      expect(find.text('Test CupertinoPage title'), findsOneWidget);
+      expect(find.text('Test Message I'), findsOneWidget);
+    });
+
+    tApp.dispose();
+  });
+
+  testWidgets("Standard Page Context Go Test", (WidgetTester tester) async {
+    final App tApp = createApp(
+      appWidget: StandardMaterialApp(
         onGenerateTitle: (context) => 'Generate Test Title',
         pages: [
           StandardPageFactory<TestPageA, void>(
@@ -779,7 +812,7 @@ void main() {
 
   testWidgets("Standard Page PageData Test", (WidgetTester tester) async {
     final App tApp = createApp(
-      appWidget: StandardCupertinoApp(
+      appWidget: StandardMaterialApp(
         onGenerateTitle: (context) => 'Link Generate Test Title',
         pages: [
           StandardPageFactory<TestPageA, void>(
@@ -818,7 +851,7 @@ void main() {
       "Standard Page PageData Test. If you have a pageKey for a StandardPage that ignores pageData.",
       (WidgetTester tester) async {
     final App tApp = createApp(
-      appWidget: StandardCupertinoApp(
+      appWidget: StandardMaterialApp(
         onGenerateTitle: (context) => 'Test Title',
         pages: [
           StandardPageFactory<TestPageA, void>(
@@ -856,7 +889,7 @@ void main() {
   testWidgets("Standard Page PageData Test. pageDataWhenNull",
       (WidgetTester tester) async {
     final App tApp = createApp(
-      appWidget: StandardCupertinoApp(
+      appWidget: StandardMaterialApp(
         onGenerateTitle: (context) => 'Link Generate Test Title',
         pages: [
           StandardPageFactory<TestPageC, TestPageData>(
@@ -949,7 +982,7 @@ void main() {
   testWidgets("Standard Page Link Generator And Change PageData Test",
       (WidgetTester tester) async {
     final App tApp = createApp(
-      appWidget: StandardCupertinoApp(
+      appWidget: StandardMaterialApp(
         onGenerateTitle: (context) => 'Link Generate Test Title',
         pages: [
           StandardPageFactory<TestPageA, void>(
@@ -997,7 +1030,7 @@ void main() {
   testWidgets("Standard Page Change Listenable PageData Test",
       (WidgetTester tester) async {
     final App tApp = createApp(
-      appWidget: StandardCupertinoApp(
+      appWidget: StandardMaterialApp(
         onGenerateTitle: (context) => 'Change Listenable PageData Test Title',
         pages: [
           StandardPageFactory<TestPageA, void>(
@@ -1051,7 +1084,7 @@ void main() {
   testWidgets("Standard Page PageData Test Before Ready",
       (WidgetTester tester) async {
     final App tApp = createApp(
-      appWidget: StandardCupertinoApp(
+      appWidget: StandardMaterialApp(
         onGenerateTitle: (context) => 'Test Title',
         pages: [
           StandardPageFactory<TestPageG, TestPageData>(
@@ -1076,92 +1109,9 @@ void main() {
     tApp.dispose();
   });
 
-  testWidgets("Standard Page On pop page", (WidgetTester tester) async {
-    late TestChangeNotifierData tProvider;
-    final App tApp = createApp(
-      appWidget: ChangeNotifierProvider<TestChangeNotifierData>(
-        create: (context) => TestChangeNotifierData(
-          title: "Standard Page OnPopPage Test Title",
-          pages: [
-            StandardPageFactory<TestPageA, void>(
-              create: (data) => TestPageA(),
-            ),
-            StandardPageFactory<TestPageB, void>(
-              create: (data) => TestPageB(),
-            ),
-          ],
-        ),
-        child: Builder(builder: (context) {
-          tProvider = context.watch<TestChangeNotifierData>();
-
-          return StandardMaterialApp(
-            onGenerateTitle: (context) => tProvider.title,
-            pages: tProvider.pages,
-            willPopPage: tProvider.willPopPage,
-          );
-        }),
-      ),
-    );
-
-    await tApp.run();
-
-    await tApp.runProcess(() async {
-      await tester.pumpAndSettle();
-
-      expect(find.text('Test Title'), findsOneWidget);
-      expect(find.text('Test Message'), findsOneWidget);
-
-      await tester.tap(find.byKey(const ValueKey(kTestButton)));
-
-      await tester.pumpAndSettle();
-
-      expect(find.text('Test Title B'), findsOneWidget);
-      expect(find.text('Test Message B'), findsOneWidget);
-
-      await tester.tap(find.byKey(const ValueKey(kOnPopButton)));
-
-      await tester.pumpAndSettle();
-
-      expect(find.text('Test Title'), findsOneWidget);
-      expect(find.text('Test Message'), findsOneWidget);
-
-      tProvider.changePages([
-        StandardPageFactory<TestPageA, void>(
-          create: (data) => TestPageA(),
-        ),
-        StandardPageFactory<TestPageB, void>(
-          create: (data) => TestPageB(),
-        ),
-      ]);
-      tProvider.changeWillPopPage((route, result) => true);
-
-      await tester.pumpAndSettle();
-
-      expect(find.text('Test Title'), findsOneWidget);
-      expect(find.text('Test Message'), findsOneWidget);
-
-      await tester.tap(find.byKey(const ValueKey(kTestButton)));
-
-      await tester.pumpAndSettle();
-
-      expect(find.text('Test Title B'), findsOneWidget);
-      expect(find.text('Test Message B'), findsOneWidget);
-
-      await tester.tap(find.byKey(const ValueKey(kOnPopButton)));
-
-      await tester.pumpAndSettle();
-
-      // here the provider made a change to return true
-      expect(find.text('Test Title B'), findsOneWidget);
-      expect(find.text('Test Message B'), findsOneWidget);
-    });
-
-    tApp.dispose();
-  });
-
   testWidgets("Custom Standard Page Test", (WidgetTester tester) async {
     final App tApp = createApp(
-      appWidget: StandardCupertinoApp(
+      appWidget: StandardMaterialApp(
         onGenerateTitle: (context) => "Custom Standard Page Test",
         pages: [
           StandardPageFactory<TestPageD, void>(
@@ -1254,7 +1204,6 @@ void main() {
             onGenerateTitle: (context) => tProvider.title,
             pages: tProvider.pages,
             routableBuilder: tProvider.routableBuilder,
-            willPopPage: tProvider.willPopPage,
           );
         }),
       ),
@@ -1316,7 +1265,6 @@ void main() {
             onGenerateTitle: (context) => tProvider.title,
             pages: tProvider.pages,
             routableBuilder: tProvider.routableBuilder,
-            willPopPage: tProvider.willPopPage,
           );
         }),
       ),
@@ -1380,7 +1328,6 @@ void main() {
             onGenerateTitle: (context) => tProvider.title,
             pages: tProvider.pages,
             routableBuilder: tProvider.routableBuilder,
-            willPopPage: tProvider.willPopPage,
           );
         }),
       ),
@@ -1437,7 +1384,6 @@ void main() {
             onGenerateTitle: (context) => tProvider.title,
             pages: tProvider.pages,
             routableBuilder: tProvider.routableBuilder,
-            willPopPage: tProvider.willPopPage,
           );
         }),
       ),
@@ -1494,7 +1440,6 @@ void main() {
             onGenerateTitle: (context) => tProvider.title,
             pages: tProvider.pages,
             routableBuilder: tProvider.routableBuilder,
-            willPopPage: tProvider.willPopPage,
           );
         }),
       ),
@@ -1547,7 +1492,6 @@ void main() {
             onGenerateTitle: (context) => tProvider.title,
             pages: tProvider.pages,
             routableBuilder: tProvider.routableBuilder,
-            willPopPage: tProvider.willPopPage,
           );
         }),
       ),
@@ -1751,6 +1695,16 @@ void main() {
       expect(buildContext!.router, isNotNull);
       expect(buildContext!.getPageFactory<TestPageA, void, void>(),
           isA<StandardPageWithResultFactory<TestPageA, void, void>>());
+
+      final tPageInstances = buildContext!.pageInstances;
+      expect(tPageInstances.map((e) => e.name), ['TestPageA']);
+      final tRootPageInstances = buildContext!.rootPageInstances;
+      expect(tRootPageInstances.map((e) => e.name), ['TestPageA']);
+      final tNestedPageInstances = buildContext!.nestedPageInstances;
+      expect(
+          tNestedPageInstances
+              .map((k, v) => MapEntry(k.name, v.map((e) => e.name).toList())),
+          isEmpty);
     });
 
     tApp.dispose();
@@ -2088,8 +2042,72 @@ void main() {
     });
 
     expect(tExceptionCount, 1);
+    expect(tException, isA<WebPageNotFound>());
     expect(tException?.logLevel, Level.INFO);
     expect(tException?.userLogLevel, Level.SHOUT);
+  });
+
+  testWidgets(
+      "Standard Page Bad Links Test. Web Page Not Found. routeWithConfiguration Test",
+      (WidgetTester tester) async {
+    int tUnknownExceptionCount = 0;
+    Object? tUnknownException;
+
+    await runZonedGuarded(() async {
+      StandardAppPlugin.debugIsWeb = true;
+
+      final App tApp = createApp(
+        appWidget: StandardMaterialApp(
+          onGenerateTitle: (context) => 'Test Title',
+          pages: [
+            StandardPageFactory<TestPageA, void>(
+              create: (data) => TestPageA(),
+              links: {
+                r'': (match, uri) {},
+              },
+              linkGenerator: (pageData) => r'',
+            ),
+          ],
+        ),
+      );
+
+      await tApp.run();
+
+      Object? tException;
+      int tExceptionCount = 0;
+      try {
+        await tApp.runProcess(() async {
+          await tester.pumpAndSettle();
+
+          expect(find.text('Test Title'), findsOneWidget);
+
+          tApp.standardAppPlugin.delegate?.routeWithConfiguration(
+            StandardRouteData(
+              factory: null,
+              pageData: null,
+            ),
+          );
+        });
+      } catch (error) {
+        if (error is! WebPageNotFound) {
+          rethrow;
+        }
+        tException = error;
+        tExceptionCount++;
+      }
+
+      expect(tExceptionCount, 1);
+      expect(tException, isA<WebPageNotFound>());
+
+      tApp.dispose();
+      StandardAppPlugin.debugIsWeb = false;
+    }, (error, stackTrace) {
+      tUnknownException = error;
+      tUnknownExceptionCount++;
+    });
+
+    expect(tUnknownExceptionCount, 1);
+    expect(tUnknownException, isA<WebPageNotFound>());
   });
 
   testWidgets("Standard Page OS Extra Route Test", (WidgetTester tester) async {
@@ -2713,6 +2731,8 @@ void main() {
 
       expect(tApp.navigator, isNotNull);
       expect(tApp.navigatorContext, isNotNull);
+      expect(tApp.currentNavigator, isNotNull);
+      expect(tApp.currentNavigatorContext, isNotNull);
       expect(find.text('TestPageContextGoWithResult'), findsOneWidget);
 
       String? tResult;

@@ -7,7 +7,7 @@ part of "standard_app.dart";
 
 /// This class is used to create applications using Material Design with Patapata.
 /// Widgets that have this class as their parent cannot use widgets intended for use with [CupertinoApp].
-/// Properties other than [pages], [routableBuilder], and [willPopPage] are properties to be passed to [MaterialApp.router].
+/// Properties other than [pages], [routableBuilder], and [onDidRemovePage] are properties to be passed to [MaterialApp.router].
 class StandardMaterialApp<T> extends StatefulWidget with StandardStatefulMixin {
   /// A GlobalKey to pass to [scaffoldMessengerKey] of [MaterialApp.router].
   /// See [MaterialApp.scaffoldMessengerKey] of [MaterialApp] for more details.
@@ -96,14 +96,19 @@ class StandardMaterialApp<T> extends StatefulWidget with StandardStatefulMixin {
 
   final List<StandardPageWithResultFactory> _pages;
   final Widget Function(BuildContext context, Widget? child)? _routableBuilder;
-  final bool Function(Route<dynamic> route, dynamic result)? _willPopPage;
+  final void Function(Page page)? _onDidRemovePage;
 
   /// A list of pages using the [StandardPageFactory] class implemented with StandardMaterialApp.
   /// It is passed to the pageFactories of [StandardRouterDelegate].
   @override
   List<
-      StandardPageWithResultFactory<StandardPageWithResult<Object?, Object?>,
-          Object?, Object?>> get pages => _pages;
+    StandardPageWithResultFactory<
+      StandardPageWithResult<Object?, Object?>,
+      Object?,
+      Object?
+    >
+  >
+  get pages => _pages;
 
   /// Wrap the entire Patapata Navigator-related application,
   /// enabling the use of screen transition-related functionalities through a function.
@@ -112,15 +117,17 @@ class StandardMaterialApp<T> extends StatefulWidget with StandardStatefulMixin {
   Widget Function(BuildContext context, Widget? child)? get routableBuilder =>
       _routableBuilder;
 
-  /// See [PopScope] for more details.
-  /// It is passed to the willPopPage of [StandardRouterDelegate].
+  /// A function called when a page is removed from the navigator.
+  /// It is passed to the onDidRemovePage of [StandardRouterDelegate].
   @override
-  bool Function(Route<dynamic> route, dynamic result)? get willPopPage =>
-      _willPopPage;
+  void Function(Page page)? get onDidRemovePage => _onDidRemovePage;
 
   /// BuildContext directly under Navigator of StandardMaterialApp
   static Element? get globalNavigatorContext =>
       _findTreeChildElement([StandardMaterialApp, Navigator]);
+
+  @override
+  StandardAppType get appType => StandardAppType.material;
 
   /// Creates a StandardMaterialApp.
   const StandardMaterialApp({
@@ -151,10 +158,10 @@ class StandardMaterialApp<T> extends StatefulWidget with StandardStatefulMixin {
     this.scrollBehavior,
     required List<StandardPageWithResultFactory> pages,
     Widget Function(BuildContext context, Widget? child)? routableBuilder,
-    bool Function(Route<dynamic> route, dynamic result)? willPopPage,
-  })  : _pages = pages,
-        _routableBuilder = routableBuilder,
-        _willPopPage = willPopPage;
+    void Function(Page page)? onDidRemovePage,
+  }) : _pages = pages,
+       _routableBuilder = routableBuilder,
+       _onDidRemovePage = onDidRemovePage;
 
   @override
   State<StandardMaterialApp<T>> createState() => _StandardMaterialAppState<T>();
@@ -165,7 +172,7 @@ class _StandardMaterialAppState<T> extends State<StandardMaterialApp<T>>
   @override
   Widget build(BuildContext context) {
     return Provider<StandardAppType>.value(
-      value: StandardAppType.material,
+      value: widget.appType,
       child: MaterialApp.router(
         scaffoldMessengerKey: widget.scaffoldMessengerKey,
         routeInformationProvider: widget.routeInformationProvider,
@@ -181,12 +188,18 @@ class _StandardMaterialAppState<T> extends State<StandardMaterialApp<T>>
         highContrastDarkTheme: widget.highContrastDarkTheme,
         themeMode: widget.themeMode,
         locale: widget.locale,
-        localizationsDelegates:
-            context.read<App>().getPlugin<I18nPlugin>()!.i18n.l10nDelegates,
+        localizationsDelegates: context
+            .read<App>()
+            .getPlugin<I18nPlugin>()!
+            .i18n
+            .l10nDelegates,
         localeListResolutionCallback: widget.localeListResolutionCallback,
         localeResolutionCallback: widget.localeResolutionCallback,
-        supportedLocales:
-            context.read<App>().getPlugin<I18nPlugin>()!.i18n.supportedL10ns,
+        supportedLocales: context
+            .read<App>()
+            .getPlugin<I18nPlugin>()!
+            .i18n
+            .supportedL10ns,
         debugShowMaterialGrid: widget.debugShowMaterialGrid,
         showPerformanceOverlay: widget.showPerformanceOverlay,
         checkerboardRasterCacheImages: widget.checkerboardRasterCacheImages,

@@ -4,6 +4,13 @@ packages:
   - packages/*
   - packages/*/example
 
+command:
+  clean:
+    hooks:
+      post: |
+        melos exec --flutter --concurrency=1 -- "flutter clean"
+        melos exec --flutter --concurrency=1  --file-exists="pubspec.lock" -- "rm pubspec.lock"
+
 scripts:
   lint:all:
     run: melos run analyze

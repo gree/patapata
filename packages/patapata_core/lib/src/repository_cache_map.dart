@@ -96,7 +96,7 @@ class _RepositoryCacheMap<K, V> extends MapBase<K, V> {
   @override
   Map<K2, V2> map<K2, V2>(MapEntry<K2, V2> Function(K key, V value) transform) {
     var tResult = <K2, V2>{};
-    for (var key in this.keys) {
+    for (var key in keys) {
       var tEntry = transform(key, _accessor[key] as V);
       tResult[tEntry.key] = tEntry.value;
     }

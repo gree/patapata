@@ -13,7 +13,6 @@ import 'package:patapata_core/src/exception.dart';
 import 'package:provider/provider.dart';
 
 part 'standard_page.dart';
-part 'standard_page_widget.dart';
 part 'standard_app_mixin.dart';
 part 'standard_material_app.dart';
 part 'standard_cupertino_app.dart';
@@ -139,12 +138,12 @@ class StandardAppPlugin extends Plugin with StartupNavigatorMixin {
   /// Navigate to a page with the specified [link].
   /// [link] is a string set in [StandardPageFactory] under `links`.
   /// {@endtemplate}
-  void route(String link) async {
+  void route(String link, [bool pushParentPage = true]) async {
     final tRouteInformation = await parser
         ?.parseRouteInformation(RouteInformation(uri: Uri.parse(link)));
 
     if (tRouteInformation != null) {
-      delegate?.routeWithConfiguration(tRouteInformation);
+      delegate?.routeWithConfiguration(tRouteInformation, null, pushParentPage);
     }
   }
 
@@ -366,21 +365,28 @@ class _StandardPagePluginMixinInline extends InlinePlugin
 /// An extension class that adds the Router functionality of StandardApp to [Router].
 extension StandardAppRouter on Router {
   /// {@macro patapata_widgets.StandardRouteDelegate.pageInstances}
-  List<Page<dynamic>> get pageInstances {
+  List<StandardPageInterface> get pageInstances {
     assert(routerDelegate is StandardRouterDelegate);
     final tDelegate = routerDelegate as StandardRouterDelegate;
 
     return tDelegate.pageInstances;
   }
 
-  /// {@template patapata_widgets.StandardAppRouter.pageChildInstances}
-  /// Get a List of the actual pages of [Page].
-  /// {@endtemplate}
-  Map<StandardPageInterface, List<Page<dynamic>>> get pageChildInstances {
+  /// {@macro patapata_widgets.StandardRouteDelegate.rootPageInstances}
+  List<StandardPageInterface> get rootPageInstances {
     assert(routerDelegate is StandardRouterDelegate);
     final tDelegate = routerDelegate as StandardRouterDelegate;
 
-    return tDelegate._pageChildInstances;
+    return tDelegate.rootPageInstances;
+  }
+
+  /// {@macro patapata_widgets.StandardRouteDelegate.nestedPageInstances}
+  Map<StandardPageInterface, List<StandardPageInterface>>
+      get nestedPageInstances {
+    assert(routerDelegate is StandardRouterDelegate);
+    final tDelegate = routerDelegate as StandardRouterDelegate;
+
+    return tDelegate.nestedPageInstances;
   }
 
   /// {@macro patapata_widgets.StandardRouteDelegate.getPageFactory}
@@ -403,38 +409,49 @@ extension StandardAppRouter on Router {
   /// {@macro patapata_widgets.StandardRouteDelegate.goWithResult}
   Future<E?> goWithResult<T extends StandardPageWithResult<R, E>,
           R extends Object?, E extends Object?>(R pageData,
-      [StandardPageNavigationMode? navigationMode]) {
+      [StandardPageNavigationMode? navigationMode,
+      bool pushParentPage = false]) {
     assert(routerDelegate is StandardRouterDelegate);
     final tDelegate = routerDelegate as StandardRouterDelegate;
-    return tDelegate.goWithResult<T, R, E>(pageData, navigationMode);
+    return tDelegate.goWithResult<T, R, E>(
+        pageData, navigationMode, pushParentPage);
   }
 
   /// {@macro patapata_widgets.StandardRouteDelegate.go}
-  Future<void> go<T extends StandardPage<R>, R extends Object?>(R pageData,
-      [StandardPageNavigationMode? navigationMode]) {
+  Future<void> go<T extends StandardPage<R>, R extends Object?>(
+    R pageData, [
+    StandardPageNavigationMode? navigationMode,
+    bool pushParentPage = false,
+  ]) {
     assert(routerDelegate is StandardRouterDelegate);
     final tDelegate = routerDelegate as StandardRouterDelegate;
-    return tDelegate.go<T, R>(pageData, navigationMode);
+    return tDelegate.go<T, R>(pageData, navigationMode, pushParentPage);
   }
 
   /// {@template patapata_widgets.StandardAppRouter.route}
   /// Navigate to a page with the specified [location].
   /// [navigationMode] represents the mode of [StandardPageNavigationMode] to use during navigation (optional).
   /// {@endtemplate}
-  void route(String location,
-      [StandardPageNavigationMode? navigationMode]) async {
+  void route(
+    String location, [
+    StandardPageNavigationMode? navigationMode,
+    bool pushParentPage = true,
+  ]) async {
     assert(routerDelegate is StandardRouterDelegate);
     final tDelegate = routerDelegate as StandardRouterDelegate;
     final tConfiguration = await routeInformationParser
         ?.parseRouteInformation(RouteInformation(uri: Uri.parse(location)));
 
     if (tConfiguration != null) {
-      tDelegate.routeWithConfiguration(tConfiguration, navigationMode);
+      tDelegate.routeWithConfiguration(
+          tConfiguration, navigationMode, pushParentPage);
     }
   }
 
   /// Remove the nearest page in [context], if it exists. Do nothing if it doesn't exist.
-  void removeRoute(BuildContext context) {
+  ///
+  /// {@macro patapata_widgets.StandardRouteDelegate.removeRoute}
+  void removeRoute(BuildContext context, [Object? result]) {
     assert(routerDelegate is StandardRouterDelegate);
     final tDelegate = routerDelegate as StandardRouterDelegate;
 
@@ -444,7 +461,7 @@ extension StandardAppRouter on Router {
       return;
     }
 
-    tDelegate.removeRoute(tRoute, null);
+    tDelegate.removeRoute(tRoute, result);
   }
 }
 
@@ -455,15 +472,20 @@ extension StandardAppRouterContext on BuildContext {
 
   /// {@macro patapata_widgets.StandardRouteDelegate.goWithResult}
   Future<E?> goWithResult<T extends StandardPageWithResult<R, E>,
-          R extends Object?, E extends Object?>(R pageData,
-      [StandardPageNavigationMode? navigationMode]) {
-    return Router.of(this).goWithResult<T, R, E>(pageData, navigationMode);
+      R extends Object?, E extends Object?>(
+    R pageData, [
+    StandardPageNavigationMode? navigationMode,
+    bool pushParentPage = false,
+  ]) {
+    return Router.of(this)
+        .goWithResult<T, R, E>(pageData, navigationMode, pushParentPage);
   }
 
   /// {@macro patapata_widgets.StandardRouteDelegate.go}
   Future<void> go<T extends StandardPage<R>, R extends Object?>(R pageData,
-      [StandardPageNavigationMode? navigationMode]) {
-    return Router.of(this).go<T, R>(pageData, navigationMode);
+      [StandardPageNavigationMode? navigationMode,
+      bool pushParentPage = false]) {
+    return Router.of(this).go<T, R>(pageData, navigationMode, pushParentPage);
   }
 
   /// {@macro patapata_widgets.StandardAppRouter.route}
@@ -472,11 +494,16 @@ extension StandardAppRouterContext on BuildContext {
   }
 
   /// {@macro patapata_widgets.StandardRouteDelegate.pageInstances}
-  List<Page<dynamic>> get pageInstances => Router.of(this).pageInstances;
+  List<StandardPageInterface> get pageInstances =>
+      Router.of(this).pageInstances;
 
-  /// {@macro patapata_widgets.StandardAppRouter.pageChildInstances}
-  Map<StandardPageInterface, List<Page<dynamic>>> get pageChildInstances =>
-      Router.of(this).pageChildInstances;
+  /// {@macro patapata_widgets.StandardRouteDelegate.rootPageInstances}
+  List<StandardPageInterface> get rootPageInstances =>
+      Router.of(this).rootPageInstances;
+
+  /// {@macro patapata_widgets.StandardRouteDelegate.nestedPageInstances}
+  Map<StandardPageInterface, List<StandardPageInterface>>
+      get nestedPageInstances => Router.of(this).nestedPageInstances;
 
   /// {@macro patapata_widgets.StandardRouteDelegate.getPageFactory}
   StandardPageWithResultFactory<T, R, E> getPageFactory<
@@ -487,8 +514,8 @@ extension StandardAppRouterContext on BuildContext {
   }
 
   /// {@macro patapata_widgets.StandardRouteDelegate.removeRoute}
-  void removeRoute() {
-    Router.of(this).removeRoute(this);
+  void removeRoute([Object? result]) {
+    Router.of(this).removeRoute(this, result);
   }
 }
 
@@ -504,12 +531,20 @@ extension StandardAppApp on App {
     return tPlugin!;
   }
 
-  /// The BuildContext of the Navigator from [StandardAppPlugin.delegate].
+  /// The BuildContext of the root Navigator from [StandardAppPlugin.delegate].
   BuildContext get navigatorContext =>
       standardAppPlugin.delegate!.navigatorContext;
 
-  /// The Navigator from [StandardAppPlugin.delegate].
+  /// The BuildContext of the current Navigator from [StandardAppPlugin.delegate].
+  BuildContext get currentNavigatorContext =>
+      standardAppPlugin.delegate!.currentNavigatorContext;
+
+  /// The root Navigator from [StandardAppPlugin.delegate].
   NavigatorState get navigator => standardAppPlugin.delegate!.navigator;
+
+  /// The current Navigator from [StandardAppPlugin.delegate].
+  NavigatorState get currentNavigator =>
+      standardAppPlugin.delegate!.currentNavigator;
 
   /// {@macro patapata_widgets.StandardRouteDelegate.goWithResult}
   Future<E?> goWithResult<T extends StandardPageWithResult<R, E>,
@@ -529,10 +564,10 @@ extension StandardAppApp on App {
     return standardAppPlugin.route(link);
   }
 
-  /// Pops the Navigator of [StandardAppApp.navigator].
+  /// maybePop the Navigator of [StandardAppApp.navigator].
   /// This is used when context is not accessible.
-  void removeRoute() {
-    navigator.pop();
+  void removeRoute([Object? result]) {
+    navigator.maybePop(result);
   }
 
   /// {@macro patapata_widgets.StandardAppPlugin.generateLinkWithResult}

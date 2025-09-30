@@ -5,6 +5,7 @@
 
 import 'dart:math';
 
+import 'package:vector_math/vector_math_64.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 import 'package:patapata_core/patapata_core.dart';
@@ -303,7 +304,8 @@ class _ScreenLayoutRenderObject extends RenderBox
       _scale = 1.0;
     } else {
       _scale = min(_breakpoints.maxScale, tWidth / standardBreakpoint);
-      _transform = Matrix4.identity()..scale(_scale, _scale, _scale);
+      _transform = Matrix4.identity()
+        ..scaleByVector3(Vector3(_scale, _scale, _scale));
     }
 
     if (tChild != null) {
@@ -324,9 +326,11 @@ class _ScreenLayoutRenderObject extends RenderBox
 
     if (tChild is RenderBox) {
       size = constraints.constrain(Size(tWidth, tChild.size.height * _scale));
-      _transform.translate(
+      _transform.translateByDouble(
         (tWidth - tChild.size.width * _scale) / 2,
         (size.height - tChild.size.height * _scale) / 2,
+        0.0,
+        1.0,
       );
     } else {
       // coverage:ignore-start
@@ -444,7 +448,8 @@ class _ScreenLayoutDisableRenderObject extends RenderBox
 
     final tChild = child;
     _scale = tParentScale;
-    _transform = Matrix4.identity()..scale(_scale, _scale, _scale);
+    _transform = Matrix4.identity()
+      ..scaleByVector3(Vector3(_scale, _scale, _scale));
 
     if (tChild != null) {
       tChild.layout(
@@ -461,9 +466,11 @@ class _ScreenLayoutDisableRenderObject extends RenderBox
     if (tChild is RenderBox) {
       size = constraints.constrain(
           Size(tChild.size.width * _scale, tChild.size.height * _scale));
-      _transform.translate(
+      _transform.translateByDouble(
         (size.width - tChild.size.width * _scale) / 2,
         (size.height - tChild.size.height * _scale) / 2,
+        0.0,
+        1.0,
       );
     } else {
       // coverage:ignore-start

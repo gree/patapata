@@ -15,8 +15,11 @@ mixin StandardStatefulMixin on StatefulWidget {
   /// enabling the use of page transition-related functionalities through a function.
   Widget Function(BuildContext context, Widget? child)? get routableBuilder;
 
-  /// A function called when the app is attempting to go back to the previous page.
-  bool Function(Route<dynamic> route, dynamic result)? get willPopPage;
+  /// A function called when a page is removed from the navigator.
+  void Function(Page page)? get onDidRemovePage;
+
+  /// The type of application.
+  StandardAppType get appType;
 }
 
 /// This is a mixin for State that is needed to create a `WidgetsApp.Router` for Patapata.
@@ -32,8 +35,9 @@ mixin StandardWidgetAppMixin<T extends StandardStatefulMixin> on State<T> {
     _routerDelegate = StandardRouterDelegate(
       context: context,
       pageFactories: widget.pages,
+      appType: widget.appType,
       routableBuilder: widget.routableBuilder,
-      willPopPage: widget.willPopPage,
+      onDidRemovePage: widget.onDidRemovePage,
     );
     _routeInformationParser = StandardRouteInformationParser(
       context: context,
@@ -52,8 +56,8 @@ mixin StandardWidgetAppMixin<T extends StandardStatefulMixin> on State<T> {
       _routerDelegate.routableBuilder = widget.routableBuilder;
     }
 
-    if (widget.willPopPage != oldWidget.willPopPage) {
-      _routerDelegate.willPopPage = widget.willPopPage;
+    if (widget.onDidRemovePage != oldWidget.onDidRemovePage) {
+      _routerDelegate.onDidRemovePage = widget.onDidRemovePage;
     }
 
     if (!const DeepCollectionEquality().equals(widget.pages, oldWidget.pages)) {

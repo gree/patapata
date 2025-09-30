@@ -7,7 +7,7 @@ plugins {
 
 android {
     namespace = "com.example.patapata_example_app"
-    compileSdk = 35
+    compileSdk = flutter.compileSdkVersion
     ndkVersion = "27.0.12077973"
 
     compileOptions {

@@ -7,7 +7,7 @@ part of "standard_app.dart";
 
 /// This class is used to create applications using Cupertino with Patapata.
 /// Widgets that have this class as their parent cannot use widgets intended for use with [MaterialApp].
-/// Properties other than [pages], [routableBuilder], and [willPopPage] are the same as [CupertinoApp].
+/// Properties other than [pages], [routableBuilder], and [onDidRemovePage] are the same as [CupertinoApp].
 class StandardCupertinoApp<T> extends StatefulWidget
     with StandardStatefulMixin {
   /// {@macro flutter.widgets.widgetsApp.routeInformationProvider}
@@ -74,14 +74,19 @@ class StandardCupertinoApp<T> extends StatefulWidget
 
   final List<StandardPageWithResultFactory> _pages;
   final Widget Function(BuildContext context, Widget? child)? _routableBuilder;
-  final bool Function(Route<dynamic> route, dynamic result)? _willPopPage;
+  final void Function(Page page)? _onDidRemovePage;
 
   /// A list of pages using the [StandardPageFactory] class implemented with StandardMaterialApp.
   /// It is passed to the pageFactories of [StandardRouterDelegate].
   @override
   List<
-      StandardPageWithResultFactory<StandardPageWithResult<Object?, Object?>,
-          Object?, Object?>> get pages => _pages;
+    StandardPageWithResultFactory<
+      StandardPageWithResult<Object?, Object?>,
+      Object?,
+      Object?
+    >
+  >
+  get pages => _pages;
 
   /// Wrap the entire Patapata Navigator-related application,
   /// enabling the use of screen transition-related functionalities through a function.
@@ -90,11 +95,13 @@ class StandardCupertinoApp<T> extends StatefulWidget
   Widget Function(BuildContext context, Widget? child)? get routableBuilder =>
       _routableBuilder;
 
-  /// A function called when the app goes back to the previous page.
-  /// It is passed to the willPopPage of [StandardRouterDelegate].
+  /// A function called when a page is removed from the navigator.
+  /// It is passed to the onDidRemovePage of [StandardRouterDelegate].
   @override
-  bool Function(Route<dynamic> route, dynamic result)? get willPopPage =>
-      _willPopPage;
+  void Function(Page page)? get onDidRemovePage => _onDidRemovePage;
+
+  @override
+  StandardAppType get appType => StandardAppType.cupertino;
 
   /// Creates a StandardCupertinoApp.
   const StandardCupertinoApp({
@@ -120,10 +127,10 @@ class StandardCupertinoApp<T> extends StatefulWidget
     this.scrollBehavior,
     required List<StandardPageWithResultFactory> pages,
     Widget Function(BuildContext context, Widget? child)? routableBuilder,
-    bool Function(Route<dynamic> route, dynamic result)? willPopPage,
-  })  : _pages = pages,
-        _routableBuilder = routableBuilder,
-        _willPopPage = willPopPage;
+    void Function(Page page)? onDidRemovePage,
+  }) : _pages = pages,
+       _routableBuilder = routableBuilder,
+       _onDidRemovePage = onDidRemovePage;
 
   @override
   State<StandardCupertinoApp> createState() => _StandardCupertinoAppState();
@@ -134,7 +141,7 @@ class _StandardCupertinoAppState<T> extends State<StandardCupertinoApp<T>>
   @override
   Widget build(BuildContext context) {
     return Provider<StandardAppType>.value(
-      value: StandardAppType.cupertino,
+      value: widget.appType,
       child: CupertinoApp.router(
         routeInformationProvider: widget.routeInformationProvider,
         routeInformationParser: _routeInformationParser,
@@ -146,12 +153,18 @@ class _StandardCupertinoAppState<T> extends State<StandardCupertinoApp<T>>
         color: widget.color,
         theme: widget.theme,
         locale: widget.locale,
-        localizationsDelegates:
-            context.read<App>().getPlugin<I18nPlugin>()!.i18n.l10nDelegates,
+        localizationsDelegates: context
+            .read<App>()
+            .getPlugin<I18nPlugin>()!
+            .i18n
+            .l10nDelegates,
         localeListResolutionCallback: widget.localeListResolutionCallback,
         localeResolutionCallback: widget.localeResolutionCallback,
-        supportedLocales:
-            context.read<App>().getPlugin<I18nPlugin>()!.i18n.supportedL10ns,
+        supportedLocales: context
+            .read<App>()
+            .getPlugin<I18nPlugin>()!
+            .i18n
+            .supportedL10ns,
         showPerformanceOverlay: widget.showPerformanceOverlay,
         checkerboardRasterCacheImages: widget.checkerboardRasterCacheImages,
         checkerboardOffscreenLayers: widget.checkerboardOffscreenLayers,

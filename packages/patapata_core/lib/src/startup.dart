@@ -225,6 +225,7 @@ class StartupSequence {
     _error = null;
     _splashFinished = false;
     _startupCompleted = false;
+    StartupNavigatorObserver._routeHashStateMap.clear();
     _machine = LogicStateMachine(_createLogicStateFactories())
       ..addListener(_onUpdate);
 
@@ -281,6 +282,7 @@ class StartupSequence {
         _error = tError;
         _machine = null;
         _startupCompleted = true;
+        StartupNavigatorObserver._routeHashStateMap.clear();
         if (tError != null) {
           _startupCompleter?.completeError(tError.error, tError.stackTrace);
 
@@ -318,8 +320,9 @@ mixin StartupNavigatorMixin {
 }
 
 class StartupNavigatorObserver extends NavigatorObserver {
+  static final Map<Route, Type> _routeHashStateMap = {};
+
   final StartupSequence _startupSequence;
-  final Map<Route, Type> _routeHashStateMap = {};
 
   StartupNavigatorObserver({
     required StartupSequence startupSequence,
@@ -328,9 +331,6 @@ class StartupNavigatorObserver extends NavigatorObserver {
   @override
   void didPush(Route<dynamic> route, Route<dynamic>? previousRoute) {
     if (_startupSequence.complete || _startupSequence._machine == null) {
-      if (_routeHashStateMap.isNotEmpty) {
-        _routeHashStateMap.clear();
-      }
       return;
     }
 

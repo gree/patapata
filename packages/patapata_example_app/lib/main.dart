@@ -16,11 +16,13 @@ import 'package:patapata_example_app/src/pages/standard_page_example_page.dart';
 import 'package:provider/provider.dart';
 
 import 'page_data.dart';
+import 'src/cupertino/widgets/app_container.dart';
 import 'src/cupertino/pages/top_page.dart';
 import 'src/cupertino/pages/home_page.dart';
 import 'src/cupertino/pages/my_page.dart';
 import 'src/environment.dart';
 import 'src/pages/config_page.dart';
+import 'src/widgets/app_container.dart';
 import 'src/pages/home_page.dart';
 import 'src/pages/my_page.dart';
 import 'src/pages/screen_layout_example_page.dart';
@@ -88,6 +90,11 @@ void main() {
     });
 }
 
+final _globalAppKey = GlobalKey<NavigatorState>(
+  debugLabel: 'patapataExampleGlobalAppKey',
+);
+BuildContext get globalAppContext => _globalAppKey.currentContext!;
+
 /// Returns either [StandardMaterialApp] or [StandardCupertinoApp] to be passed to [App.createAppWidget].
 /// The choice between the two depends on [Environment.appType] in [App.environment].
 /// If [flutter run --dart-define=APP_TYPE=cupertino] is used, it uses [StandardCupertinoApp].
@@ -120,23 +127,73 @@ Widget _createAppWidget(BuildContext context, App<Environment> app) {
           groupRoot: true,
         ),
         // Cupertino Tab and pages.
-        // CupertinoTitlePage are pages related to the tabs on the CupertinoHomePage.
-        // The parent of the tabs in Home is the CupertinoHomePage, and the first child page displayed within that tab is the CupertinoTitlePage.
-        StandardPageFactory<CupertinoHomePage, void>(
-          create: (data) => CupertinoHomePage(),
-        ),
-        StandardPageFactory<CupertinoTitlePage, void>(
-          create: (data) => CupertinoTitlePage(),
-          parentPageType: CupertinoHomePage,
-        ),
-        // CupertinoMyFavoritePage is a page related to the tabs on CupertinoMyPage.
-        // The parent of the tabs in CupertinoMyPage is CupertinoMyPage itself, and the first child page displayed within that tab is CupertinoMyFavoritePage.
-        StandardPageFactory<CupertinoMyPage, void>(
-          create: (data) => CupertinoMyPage(),
-        ),
-        StandardPageFactory<CupertinoMyFavoritePage, void>(
-          create: (data) => CupertinoMyFavoritePage(),
-          parentPageType: CupertinoMyPage,
+        StandardPageWithNestedNavigatorFactory<CupertinoAppContainer>(
+          create: (data) => CupertinoAppContainer(),
+          links: {
+            r'/tab': (match, uri) {},
+          },
+          linkGenerator: (pageData) => '/tab',
+          nestedPageFactories: [
+            StandardPageWithNestedNavigatorFactory<CupertinoHomePageParent>(
+              create: (data) => CupertinoHomePageParent(),
+              nestedPageFactories: [
+                StandardPageFactory<CupertinoHomePage, void>(
+                  create: (data) => CupertinoHomePage(),
+                  links: {
+                    r'home': (match, uri) {},
+                  },
+                  linkGenerator: (pageData) => 'home',
+                ),
+                StandardChildPageFactory<CupertinoTestPageA, void, void>(
+                  create: (data) => CupertinoTestPageA(),
+                  links: {
+                    r'page_a': (match, uri) {},
+                  },
+                  linkGenerator: (pageData) => 'page_a',
+                  createParentPageData: (_) {},
+                ),
+              ],
+            ),
+            StandardPageWithNestedNavigatorFactory<CupertinoMyPageParent>(
+              create: (data) => CupertinoMyPageParent(),
+              nestedPageFactories: [
+                StandardPageFactory<CupertinoMyPage, void>(
+                  create: (data) => CupertinoMyPage(),
+                  links: {
+                    r'my_page': (match, uri) {},
+                  },
+                  linkGenerator: (pageData) => 'my_page',
+                ),
+                StandardChildPageFactory<CupertinoTestPageB, void, void>(
+                  create: (data) => CupertinoTestPageB(),
+                  links: {
+                    r'page_b': (match, uri) {},
+                  },
+                  linkGenerator: (pageData) => 'page_b',
+                  createParentPageData: (_) {},
+                ),
+              ],
+            ),
+          ],
+          anyNestedPageFactories: [
+            StandardPageFactory<CupertinoTestPageC, void>(
+              create: (data) => CupertinoTestPageC(),
+              links: {
+                r'page_c': (match, uri) {},
+              },
+              linkGenerator: (pageData) => 'page_c',
+              childPageFactories: [
+                StandardChildPageFactory<CupertinoTestPageD, void, void>(
+                  create: (data) => CupertinoTestPageD(),
+                  links: {
+                    r'page_d': (match, uri) {},
+                  },
+                  linkGenerator: (pageData) => 'page_d',
+                  createParentPageData: (_) {},
+                ),
+              ],
+            ),
+          ],
         ),
       ],
       routableBuilder: (context, child) {
@@ -159,6 +216,14 @@ Widget _createAppWidget(BuildContext context, App<Environment> app) {
   } else {
     return StandardMaterialApp(
       onGenerateTitle: (context) => l(context, 'title'),
+      theme: ThemeData(
+        // pageTransitionsTheme is explicitly set to the old transition on Android.
+        pageTransitionsTheme: const PageTransitionsTheme(
+          builders: {
+            TargetPlatform.android: PredictiveBackPageTransitionsBuilder(),
+          },
+        ),
+      ),
       pages: [
         // Splash screen page.
         if (!kIsWeb)
@@ -212,31 +277,6 @@ Widget _createAppWidget(BuildContext context, App<Environment> app) {
         ),
         StandardPageFactory<ErrorPageSpecificPage, void>(
           create: (_) => ErrorPageSpecificPage(),
-        ),
-        // Material Tab and pages.
-        // TitlePage and TitleDetailsPage are pages related to the tabs on the HomePage.
-        // The parent of the tabs in Home is the HomePage,
-        // and the first child page displayed within that tab is the TitlePage.
-        StandardPageFactory<HomePage, void>(
-          create: (data) => HomePage(),
-        ),
-        StandardPageFactory<TitlePage, void>(
-          create: (data) => TitlePage(),
-          parentPageType: HomePage,
-        ),
-        StandardPageFactory<TitleDetailsPage, void>(
-          create: (data) => TitleDetailsPage(),
-          parentPageType: HomePage,
-        ),
-        // MyFavoritePage is a page related to the tabs on MyPage.
-        // The parent of the tabs in MyPage is MyPage itself,
-        // and the first child page displayed within that tab is MyFavoritePage.
-        StandardPageFactory<MyPage, void>(
-          create: (data) => MyPage(),
-        ),
-        StandardPageFactory<MyFavoritePage, void>(
-          create: (data) => MyFavoritePage(),
-          parentPageType: MyPage,
         ),
         // The page with an example implementation of ScreenLayout.
         StandardPageFactory<ScreenLayoutExamplePage, void>(
@@ -303,7 +343,74 @@ Widget _createAppWidget(BuildContext context, App<Environment> app) {
         // BaseListenable inherits from ChangeNotifier.
         StandardPageFactory<ChangeListenablePage, BaseListenable>(
           create: (data) => ChangeListenablePage(),
-        )
+        ),
+        // Tab page with footer navigation.
+        StandardPageWithNestedNavigatorFactory<AppContainer>(
+          create: (data) => AppContainer(),
+          links: {
+            r'/tab': (match, uri) {},
+          },
+          linkGenerator: (pageData) => '/tab',
+          nestedPageFactories: [
+            StandardPageWithNestedNavigatorFactory<HomePageParent>(
+              create: (data) => HomePageParent(),
+              nestedPageFactories: [
+                StandardPageFactory<HomePage, void>(
+                  create: (data) => HomePage(),
+                  links: {
+                    r'home': (match, uri) {},
+                  },
+                  linkGenerator: (pageData) => 'home',
+                ),
+                StandardPageFactory<TestPageA, void>(
+                  create: (data) => TestPageA(),
+                  links: {
+                    r'page_a': (match, uri) {},
+                  },
+                  linkGenerator: (pageData) => 'page_a',
+                ),
+              ],
+            ),
+            StandardPageWithNestedNavigatorFactory<MyPageParent>(
+              create: (data) => MyPageParent(),
+              nestedPageFactories: [
+                StandardPageFactory<MyPage, void>(
+                  create: (data) => MyPage(),
+                  links: {
+                    r'my_page': (match, uri) {},
+                  },
+                  linkGenerator: (pageData) => 'my_page',
+                ),
+                StandardPageFactory<TestPageB, void>(
+                  create: (data) => TestPageB(),
+                  links: {
+                    r'page_b': (match, uri) {},
+                  },
+                  linkGenerator: (pageData) => 'page_b',
+                ),
+              ],
+            ),
+          ],
+          anyNestedPageFactories: [
+            StandardPageFactory<TestPageC, void>(
+              create: (data) => TestPageC(),
+              links: {
+                r'page_c': (match, uri) {},
+              },
+              linkGenerator: (pageData) => 'page_c',
+              childPageFactories: [
+                StandardChildPageFactory<TestPageD, void, void>(
+                  create: (data) => TestPageD(),
+                  links: {
+                    r'page_d': (match, uri) {},
+                  },
+                  linkGenerator: (pageData) => 'page_d',
+                  createParentPageData: (_) {},
+                ),
+              ],
+            ),
+          ],
+        ),
       ],
       routableBuilder: (context, child) {
         // Setup [ScreenLayout]
