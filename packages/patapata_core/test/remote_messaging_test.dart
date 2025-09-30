@@ -18,7 +18,7 @@ void main() {
     const tBody = 'body';
 
     test('Instance (no arguments).', () async {
-      // Purposely not using `const` to improve code coverage.
+      // Purposely not using `const` because the current version of flutter is flagging const constructors as not being executed in coverage tests.
       // ignore: prefer_const_constructors
       final tRemoteMessageNotification = RemoteMessageNotification();
 
@@ -52,7 +52,7 @@ void main() {
     const tRemoteMessageNotification = RemoteMessageNotification();
 
     test('Instance (no arguments).', () async {
-      // Purposely not using `const` to improve code coverage.
+      // Purposely not using `const` because the current version of flutter is flagging const constructors as not being executed in coverage tests.
       // ignore: prefer_const_constructors
       final tRemoteMessage = RemoteMessage();
 

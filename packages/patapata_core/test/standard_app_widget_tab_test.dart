@@ -587,7 +587,7 @@ class _TestTitlePage extends StandardPage<void> {
       appBar: AppBar(
         title: const Text("Test Title Page"),
         automaticallyImplyLeading: false,
-        // Purposely not using `const` to improve code coverage.
+        // Purposely not using `const` because the current version of flutter is flagging const constructors as not being executed in coverage tests.
         // ignore: prefer_const_constructors
         leading: StandardPageBackButton(
           key: const ValueKey(_kTestStandardPageBackButton),
