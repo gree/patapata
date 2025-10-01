@@ -68,10 +68,18 @@ class WebLocalConfig extends PatapataPlugin {
         web.window.localStorage.setItem(tArgs[0] as String, 's${tArgs[1]}');
         break;
       case 'setMany':
-        var tArgs = (call.arguments as List<dynamic>).cast<List<String>>();
-        for (var arg in tArgs) {
-          web.window.localStorage.setItem(arg[0], arg[1]);
-        }
+        var tArgs = (call.arguments as Map).cast<String, Object>();
+        tArgs.forEach((key, value) {
+          if (value is String) {
+            web.window.localStorage.setItem(key, 's$value');
+          } else if (value is int) {
+            web.window.localStorage.setItem(key, 'i$value');
+          } else if (value is double) {
+            web.window.localStorage.setItem(key, 'd$value');
+          } else if (value is bool) {
+            web.window.localStorage.setItem(key, 'b${(value) ? '1' : '0'}');
+          }
+        });
         break;
       default:
         break;
