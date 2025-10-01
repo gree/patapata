@@ -2,6 +2,7 @@
 //
 // This source code is licensed under the MIT license found in the
 // LICENSE file in the root directory of this source tree.
+import 'dart:js_interop';
 
 import 'package:flutter/services.dart';
 import 'package:flutter_web_plugins/flutter_web_plugins.dart';
@@ -32,7 +33,12 @@ class WebLocalConfig extends PatapataPlugin {
     );
 
     channel?.setMethodCallHandler(handleMethodCall);
+    web.window.addEventListener('storage', onStorageEvent.toJS);
 
+    _sync();
+  }
+
+  void onStorageEvent(web.StorageEvent event) {
     _sync();
   }
 
