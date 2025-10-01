@@ -1119,6 +1119,10 @@ abstract class StandardPageWithResult<T extends Object?, E extends Object?>
     return tChild;
   }
 
+  /// Describe the user interface for this [StandardPage]
+  /// The regular build method should generally not be used.
+  ///
+  /// The context passed to this method is wrapped with a [Builder] from the [StandardPage]'s context.
   @protected
   Widget buildPage(BuildContext context);
 }
