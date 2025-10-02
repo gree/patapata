@@ -1,3 +1,11 @@
+## 1.4.0
+
+ - **FIX**: local_web_config, Monitor StorageEvent to detect changes from another tab.
+ - **FIX**: setMany in web_local_config causes cast error.
+ - **FEAT**: bump minimum Flutter version to 3.29.0.
+ - **FEAT**: support flutter 3.35.0.
+ - **DOCS**: Added description of StandardPage.buildPage.
+
 ## 1.3.0
 
  - **FIX**: When running bootstrap on a new Flutter project, the uses-material-design entry is unintentionally removed from pubspec.yaml.

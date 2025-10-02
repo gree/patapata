@@ -1,3 +1,7 @@
+## 1.3.0
+
+ - **FEAT**: support flutter 3.35.0.
+
 ## 1.2.1
 
  - Update a dependency to the latest release.

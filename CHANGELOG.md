@@ -3,6 +3,62 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 2025-10-02
+
+### Changes
+
+---
+
+Packages with breaking changes:
+
+ - There are no breaking changes in this release.
+
+Packages with other changes:
+
+ - [`patapata_builder` - `v1.2.0`](#patapata_builder---v120)
+ - [`patapata_core` - `v1.4.0`](#patapata_core---v140)
+ - [`patapata_riverpod` - `v1.3.0`](#patapata_riverpod---v130)
+ - [`patapata_sentry` - `v1.2.2`](#patapata_sentry---v122)
+ - [`patapata_firebase_remote_config` - `v1.3.1`](#patapata_firebase_remote_config---v131)
+ - [`patapata_firebase_analytics` - `v1.2.2`](#patapata_firebase_analytics---v122)
+ - [`patapata_firebase_messaging` - `v1.3.1`](#patapata_firebase_messaging---v131)
+ - [`patapata_firebase_auth` - `v1.2.2`](#patapata_firebase_auth---v122)
+ - [`patapata_firebase_core` - `v1.3.1`](#patapata_firebase_core---v131)
+ - [`patapata_apple_push_notifications` - `v1.2.2`](#patapata_apple_push_notifications---v122)
+ - [`patapata_firebase_crashlytics` - `v1.3.1`](#patapata_firebase_crashlytics---v131)
+
+Packages with dependency updates only:
+
+> Packages listed below depend on other packages in this workspace that have had changes. Their versions have been incremented to bump the minimum dependency versions of the packages they depend upon in this project.
+
+ - `patapata_sentry` - `v1.2.2`
+ - `patapata_firebase_remote_config` - `v1.3.1`
+ - `patapata_firebase_analytics` - `v1.2.2`
+ - `patapata_firebase_messaging` - `v1.3.1`
+ - `patapata_firebase_auth` - `v1.2.2`
+ - `patapata_firebase_core` - `v1.3.1`
+ - `patapata_apple_push_notifications` - `v1.2.2`
+ - `patapata_firebase_crashlytics` - `v1.3.1`
+
+---
+
+#### `patapata_builder` - `v1.2.0`
+
+ - **FEAT**: support flutter 3.35.0.
+
+#### `patapata_core` - `v1.4.0`
+
+ - **FIX**: local_web_config, Monitor StorageEvent to detect changes from another tab.
+ - **FIX**: setMany in web_local_config causes cast error.
+ - **FEAT**: bump minimum Flutter version to 3.29.0.
+ - **FEAT**: support flutter 3.35.0.
+ - **DOCS**: Added description of StandardPage.buildPage.
+
+#### `patapata_riverpod` - `v1.3.0`
+
+ - **FEAT**: support flutter 3.35.0.
+
+
 ## 2025-04-04
 
 ### Changes
