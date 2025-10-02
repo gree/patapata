@@ -18,7 +18,9 @@ void main() {
     const tBody = 'body';
 
     test('Instance (no arguments).', () async {
-      const tRemoteMessageNotification = RemoteMessageNotification();
+      // Purposely not using `const` because the current version of flutter is flagging const constructors as not being executed in coverage tests.
+      // ignore: prefer_const_constructors
+      final tRemoteMessageNotification = RemoteMessageNotification();
 
       expect(tRemoteMessageNotification, isA<RemoteMessageNotification>());
       expect(tRemoteMessageNotification.title, isNull);
@@ -50,7 +52,9 @@ void main() {
     const tRemoteMessageNotification = RemoteMessageNotification();
 
     test('Instance (no arguments).', () async {
-      const tRemoteMessage = RemoteMessage();
+      // Purposely not using `const` because the current version of flutter is flagging const constructors as not being executed in coverage tests.
+      // ignore: prefer_const_constructors
+      final tRemoteMessage = RemoteMessage();
 
       expect(tRemoteMessage, isA<RemoteMessage>());
       expect(tRemoteMessage.messageId, isNull);

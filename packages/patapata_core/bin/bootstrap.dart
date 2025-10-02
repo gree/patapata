@@ -119,7 +119,7 @@ void main(List<String> arguments) {
 
     // Change Android SDK compile version to 35
     // Change Android SDK target version to 35
-    // Change Android SDK minimum version to 23
+    // Change Android SDK minimum version to 24
     // Change Android NDK version to 27.0.12077973
     // Change Java version to 11
     // Check if coreLibraryDesugaringEnabled is set; if not, add it.
@@ -176,7 +176,9 @@ void _checkEnvironmentFile(ArgResults results) {
       tFile.createSync(recursive: true);
     }
 
-    tFile.writeAsStringSync(DartFormatter().format('''
+    tFile.writeAsStringSync(
+        DartFormatter(languageVersion: DartFormatter.latestLanguageVersion)
+            .format('''
 import 'package:flutter/foundation.dart';
 import 'package:patapata_core/patapata_core.dart';
 ${tMixins.contains('ScreenLayoutEnvironment') ? '''
@@ -195,9 +197,9 @@ class Environment${tMixins.isNotEmpty ? ' with\n${tMixins.join(',\n')}' : ''} {
   @override
   final List<Locale> supportedL10ns = const [
 ${[
-            for (final tLocale in results['locale'] as List<String>)
-              "Locale('$tLocale')",
-          ].join(',\n')}
+                    for (final tLocale in results['locale'] as List<String>)
+                      "Locale('$tLocale')",
+                  ].join(',\n')}
   ];
 
   @override
@@ -306,7 +308,9 @@ void _checkMainFile(ArgResults results) {
       tFile.createSync(recursive: true);
     }
 
-    tFile.writeAsStringSync(DartFormatter().format('''
+    tFile.writeAsStringSync(
+        DartFormatter(languageVersion: DartFormatter.latestLanguageVersion)
+            .format('''
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -452,7 +456,9 @@ void _checkSplashPageFile(ArgResults results) {
       tFile.createSync(recursive: true);
     }
 
-    tFile.writeAsStringSync(DartFormatter().format('''
+    tFile.writeAsStringSync(
+        DartFormatter(languageVersion: DartFormatter.latestLanguageVersion)
+            .format('''
 import 'package:flutter/material.dart';
 import 'package:patapata_core/patapata_widgets.dart';
 
@@ -485,7 +491,9 @@ void _checkAgreementPageFile(ArgResults results) {
       tFile.createSync(recursive: true);
     }
 
-    tFile.writeAsStringSync(DartFormatter().format('''
+    tFile.writeAsStringSync(
+        DartFormatter(languageVersion: DartFormatter.latestLanguageVersion)
+            .format('''
 import 'package:flutter/material.dart';
 import 'package:patapata_core/patapata_core.dart';
 import 'package:patapata_core/patapata_widgets.dart';
@@ -540,7 +548,9 @@ void _checkHomePageFile(ArgResults results) {
       tFile.createSync(recursive: true);
     }
 
-    tFile.writeAsStringSync(DartFormatter().format('''
+    tFile.writeAsStringSync(
+        DartFormatter(languageVersion: DartFormatter.latestLanguageVersion)
+            .format('''
 import 'package:flutter/material.dart';
 import 'package:patapata_core/patapata_core.dart';
 import 'package:patapata_core/patapata_widgets.dart';
@@ -577,7 +587,9 @@ void _checkStartupFile(ArgResults results) {
       tFile.createSync(recursive: true);
     }
 
-    tFile.writeAsStringSync(DartFormatter().format('''
+    tFile.writeAsStringSync(
+        DartFormatter(languageVersion: DartFormatter.latestLanguageVersion)
+            .format('''
 import 'package:patapata_core/patapata_core.dart';
 
 import 'errors.dart';
@@ -645,7 +657,9 @@ void _checkErrorsFile(ArgResults results) {
       tFile.createSync(recursive: true);
     }
 
-    tFile.writeAsStringSync(DartFormatter().format('''
+    tFile.writeAsStringSync(
+        DartFormatter(languageVersion: DartFormatter.latestLanguageVersion)
+            .format('''
 import 'package:patapata_core/patapata_core.dart';
 import 'package:patapata_core/patapata_core_libs.dart';
 import 'package:patapata_core/patapata_widgets.dart';
@@ -715,7 +729,9 @@ final class AppVersionException extends AppException {
       tErrorPageFile.createSync(recursive: true);
     }
 
-    tErrorPageFile.writeAsStringSync(DartFormatter().format('''
+    tErrorPageFile.writeAsStringSync(
+        DartFormatter(languageVersion: DartFormatter.latestLanguageVersion)
+            .format('''
 import 'package:flutter/material.dart';
 import 'package:patapata_core/patapata_core.dart';
 import 'package:patapata_core/patapata_widgets.dart';
@@ -953,10 +969,10 @@ void _checkAndroidGradleFile(ArgResults results) {
     'targetSdk = 35',
   );
 
-  // Replace the minimum SDK version with 23 as plain text
+  // Replace the minimum SDK version with 24 as plain text
   tDocument = tDocument.replaceAll(
     'minSdk = flutter.minSdkVersion',
-    'minSdk = 23',
+    'minSdk = 24',
   );
 
   // Replace the sourceCompatibility with JAVA 11
@@ -1240,7 +1256,9 @@ void _checkWidgetTestFile(ArgResults results) {
       tFile.createSync(recursive: true);
     }
 
-    tFile.writeAsStringSync(DartFormatter().format('''
+    tFile.writeAsStringSync(
+        DartFormatter(languageVersion: DartFormatter.latestLanguageVersion)
+            .format('''
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {

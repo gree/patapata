@@ -22,7 +22,7 @@ dev_dependencies:
   flutter_lints: ^3.0.2
   riverpod_generator: ^2.6.1
   build_runner: ^2.4.9
-  custom_lint: ^0.6.4
+  custom_lint: ">=0.6.4 <0.8.0"
   riverpod_lint: ^2.3.10
 
 flutter:
