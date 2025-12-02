@@ -193,7 +193,7 @@ class InlinePlugin extends Plugin {
   @override
   FutureOr<bool> init(App app) async {
     if (_init != null) {
-      if (!await _init!(app)) {
+      if (!await _init(app)) {
         return false;
       }
     }
@@ -204,7 +204,7 @@ class InlinePlugin extends Plugin {
   @override
   FutureOr<void> dispose() async {
     if (_dispose != null) {
-      await _dispose!();
+      await _dispose();
     }
 
     return super.dispose();
@@ -213,7 +213,7 @@ class InlinePlugin extends Plugin {
   @override
   Widget createAppWidgetWrapper(Widget child) {
     if (_createAppWidgetWrapper != null) {
-      return _createAppWidgetWrapper!(child);
+      return _createAppWidgetWrapper(child);
     }
 
     return super.createAppWidgetWrapper(child);
@@ -222,7 +222,7 @@ class InlinePlugin extends Plugin {
   @override
   RemoteConfig? createRemoteConfig() {
     if (_createRemoteConfig != null) {
-      return _createRemoteConfig!();
+      return _createRemoteConfig();
     }
 
     return super.createRemoteConfig();
@@ -231,7 +231,7 @@ class InlinePlugin extends Plugin {
   @override
   LocalConfig? createLocalConfig() {
     if (_createLocalConfig != null) {
-      return _createLocalConfig!();
+      return _createLocalConfig();
     }
 
     return super.createLocalConfig();
@@ -240,7 +240,7 @@ class InlinePlugin extends Plugin {
   @override
   RemoteMessaging? createRemoteMessaging() {
     if (_createRemoteMessaging != null) {
-      return _createRemoteMessaging!();
+      return _createRemoteMessaging();
     }
 
     return super.createRemoteMessaging();
@@ -249,7 +249,7 @@ class InlinePlugin extends Plugin {
   @override
   List<NavigatorObserver> get navigatorObservers {
     if (_navigatorObservers != null) {
-      return _navigatorObservers!();
+      return _navigatorObservers();
     }
 
     return super.navigatorObservers;

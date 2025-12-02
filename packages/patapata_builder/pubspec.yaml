@@ -5,17 +5,18 @@ homepage: https://github.com/gree/patapata
 repository: https://github.com/gree/patapata/tree/main/packages/patapata_builder
 
 environment:
-  sdk: '>=3.0.0 <4.0.0'
+  sdk: ">=3.5.0 <4.0.0"
+resolution: workspace
 
 dependencies:
   patapata_core: ^1.4.0
 
   meta: ^1.15.0
-  analyzer: '>=6.7.0 <8.0.0'
+  analyzer: ">=6.7.0 <8.0.0"
   build: ^2.0.0
-  build_config: '^1.1.1'
-  source_gen: '>=1.5.0 <3.0.0'
+  build_config: "^1.1.1"
+  source_gen: ">=1.5.0 <3.0.0"
 
 dev_dependencies:
   build_runner: ^2.4.13
-  dart_flutter_team_lints: ^1.0.0
+  dart_flutter_team_lints: ^3.0.0

@@ -302,7 +302,7 @@ class MockRemoteMessaging extends RemoteMessaging {
   @override
   Future<RemoteMessage?> getInitialMessage() {
     if (_getInitialMessage != null) {
-      return _getInitialMessage!();
+      return _getInitialMessage();
     }
 
     return Future.value(null);
@@ -311,7 +311,7 @@ class MockRemoteMessaging extends RemoteMessaging {
   @override
   Stream<RemoteMessage> get messages {
     if (_messages != null) {
-      return _messages!();
+      return _messages();
     }
 
     return const Stream.empty();
@@ -320,7 +320,7 @@ class MockRemoteMessaging extends RemoteMessaging {
   @override
   Stream<String?> get tokens {
     if (_tokens != null) {
-      return _tokens!();
+      return _tokens();
     }
 
     return const Stream.empty();
@@ -329,7 +329,7 @@ class MockRemoteMessaging extends RemoteMessaging {
   @override
   Future<String?> getToken() {
     if (_getToken != null) {
-      return _getToken!();
+      return _getToken();
     }
 
     return Future.value(null);

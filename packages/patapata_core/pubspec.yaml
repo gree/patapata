@@ -5,8 +5,9 @@ homepage: https://github.com/gree/patapata
 repository: https://github.com/gree/patapata/tree/main/packages/patapata_core
 
 environment:
-  sdk: ">=3.0.0 <4.0.0"
+  sdk: ">=3.5.0 <4.0.0"
   flutter: ">=3.29.0"
+resolution: workspace
 
 executables:
   bootstrap:
@@ -41,13 +42,13 @@ dependencies:
   xml: ^6.3.0
   yaml_edit: ^2.1.1
   web: ^1.1.0
-  vector_math: ^2.2.0
+  vector_math: ^2.0.0
 
 dev_dependencies:
   test: ">=1.20.0"
   flutter_test:
     sdk: flutter
-  flutter_lints: ^3.0.2
+  flutter_lints: ^5.0.0
   golden_toolkit: ^0.15.0
   mockito: ^5.4.4
   flutter_svg: ^2.0.10+1

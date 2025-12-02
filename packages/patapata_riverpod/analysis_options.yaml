@@ -3,6 +3,7 @@ include: package:flutter_lints/flutter.yaml
 linter:
   rules:
     avoid_dynamic_calls: true
+    unnecessary_library_name: false
 
 analyzer:
   plugins:

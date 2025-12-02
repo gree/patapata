@@ -282,20 +282,20 @@ class _StandardAppRoutePluginMixinInline extends InlinePlugin
   Future<StandardRouteData?> parseRouteInformation(
           RouteInformation routeInformation) =>
       _parseRouteInformation != null
-          ? _parseRouteInformation!(routeInformation)
+          ? _parseRouteInformation(routeInformation)
           : super.parseRouteInformation(routeInformation);
 
   @override
   Future<RouteInformation?> transformRouteInformation(
           RouteInformation routeInformation) =>
       _transformRouteInformation != null
-          ? _transformRouteInformation!(routeInformation)
+          ? _transformRouteInformation(routeInformation)
           : super.transformRouteInformation(routeInformation);
 
   @override
   Future<StandardRouteData?> getInitialRouteData() =>
       _getInitialRouteData != null
-          ? _getInitialRouteData!()
+          ? _getInitialRouteData()
           : super.getInitialRouteData();
 }
 

@@ -278,7 +278,7 @@ class RepositoryBuilder extends GeneratorForAnnotation<RepositoryClass> {
     final tFormattedFields = formatField(fields);
     late final String tClassGenerateString;
 
-    final fGenerateCacheDuration = () {
+    String fGenerateCacheDuration() {
       if (classElement.interfaces
           .where((e) => e.element.name == (RepositoryModelCache).toString())
           .isEmpty) {
@@ -289,7 +289,7 @@ class RepositoryBuilder extends GeneratorForAnnotation<RepositoryClass> {
       }
 
       return '';
-    };
+    }
 
     final tConstructorsString = classElement.constructors.map((c) {
       if (c.name.isEmpty) {
