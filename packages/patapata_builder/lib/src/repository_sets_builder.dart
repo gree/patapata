@@ -3,6 +3,9 @@
 // This source code is licensed under the MIT license found in the
 // LICENSE file in the root directory of this source tree.
 
+// TODO: Deprecated member usage should be avoided. However, due to the significant impact of fixes, it is on hold.
+// ignore_for_file: deprecated_member_use
+
 import 'dart:async';
 import 'dart:collection';
 
