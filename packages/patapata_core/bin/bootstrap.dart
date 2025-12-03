@@ -117,11 +117,6 @@ void main(List<String> arguments) {
     // Change Android Gradle Wrapper version to 8.10.2
     _checkAndroidGradleWrapperFile(tResults);
 
-    // Change Android SDK compile version to 35
-    // Change Android SDK target version to 35
-    // Change Android SDK minimum version to 24
-    // Change Android NDK version to 27.0.12077973
-    // Change Java version to 11
     // Check if coreLibraryDesugaringEnabled is set; if not, add it.
     _checkAndroidGradleFile(tResults);
 
@@ -957,59 +952,6 @@ void _checkAndroidGradleFile(ArgResults results) {
 
   String tDocument = tFile.readAsStringSync();
 
-  // Replace the compile SDK version with 35 as plain text
-  tDocument = tDocument.replaceAll(
-    'compileSdk = flutter.compileSdkVersion',
-    'compileSdk = 35',
-  );
-
-  // Replace the target SDK version with 35 as plain text
-  tDocument = tDocument.replaceAll(
-    'targetSdk = flutter.targetSdkVersion',
-    'targetSdk = 35',
-  );
-
-  // Replace the minimum SDK version with 24 as plain text
-  tDocument = tDocument.replaceAll(
-    'minSdk = flutter.minSdkVersion',
-    'minSdk = 24',
-  );
-
-  // Replace the sourceCompatibility with JAVA 11
-  tDocument = tDocument.replaceAll(
-    'sourceCompatibility = JavaVersion.VERSION_1_8',
-    'sourceCompatibility = JavaVersion.VERSION_11',
-  );
-
-  // Replace the targetCompatibility with JAVA 11
-  tDocument = tDocument.replaceAll(
-    'targetCompatibility = JavaVersion.VERSION_1_8',
-    'targetCompatibility = JavaVersion.VERSION_11',
-  );
-
-  // Replace the jvmTarget with JAVA 11
-  tDocument = tDocument.replaceAll(
-    'jvmTarget = JavaVersion.VERSION_1_8',
-    'jvmTarget = JavaVersion.VERSION_11',
-  );
-
-  // Replace the ndkVersion with version 27.0.12077973
-  //
-  // In Flutter 3.29.0, flutter.ndkVersion is set to 26.3.11579264,
-  // but AGP 8.7.0 uses 27.0.12077973 as the default.
-  // If an external package does not specify ndkVersion, the app may end up using an older version,
-  // which will trigger a warning.
-  // Therefore, set ndkVersion to match AGP 8.7.0.
-  //
-  // In Flutter 3.27.0, AGP 8.1.0 is used and its default is 25.1.8937393,
-  // but flutter.ndkVersion is 26.1.10909125.
-  // Since flutter.ndkVersion is higher than the AGP default,
-  // we should not remove the ndkVersion setting and must specify a newer version.
-  tDocument = tDocument.replaceAll(
-    'ndkVersion = flutter.ndkVersion',
-    'ndkVersion = "27.0.12077973"',
-  );
-
   // Add configuration for coreLibraryDesugaring
   // This is because flutter_local_notifications, which patapata_core depends on, uses Java 8 features.
 
@@ -1017,8 +959,8 @@ void _checkAndroidGradleFile(ArgResults results) {
       ? 'isCoreLibraryDesugaringEnabled = true'
       : 'coreLibraryDesugaringEnabled = true';
   final tDesugarLibraryText = (tIsKts)
-      ? 'coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.4")'
-      : 'coreLibraryDesugaring "com.android.tools:desugar_jdk_libs:2.1.4"';
+      ? 'coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.5")'
+      : 'coreLibraryDesugaring "com.android.tools:desugar_jdk_libs:2.1.5"';
 
   if (!tDocument.contains(tDesugarEnableText)) {
     final tCompileOptionsRegex = RegExp(

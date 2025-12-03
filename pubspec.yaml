@@ -6,6 +6,7 @@ environment:
 workspace:
   - packages/patapata_adjust
   - packages/patapata_apple_push_notifications
+  - packages/patapata_apple_push_notifications/example
   - packages/patapata_apps_flyer
   - packages/patapata_builder
   - packages/patapata_core
