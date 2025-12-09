@@ -17,9 +17,7 @@ import 'package:patapata_core/src/widgets/platform_dialog.dart';
 typedef DialogActionBuilder = PlatformDialogAction Function(dynamic result);
 
 abstract class TestButtonBase<T> {
-  TestButtonBase({
-    required this.expectedResults,
-  });
+  TestButtonBase({required this.expectedResults});
 
   final T expectedResults;
   dynamic actuallyResults;
@@ -45,9 +43,7 @@ abstract class TestButtonBase<T> {
 }
 
 class TestButton1 extends TestButtonBase<bool> {
-  TestButton1({
-    required super.expectedResults,
-  });
+  TestButton1({required super.expectedResults});
 
   @override
   Finder createFinder(TargetPlatform? target) {
@@ -74,9 +70,7 @@ class TestButton1 extends TestButtonBase<bool> {
 }
 
 class TestButton2 extends TestButtonBase<int> {
-  TestButton2({
-    required super.expectedResults,
-  });
+  TestButton2({required super.expectedResults});
 
   @override
   Finder createFinder(TargetPlatform? target) {
@@ -103,9 +97,7 @@ class TestButton2 extends TestButtonBase<int> {
       child: const SizedBox(
         width: 20,
         height: 20,
-        child: ColoredBox(
-          color: Colors.red,
-        ),
+        child: ColoredBox(color: Colors.red),
       ),
       action: defaultAction,
       result: defaultReturn,
@@ -120,18 +112,13 @@ const _localizationsDelegates = [
 ];
 
 class TestApp {
-  TestApp({
-    required this.targetPlatform,
-  });
+  TestApp({required this.targetPlatform});
 
   final TargetPlatform? targetPlatform;
   final appKey = GlobalKey();
 
   Widget createApp() {
-    final tHome = KeyedSubtree(
-      key: appKey,
-      child: const SizedBox.shrink(),
-    );
+    final tHome = KeyedSubtree(key: appKey, child: const SizedBox.shrink());
 
     if (targetPlatform == TargetPlatform.iOS ||
         targetPlatform == TargetPlatform.macOS) {
@@ -141,9 +128,7 @@ class TestApp {
       );
     }
 
-    return MaterialApp(
-      home: tHome,
-    );
+    return MaterialApp(home: tHome);
   }
 
   Type? getDialogType() {
@@ -158,9 +143,7 @@ class TestApp {
 
 void main() {
   final List<TestApp> tTestApps = kIsWeb
-      ? [
-          TestApp(targetPlatform: null),
-        ]
+      ? [TestApp(targetPlatform: null)]
       : [
           TestApp(targetPlatform: TargetPlatform.android),
           TestApp(targetPlatform: TargetPlatform.windows),
@@ -209,8 +192,9 @@ void main() {
           }
 
           // Test the behavior when the button1 is pressed.
-          tTapTestFuture =
-              tester.tap(testButton.createFinder(testApp.targetPlatform));
+          tTapTestFuture = tester.tap(
+            testButton.createFinder(testApp.targetPlatform),
+          );
           await Future.wait([tTapTestFuture, tResultTestCompleter.future]);
           await tester.pumpAndSettle();
         }

@@ -137,11 +137,8 @@ class _PlatformAlertDialog<T> extends StatelessWidget {
           return CupertinoDialogAction(
             isDefaultAction: action.isDefault,
             isDestructiveAction: action.isDestructive,
-            child: action.child ??
-                Text(
-                  action.text!,
-                  textAlign: TextAlign.center,
-                ),
+            child:
+                action.child ?? Text(action.text!, textAlign: TextAlign.center),
             onPressed: () {
               Navigator.pop(context, action.result());
               action.action?.call();
@@ -163,11 +160,7 @@ class _PlatformAlertDialog<T> extends StatelessWidget {
         content: SingleChildScrollView(child: content),
         actions: actions.map((action) {
           return TextButton(
-            child: action.child ??
-                Text(
-                  action.text!,
-                  textAlign: TextAlign.end,
-                ),
+            child: action.child ?? Text(action.text!, textAlign: TextAlign.end),
             onPressed: () {
               Navigator.pop(context, action.result());
               action.action?.call();

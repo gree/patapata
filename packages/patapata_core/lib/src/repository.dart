@@ -71,6 +71,7 @@ class _ScheduledEntry<T extends RepositoryModelBase<T, I>, I extends Object> {
         other.id == id &&
         other.completer == completer;
   }
+
   // coverage:ignore-end
 }
 
@@ -80,8 +81,10 @@ class _ScheduledEntry<T extends RepositoryModelBase<T, I>, I extends Object> {
 /// This class serves as the root of the repository system.
 /// It interacts with logic and [RepositoryModel] through [RepositoryProvider].
 /// Be sure to place it higher in the hierarchy than [RepositoryProvider].
-abstract class Repository<T extends RepositoryModelBase<T, I>,
-    I extends Object> {
+abstract class Repository<
+  T extends RepositoryModelBase<T, I>,
+  I extends Object
+> {
   /// Standard maximum cache size.
   static const kDefaultMaxObjectCacheSize = 100;
 
@@ -94,8 +97,9 @@ abstract class Repository<T extends RepositoryModelBase<T, I>,
   @protected
   int get maxObjectCacheSize => kDefaultMaxObjectCacheSize;
 
-  late final _objectCache =
-      _RepositoryCacheMap<I, T>(maximumSize: maxObjectCacheSize);
+  late final _objectCache = _RepositoryCacheMap<I, T>(
+    maximumSize: maxObjectCacheSize,
+  );
   final _objectFetchMap = HashMap<_FetchSetEntry<I>, Completer<T?>>();
 
   @visibleForTesting
@@ -131,11 +135,7 @@ abstract class Repository<T extends RepositoryModelBase<T, I>,
     _scheduleIfNeeded(set);
   }
 
-  void _scheduleMany(
-    List<I> ids,
-    Type set,
-    List<Completer<T?>> completers,
-  ) {
+  void _scheduleMany(List<I> ids, Type set, List<Completer<T?>> completers) {
     final tEntries = _scheduledFetches.putIfAbsent(set, () => {});
 
     for (var i = 0; i < ids.length; i++) {
@@ -170,25 +170,28 @@ abstract class Repository<T extends RepositoryModelBase<T, I>,
         final tIds = entries.map((e) => e.id).toList(growable: false);
         final tEntryList = entries.toList();
 
-        multiSetFetchers[set]!(tIds).then((objects) {
-          for (var v in objects) {
-            final tEntry =
-                tEntryList.firstWhere((e) => e.id == v?.repositoryId);
-            tEntryList.remove(tEntry);
+        multiSetFetchers[set]!(tIds)
+            .then((objects) {
+              for (var v in objects) {
+                final tEntry = tEntryList.firstWhere(
+                  (e) => e.id == v?.repositoryId,
+                );
+                tEntryList.remove(tEntry);
 
-            _handleObject(v, set, tEntry.completer);
-          }
+                _handleObject(v, set, tEntry.completer);
+              }
 
-          for (var f in tEntryList) {
-            f.completer.complete(null);
-          }
-        }).catchError((error, stackTrace) {
-          for (var i in entries.toList(growable: false)) {
-            i.completer.completeError(error, stackTrace);
-          }
+              for (var f in tEntryList) {
+                f.completer.complete(null);
+              }
+            })
+            .catchError((error, stackTrace) {
+              for (var i in entries.toList(growable: false)) {
+                i.completer.completeError(error, stackTrace);
+              }
 
-          throw error;
-        });
+              throw error;
+            });
       })(e.key, e.value);
     }
   }
@@ -230,8 +233,9 @@ abstract class Repository<T extends RepositoryModelBase<T, I>,
   bool _cacheContains(I id) => _objectCache.containsKey(id);
 
   // TODO: runtime time
-  late final _cacheDurationTimers =
-      Expando<Timer>('$runtimeType cache duration timers');
+  late final _cacheDurationTimers = Expando<Timer>(
+    '$runtimeType cache duration timers',
+  );
 
   void _handleObjectCacheDuration(T object) {
     if (object is RepositoryModelCache) {
@@ -249,7 +253,8 @@ abstract class Repository<T extends RepositoryModelBase<T, I>,
             // Create a clean closure with 0 references to outside.
             return () {
               _logger.info(
-                  'Object cache duration expired: Have listeners: ${object._repositoryHasListeners}');
+                'Object cache duration expired: Have listeners: ${object._repositoryHasListeners}',
+              );
 
               if (object._repositoryHasListeners) {
                 refresh(object);
@@ -261,11 +266,7 @@ abstract class Repository<T extends RepositoryModelBase<T, I>,
     }
   }
 
-  T? _handleObject(
-    T? object,
-    Type set,
-    Completer<T?> completer,
-  ) {
+  T? _handleObject(T? object, Type set, Completer<T?> completer) {
     if (object == null) {
       completer.complete(null);
 
@@ -293,17 +294,17 @@ abstract class Repository<T extends RepositoryModelBase<T, I>,
       final tMainObject = _accessCache(tId)!;
 
       if (tMainObject is RepositoryModel<T, I>) {
-        tMainObject.lock(
-          (batch) {
-            tMainObject.update(batch, object);
-            _handleObjectCacheDuration(tMainObject);
-            batch.commit();
-            completer.complete(tMainObject);
-          },
-        ).catchError((error, stackTrace) {
-          completer.completeError(error, stackTrace);
-          return false;
-        });
+        tMainObject
+            .lock((batch) {
+              tMainObject.update(batch, object);
+              _handleObjectCacheDuration(tMainObject);
+              batch.commit();
+              completer.complete(tMainObject);
+            })
+            .catchError((error, stackTrace) {
+              completer.completeError(error, stackTrace);
+              return false;
+            });
       } else {
         if (tMainObject is SimpleRepositoryModel<T, I>) {
           tMainObject.update(object);
@@ -339,13 +340,11 @@ abstract class Repository<T extends RepositoryModelBase<T, I>,
       final tMainObject = _accessCache(tId)!;
 
       if (tMainObject is RepositoryModel<T, I>) {
-        await tMainObject.lock(
-          (batch) {
-            tMainObject.update(batch, object);
-            _handleObjectCacheDuration(tMainObject);
-            batch.commit();
-          },
-        );
+        await tMainObject.lock((batch) {
+          tMainObject.update(batch, object);
+          _handleObjectCacheDuration(tMainObject);
+          batch.commit();
+        });
       } else {
         _handleObjectCacheDuration(tMainObject);
 
@@ -399,8 +398,9 @@ abstract class Repository<T extends RepositoryModelBase<T, I>,
     RepositoryFetchPolicy fetchPolicy = RepositoryFetchPolicy.cacheFirst,
     bool? synchronousCache,
   }) {
-    assert(singleSetFetchers.containsKey(set) ||
-        multiSetFetchers.containsKey(set));
+    assert(
+      singleSetFetchers.containsKey(set) || multiSetFetchers.containsKey(set),
+    );
 
     // This access will make this id the Most Recently Used (MRU).
     // Even without a set and without actual use,
@@ -414,7 +414,8 @@ abstract class Repository<T extends RepositoryModelBase<T, I>,
       }
 
       if (tObject?.repositorySets.contains(set) == true) {
-        final tSynchronousCache = synchronousCache ??
+        final tSynchronousCache =
+            synchronousCache ??
             (Zone.current[#repositorySynchronousCache] as bool?) ??
             false;
         // Return as quickly as possible.
@@ -443,16 +444,18 @@ abstract class Repository<T extends RepositoryModelBase<T, I>,
         return tCompleter;
       }
 
-      singleSetFetchers[set]!(id).then(
-        (object) {
-          return _handleObject(object, set, tCompleter);
-        },
-        onError: (error, stackTrace) {
-          tCompleter.completeError(error, stackTrace);
-        },
-      ).whenComplete(() {
-        _objectFetchMap.remove(tIdSet);
-      });
+      singleSetFetchers[set]!(id)
+          .then(
+            (object) {
+              return _handleObject(object, set, tCompleter);
+            },
+            onError: (error, stackTrace) {
+              tCompleter.completeError(error, stackTrace);
+            },
+          )
+          .whenComplete(() {
+            _objectFetchMap.remove(tIdSet);
+          });
 
       return tCompleter;
     }).future;
@@ -515,7 +518,8 @@ abstract class Repository<T extends RepositoryModelBase<T, I>,
     }
 
     if (tToFetch.isEmpty && tToWaitFor.isEmpty) {
-      final tSynchronousCache = synchronousCache ??
+      final tSynchronousCache =
+          synchronousCache ??
           (Zone.current[#repositorySynchronousCache] as bool?) ??
           false;
       // Return as quickly as possible.
@@ -530,42 +534,49 @@ abstract class Repository<T extends RepositoryModelBase<T, I>,
     if (tToWaitFor.isNotEmpty) {
       final tFuturesToWaitFor = tToWaitFor.keys.toList(growable: false);
 
-      tFinalFutures.add(Future.wait(tFuturesToWaitFor).then((objects) {
-        for (var i = 0, il = objects.length; i < il; i++) {
-          tResults[tToWaitFor[tFuturesToWaitFor[i]]!] = objects[i];
-        }
+      tFinalFutures.add(
+        Future.wait(tFuturesToWaitFor).then((objects) {
+          for (var i = 0, il = objects.length; i < il; i++) {
+            tResults[tToWaitFor[tFuturesToWaitFor[i]]!] = objects[i];
+          }
 
-        return objects;
-      }));
+          return objects;
+        }),
+      );
     }
 
     if (tToFetch.isNotEmpty) {
       final tToFetchIds = tToFetch.keys.toList(growable: false);
-      final tToFetchCompleters =
-          tToFetchIds.map((v) => Completer<T?>()).toList(growable: false);
+      final tToFetchCompleters = tToFetchIds
+          .map((v) => Completer<T?>())
+          .toList(growable: false);
 
       for (var i = 0; i < tToFetchIds.length; i++) {
         final tIdSet = _FetchSetEntry(tToFetchIds[i], set);
         _objectFetchMap[tIdSet] = tToFetchCompleters[i];
 
-        tToFetchCompleters[i].future.then((v) {
-          if (v != null) {
-            tResults[tToFetch[v.repositoryId]!] = v;
-          }
-        }).whenComplete(() {
-          _objectFetchMap.remove(tIdSet);
-        });
+        tToFetchCompleters[i].future
+            .then((v) {
+              if (v != null) {
+                tResults[tToFetch[v.repositoryId]!] = v;
+              }
+            })
+            .whenComplete(() {
+              _objectFetchMap.remove(tIdSet);
+            });
       }
 
       tFinalFutures.addAll(tToFetchCompleters.map((e) => e.future));
       _scheduleMany(tToFetchIds, set, tToFetchCompleters);
     }
 
-    Future.wait(tFinalFutures).then<void>((value) {
-      tCompleter.complete(tResults);
-    }).catchError((error, stackTrace) {
-      tCompleter.completeError(error, stackTrace);
-    });
+    Future.wait(tFinalFutures)
+        .then<void>((value) {
+          tCompleter.complete(tResults);
+        })
+        .catchError((error, stackTrace) {
+          tCompleter.completeError(error, stackTrace);
+        });
 
     return tCompleter.future;
   }
@@ -573,13 +584,16 @@ abstract class Repository<T extends RepositoryModelBase<T, I>,
   Iterable<Type> _setsToRefresh(T object) {
     // The set with the most variables is likely to have the most variables
     // in other sets as well, so process it first.
-    final tSetVariablesSorted = object.repositorySetVariables.entries
-        .where((e) =>
-            (singleSetFetchers.containsKey(e.key) ||
-                multiSetFetchers.containsKey(e.key)) &&
-            object.repositoryHasSet(e.key))
-        .toList()
-      ..sort((a, b) => b.value.length.compareTo(a.value.length));
+    final tSetVariablesSorted =
+        object.repositorySetVariables.entries
+            .where(
+              (e) =>
+                  (singleSetFetchers.containsKey(e.key) ||
+                      multiSetFetchers.containsKey(e.key)) &&
+                  object.repositoryHasSet(e.key),
+            )
+            .toList()
+          ..sort((a, b) => b.value.length.compareTo(a.value.length));
 
     var tKeepChecking = true;
 
@@ -610,11 +624,7 @@ abstract class Repository<T extends RepositoryModelBase<T, I>,
     final tId = object.repositoryId;
 
     for (var tSet in _setsToRefresh(object)) {
-      await fetch(
-        tId,
-        tSet,
-        fetchPolicy: RepositoryFetchPolicy.noCache,
-      );
+      await fetch(tId, tSet, fetchPolicy: RepositoryFetchPolicy.noCache);
     }
   }
 
@@ -638,16 +648,16 @@ abstract class Repository<T extends RepositoryModelBase<T, I>,
           fetchPolicy: RepositoryFetchPolicy.noCache,
         );
       } else {
-        final tMaxConcurrentFetches =
-            (maxConcurrentFetches > 0) ? maxConcurrentFetches : 1;
+        final tMaxConcurrentFetches = (maxConcurrentFetches > 0)
+            ? maxConcurrentFetches
+            : 1;
         for (var j = 0; j < i.value.length; j += tMaxConcurrentFetches) {
           final tSlice = i.value.skip(j).take(tMaxConcurrentFetches);
           final tFutures = tSlice
-              .map((e) => fetch(
-                    e,
-                    i.key,
-                    fetchPolicy: RepositoryFetchPolicy.noCache,
-                  ))
+              .map(
+                (e) =>
+                    fetch(e, i.key, fetchPolicy: RepositoryFetchPolicy.noCache),
+              )
               .toList(growable: false);
           await SynchronousErrorableFuture.wait(tFutures);
         }

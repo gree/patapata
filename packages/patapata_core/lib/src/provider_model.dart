@@ -10,8 +10,8 @@ import 'package:patapata_core/patapata_interface.dart';
 import 'exception.dart';
 import 'sequential_work_queue.dart';
 
-typedef ProviderModelProcess = FutureOr<void> Function(
-    ProviderModelBatch batch);
+typedef ProviderModelProcess =
+    FutureOr<void> Function(ProviderModelBatch batch);
 
 class _DebugDynamicType<T> {
   const _DebugDynamicType();
@@ -37,11 +37,8 @@ class ProviderModelVariable<T>
   /// Whether this variable has been set or not.
   bool get set => _set;
 
-  ProviderModelVariable._internalCreate(
-    this._parent,
-    this._value,
-    this._set,
-  ) : _nullable = null is T;
+  ProviderModelVariable._internalCreate(this._parent, this._value, this._set)
+    : _nullable = null is T;
 
   @override
   String toString() {
@@ -116,17 +113,16 @@ class ProviderModelVariable<T>
         return unsafeValue;
       }
 
-      final tQueuesToWaitFor =
-          _parent._lockQueues!.values.where((e) => e.isNotEmpty);
+      final tQueuesToWaitFor = _parent._lockQueues!.values.where(
+        (e) => e.isNotEmpty,
+      );
 
       if (tQueuesToWaitFor.isEmpty) {
         return unsafeValue;
       }
 
       // Wait until all queues have been finished.
-      await Future.wait([
-        for (var i in tQueuesToWaitFor) i.add(() => null),
-      ]);
+      await Future.wait([for (var i in tQueuesToWaitFor) i.add(() => null)]);
 
       // But now, after waiting once, there might still be
       // more things added to the queues again.
@@ -180,8 +176,8 @@ class ProviderModelBatch {
   /// will be returned via [ProviderModelVariable.unsafeValue].
   T get<T>(ProviderModelVariable<T> container) =>
       _reserves.containsKey(container)
-          ? _reserves[container]
-          : container.unsafeValue;
+      ? _reserves[container]
+      : container.unsafeValue;
 
   /// Disable this batch.
   /// This is only called externally by [ProviderModel.lock].
@@ -217,9 +213,7 @@ class ProviderModelBatch {
   /// as well as all [ProviderModelVariable]s in this batch.
   ///
   /// If [notify] is false, [notifyListeners] will not be called on the [ProviderModel] nor any [ProviderModelVariable]s.
-  void commit({
-    bool? notify,
-  }) {
+  void commit({bool? notify}) {
     if (_completed) {
       return;
     }
@@ -265,7 +259,7 @@ class ProviderLockKey {
 /// Thrown when [ProviderModel.begin] is called while a lock is already in place.
 class ConflictException extends PatapataCoreException {
   ConflictException(this.key, this.from)
-      : super(code: PatapataCoreExceptionCode.PPE201);
+    : super(code: PatapataCoreExceptionCode.PPE201);
 
   /// The [ProviderLockKey] that was being used when this exception was thrown.
   final ProviderLockKey key;
@@ -546,8 +540,10 @@ abstract class ProviderModel<T>
     lockKey ??= _defaultLockKey;
     _lockQueues ??= <ProviderLockKey, SequentialWorkQueue>{};
 
-    final tQueue =
-        _lockQueues!.putIfAbsent(lockKey, () => SequentialWorkQueue());
+    final tQueue = _lockQueues!.putIfAbsent(
+      lockKey,
+      () => SequentialWorkQueue(),
+    );
 
     if (override) {
       tQueue.clear();
@@ -600,8 +596,9 @@ abstract class ProviderModel<T>
 
     final tSubscription = ProviderModelUseSubscription<T>._(this, callback);
 
-    (_useSubscriptions ??= <ProviderModelUseSubscription<T>>[])
-        .add(tSubscription);
+    (_useSubscriptions ??= <ProviderModelUseSubscription<T>>[]).add(
+      tSubscription,
+    );
 
     _executeUseSubscription(tSubscription);
 
@@ -611,14 +608,9 @@ abstract class ProviderModel<T>
   void _executeUseSubscription(ProviderModelUseSubscription<T> subscription) {
     subscription._clearVariables();
 
-    runZoned<void>(
-      () {
-        subscription.callback(this as T);
-      },
-      zoneValues: {
-        #providerModelUseSubscription: subscription,
-      },
-    );
+    runZoned<void>(() {
+      subscription.callback(this as T);
+    }, zoneValues: {#providerModelUseSubscription: subscription});
 
     subscription._listenToVariables();
   }

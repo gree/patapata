@@ -19,8 +19,9 @@ class NoAutoProcessInitialRouteEnvironment extends Environment
 void main() {
   testInitialize();
 
-  testWidgets('Standard Nested Page hasNestedPages Test',
-      (WidgetTester tester) async {
+  testWidgets('Standard Nested Page hasNestedPages Test', (
+    WidgetTester tester,
+  ) async {
     final tStandardFactory = StandardPageFactory<TestPageA, void>(
       create: (data) => TestPageA(),
     );
@@ -28,9 +29,7 @@ void main() {
     final tNestedFactory = StandardPageWithNestedNavigatorFactory<TestNestedA>(
       create: (data) => TestNestedA(),
       nestedPageFactories: [
-        StandardPageFactory<TestPageA, void>(
-          create: (data) => TestPageA(),
-        ),
+        StandardPageFactory<TestPageA, void>(create: (data) => TestPageA()),
       ],
     );
 
@@ -41,12 +40,14 @@ void main() {
     expect(tNestedFactory.hasChildPages, isFalse);
   });
 
-  testWidgets('Standard Nested Page Context Go Test',
-      (WidgetTester tester) async {
+  testWidgets('Standard Nested Page Context Go Test', (
+    WidgetTester tester,
+  ) async {
     await _setTestDeviceSize(tester);
 
-    final tNavigatorMode =
-        TestNavigatorMode(StandardPageNavigationMode.moveToTop);
+    final tNavigatorMode = TestNavigatorMode(
+      StandardPageNavigationMode.moveToTop,
+    );
 
     final App tApp = createApp(
       appWidget: Provider<TestNavigatorMode>.value(
@@ -73,39 +74,40 @@ void main() {
                 ),
                 StandardPageFactory<TestCustomPageA, void>(
                   create: (data) => TestCustomPageA(),
-                  pageBuilder: (
-                    child,
-                    name,
-                    pageData,
-                    pageKey,
-                    restorationId,
-                    standardPageKey,
-                    factoryObject,
-                  ) =>
-                      StandardCustomPage(
-                    name: 'Test Custom Standard Page',
-                    key: const ValueKey('test-custom-key'),
-                    restorationId: 'custom-restorationId',
-                    standardPageKey: standardPageKey,
-                    factoryObject: factoryObject,
-                    barrierColor: Colors.blueAccent,
-                    child: Column(
-                      children: [
-                        Expanded(child: child),
-                        const Text('add-custom-standard-page-widget'),
-                      ],
-                    ),
-                    transitionDuration: const Duration(milliseconds: 500),
-                    transitionBuilder:
-                        (context, animation, secondaryAnimation, child) {
-                      return SlideTransition(
-                        position: Tween<Offset>(
-                                begin: const Offset(0, 1), end: Offset.zero)
-                            .animate(animation),
-                        child: child,
-                      );
-                    },
-                  ),
+                  pageBuilder:
+                      (
+                        child,
+                        name,
+                        pageData,
+                        pageKey,
+                        restorationId,
+                        standardPageKey,
+                        factoryObject,
+                      ) => StandardCustomPage(
+                        name: 'Test Custom Standard Page',
+                        key: const ValueKey('test-custom-key'),
+                        restorationId: 'custom-restorationId',
+                        standardPageKey: standardPageKey,
+                        factoryObject: factoryObject,
+                        barrierColor: Colors.blueAccent,
+                        child: Column(
+                          children: [
+                            Expanded(child: child),
+                            const Text('add-custom-standard-page-widget'),
+                          ],
+                        ),
+                        transitionDuration: const Duration(milliseconds: 500),
+                        transitionBuilder:
+                            (context, animation, secondaryAnimation, child) {
+                              return SlideTransition(
+                                position: Tween<Offset>(
+                                  begin: const Offset(0, 1),
+                                  end: Offset.zero,
+                                ).animate(animation),
+                                child: child,
+                              );
+                            },
+                      ),
                 ),
               ],
             ),
@@ -137,21 +139,12 @@ void main() {
           'TestNestedB',
           'TestPageC',
         ],
-        expectedRootPageInstanceNames: [
-          'TestNestedA',
-          'TestNestedB',
-        ],
+        expectedRootPageInstanceNames: ['TestNestedA', 'TestNestedB'],
         expectedNestedPageInstanceNames: {
           'TestNestedA': ['TestPageA', 'TestPageB'],
           'TestNestedB': ['TestPageC'],
         },
-        expectedActiveStates: [
-          false,
-          false,
-          false,
-          true,
-          true,
-        ],
+        expectedActiveStates: [false, false, false, true, true],
       );
 
       await tester.tap(find.byKey(const ValueKey(kTestButtonGoA)));
@@ -171,21 +164,12 @@ void main() {
           'TestNestedB',
           'TestPageC',
         ],
-        expectedRootPageInstanceNames: [
-          'TestNestedA',
-          'TestNestedB',
-        ],
+        expectedRootPageInstanceNames: ['TestNestedA', 'TestNestedB'],
         expectedNestedPageInstanceNames: {
           'TestNestedA': ['TestPageB', 'TestPageA'],
           'TestNestedB': ['TestPageC'],
         },
-        expectedActiveStates: [
-          false,
-          false,
-          false,
-          true,
-          true,
-        ],
+        expectedActiveStates: [false, false, false, true, true],
       );
 
       await tester.tap(find.byKey(const ValueKey(kTestButtonGoNA)));
@@ -201,21 +185,12 @@ void main() {
           'TestPageB',
           'TestPageA',
         ],
-        expectedRootPageInstanceNames: [
-          'TestNestedB',
-          'TestNestedA',
-        ],
+        expectedRootPageInstanceNames: ['TestNestedB', 'TestNestedA'],
         expectedNestedPageInstanceNames: {
           'TestNestedA': ['TestPageB', 'TestPageA'],
           'TestNestedB': ['TestPageC'],
         },
-        expectedActiveStates: [
-          false,
-          false,
-          true,
-          false,
-          true,
-        ],
+        expectedActiveStates: [false, false, true, false, true],
       );
 
       await tester.tap(find.byKey(const ValueKey(kTestBackButton)));
@@ -232,21 +207,12 @@ void main() {
           'TestPageA',
           'TestPageB',
         ],
-        expectedRootPageInstanceNames: [
-          'TestNestedB',
-          'TestNestedA',
-        ],
+        expectedRootPageInstanceNames: ['TestNestedB', 'TestNestedA'],
         expectedNestedPageInstanceNames: {
           'TestNestedA': ['TestPageA', 'TestPageB'],
           'TestNestedB': ['TestPageC'],
         },
-        expectedActiveStates: [
-          false,
-          false,
-          true,
-          false,
-          true,
-        ],
+        expectedActiveStates: [false, false, true, false, true],
       );
 
       await tester.tap(find.byKey(const ValueKey(kTestBackButton)));
@@ -259,20 +225,12 @@ void main() {
 
       _checkPageInstances(
         tApp,
-        expectedPageInstanceNames: [
-          'TestNestedB',
-          'TestPageC',
-        ],
-        expectedRootPageInstanceNames: [
-          'TestNestedB',
-        ],
+        expectedPageInstanceNames: ['TestNestedB', 'TestPageC'],
+        expectedRootPageInstanceNames: ['TestNestedB'],
         expectedNestedPageInstanceNames: {
           'TestNestedB': ['TestPageC'],
         },
-        expectedActiveStates: [
-          true,
-          true,
-        ],
+        expectedActiveStates: [true, true],
       );
 
       await tester.tap(find.byKey(const ValueKey(kTestButtonGoCustomA)));
@@ -286,17 +244,11 @@ void main() {
           'TestPageC',
           'Test Custom Standard Page',
         ],
-        expectedRootPageInstanceNames: [
-          'TestNestedB',
-        ],
+        expectedRootPageInstanceNames: ['TestNestedB'],
         expectedNestedPageInstanceNames: {
           'TestNestedB': ['TestPageC', 'Test Custom Standard Page'],
         },
-        expectedActiveStates: [
-          true,
-          false,
-          true,
-        ],
+        expectedActiveStates: [true, false, true],
       );
 
       await tester.tap(find.byKey(const ValueKey(kTestBackButton)));
@@ -305,20 +257,12 @@ void main() {
 
       _checkPageInstances(
         tApp,
-        expectedPageInstanceNames: [
-          'TestNestedB',
-          'TestPageC',
-        ],
-        expectedRootPageInstanceNames: [
-          'TestNestedB',
-        ],
+        expectedPageInstanceNames: ['TestNestedB', 'TestPageC'],
+        expectedRootPageInstanceNames: ['TestNestedB'],
         expectedNestedPageInstanceNames: {
           'TestNestedB': ['TestPageC'],
         },
-        expectedActiveStates: [
-          true,
-          true,
-        ],
+        expectedActiveStates: [true, true],
       );
 
       // Since there is no history, Pop is not possible.
@@ -330,12 +274,14 @@ void main() {
     tApp.dispose();
   });
 
-  testWidgets('Standard Nested Page Test. activeFirstNestedPage=true',
-      (WidgetTester tester) async {
+  testWidgets('Standard Nested Page Test. activeFirstNestedPage=true', (
+    WidgetTester tester,
+  ) async {
     await _setTestDeviceSize(tester);
 
-    final tNavigatorMode =
-        TestNavigatorMode(StandardPageNavigationMode.moveToTop);
+    final tNavigatorMode = TestNavigatorMode(
+      StandardPageNavigationMode.moveToTop,
+    );
 
     final App tApp = createApp(
       appWidget: Provider<TestNavigatorMode>.value(
@@ -372,19 +318,11 @@ void main() {
 
       _checkPageInstances(
         tApp,
-        expectedPageInstanceNames: [
-          'TestNestedA',
-          'TestPageA',
-          'TestPageB',
-        ],
+        expectedPageInstanceNames: ['TestNestedA', 'TestPageA', 'TestPageB'],
         expectedNestedPageInstanceNames: {
           'TestNestedA': ['TestPageA', 'TestPageB'],
         },
-        expectedActiveStates: [
-          true,
-          false,
-          true,
-        ],
+        expectedActiveStates: [true, false, true],
       );
 
       await tester.tap(find.byKey(const ValueKey(kTestButtonGoA)));
@@ -393,19 +331,11 @@ void main() {
 
       _checkPageInstances(
         tApp,
-        expectedPageInstanceNames: [
-          'TestNestedA',
-          'TestPageB',
-          'TestPageA',
-        ],
+        expectedPageInstanceNames: ['TestNestedA', 'TestPageB', 'TestPageA'],
         expectedNestedPageInstanceNames: {
           'TestNestedA': ['TestPageB', 'TestPageA'],
         },
-        expectedActiveStates: [
-          true,
-          false,
-          true,
-        ],
+        expectedActiveStates: [true, false, true],
       );
 
       await tester.tap(find.byKey(const ValueKey(kTestBackButton)));
@@ -414,19 +344,11 @@ void main() {
 
       _checkPageInstances(
         tApp,
-        expectedPageInstanceNames: [
-          'TestNestedA',
-          'TestPageA',
-          'TestPageB',
-        ],
+        expectedPageInstanceNames: ['TestNestedA', 'TestPageA', 'TestPageB'],
         expectedNestedPageInstanceNames: {
           'TestNestedA': ['TestPageA', 'TestPageB'],
         },
-        expectedActiveStates: [
-          true,
-          false,
-          true,
-        ],
+        expectedActiveStates: [true, false, true],
       );
 
       await tester.tap(find.byKey(const ValueKey(kTestBackButton)));
@@ -435,17 +357,11 @@ void main() {
 
       _checkPageInstances(
         tApp,
-        expectedPageInstanceNames: [
-          'TestNestedA',
-          'TestPageA',
-        ],
+        expectedPageInstanceNames: ['TestNestedA', 'TestPageA'],
         expectedNestedPageInstanceNames: {
           'TestNestedA': ['TestPageA'],
         },
-        expectedActiveStates: [
-          true,
-          true,
-        ],
+        expectedActiveStates: [true, true],
       );
 
       // Since there is no history, Pop is not possible.
@@ -457,12 +373,14 @@ void main() {
     tApp.dispose();
   });
 
-  testWidgets('Standard Nested Page Test. activeFirstNestedPage=false',
-      (WidgetTester tester) async {
+  testWidgets('Standard Nested Page Test. activeFirstNestedPage=false', (
+    WidgetTester tester,
+  ) async {
     await _setTestDeviceSize(tester);
 
-    final tNavigatorMode =
-        TestNavigatorMode(StandardPageNavigationMode.moveToTop);
+    final tNavigatorMode = TestNavigatorMode(
+      StandardPageNavigationMode.moveToTop,
+    );
 
     final App tApp = createApp(
       appWidget: Provider<TestNavigatorMode>.value(
@@ -499,19 +417,11 @@ void main() {
 
       _checkPageInstances(
         tApp,
-        expectedPageInstanceNames: [
-          'TestNestedA',
-          'TestPageA',
-          'TestPageB',
-        ],
+        expectedPageInstanceNames: ['TestNestedA', 'TestPageA', 'TestPageB'],
         expectedNestedPageInstanceNames: {
           'TestNestedA': ['TestPageA', 'TestPageB'],
         },
-        expectedActiveStates: [
-          true,
-          false,
-          true,
-        ],
+        expectedActiveStates: [true, false, true],
       );
 
       await tester.tap(find.byKey(const ValueKey(kTestButtonGoA)));
@@ -520,19 +430,11 @@ void main() {
 
       _checkPageInstances(
         tApp,
-        expectedPageInstanceNames: [
-          'TestNestedA',
-          'TestPageB',
-          'TestPageA',
-        ],
+        expectedPageInstanceNames: ['TestNestedA', 'TestPageB', 'TestPageA'],
         expectedNestedPageInstanceNames: {
           'TestNestedA': ['TestPageB', 'TestPageA'],
         },
-        expectedActiveStates: [
-          true,
-          false,
-          true,
-        ],
+        expectedActiveStates: [true, false, true],
       );
 
       await tester.tap(find.byKey(const ValueKey(kTestBackButton)));
@@ -541,17 +443,11 @@ void main() {
 
       _checkPageInstances(
         tApp,
-        expectedPageInstanceNames: [
-          'TestNestedA',
-          'TestPageB',
-        ],
+        expectedPageInstanceNames: ['TestNestedA', 'TestPageB'],
         expectedNestedPageInstanceNames: {
           'TestNestedA': ['TestPageB'],
         },
-        expectedActiveStates: [
-          true,
-          true,
-        ],
+        expectedActiveStates: [true, true],
       );
 
       // Since there is no history, Pop is not possible.
@@ -563,12 +459,14 @@ void main() {
     tApp.dispose();
   });
 
-  testWidgets('Standard Nested Page Test. SplashPage on Nested Navigator',
-      (WidgetTester tester) async {
+  testWidgets('Standard Nested Page Test. SplashPage on Nested Navigator', (
+    WidgetTester tester,
+  ) async {
     await _setTestDeviceSize(tester);
 
-    final tNavigatorMode =
-        TestNavigatorMode(StandardPageNavigationMode.moveToTop);
+    final tNavigatorMode = TestNavigatorMode(
+      StandardPageNavigationMode.moveToTop,
+    );
 
     final App tApp = createApp(
       environment: NoAutoProcessInitialRouteEnvironment(),
@@ -607,20 +505,12 @@ void main() {
 
       _checkPageInstances(
         tApp,
-        expectedPageInstanceNames: [
-          'TestNestedA',
-          'SplashPage',
-        ],
-        expectedRootPageInstanceNames: [
-          'TestNestedA',
-        ],
+        expectedPageInstanceNames: ['TestNestedA', 'SplashPage'],
+        expectedRootPageInstanceNames: ['TestNestedA'],
         expectedNestedPageInstanceNames: {
           'TestNestedA': ['SplashPage'],
         },
-        expectedActiveStates: [
-          true,
-          true,
-        ],
+        expectedActiveStates: [true, true],
       );
 
       await tApp.standardAppPlugin.delegate?.processInitialRoute();
@@ -628,32 +518,26 @@ void main() {
 
       _checkPageInstances(
         tApp,
-        expectedPageInstanceNames: [
-          'TestNestedA',
-          'TestPageB',
-        ],
-        expectedRootPageInstanceNames: [
-          'TestNestedA',
-        ],
+        expectedPageInstanceNames: ['TestNestedA', 'TestPageB'],
+        expectedRootPageInstanceNames: ['TestNestedA'],
         expectedNestedPageInstanceNames: {
           'TestNestedA': ['TestPageB'],
         },
-        expectedActiveStates: [
-          true,
-          true,
-        ],
+        expectedActiveStates: [true, true],
       );
     });
 
     tApp.dispose();
   });
 
-  testWidgets("Standard Nested Page Context StandardAppRouterContext Test",
-      (WidgetTester tester) async {
+  testWidgets("Standard Nested Page Context StandardAppRouterContext Test", (
+    WidgetTester tester,
+  ) async {
     await _setTestDeviceSize(tester);
 
-    final tNavigatorMode =
-        TestNavigatorMode(StandardPageNavigationMode.moveToTop);
+    final tNavigatorMode = TestNavigatorMode(
+      StandardPageNavigationMode.moveToTop,
+    );
 
     final App tApp = createApp(
       appWidget: Provider<TestNavigatorMode>.value(
@@ -707,28 +591,23 @@ void main() {
       final tRootPageInstances = tContext.rootPageInstances;
       final tNestedPageInstances = tContext.nestedPageInstances;
 
-      expect(
-        tPageInstances.map((e) => e.name),
-        [
-          'TestNestedA',
-          'TestPageA',
-          'TestPageB',
-          'TestNestedB',
-          'TestPageC',
-        ],
-      );
+      expect(tPageInstances.map((e) => e.name), [
+        'TestNestedA',
+        'TestPageA',
+        'TestPageB',
+        'TestNestedB',
+        'TestPageC',
+      ]);
+
+      expect(tRootPageInstances.map((e) => e.name), [
+        'TestNestedA',
+        'TestNestedB',
+      ]);
 
       expect(
-        tRootPageInstances.map((e) => e.name),
-        [
-          'TestNestedA',
-          'TestNestedB',
-        ],
-      );
-
-      expect(
-        tNestedPageInstances
-            .map((k, v) => MapEntry(k.name, v.map((e) => e.name).toList())),
+        tNestedPageInstances.map(
+          (k, v) => MapEntry(k.name, v.map((e) => e.name).toList()),
+        ),
         {
           'TestNestedA': ['TestPageA', 'TestPageB'],
           'TestNestedB': ['TestPageC'],
@@ -739,12 +618,14 @@ void main() {
     tApp.dispose();
   });
 
-  testWidgets('Standard Nested Page Test. check default nested page',
-      (WidgetTester tester) async {
+  testWidgets('Standard Nested Page Test. check default nested page', (
+    WidgetTester tester,
+  ) async {
     await _setTestDeviceSize(tester);
 
-    final tNavigatorMode =
-        TestNavigatorMode(StandardPageNavigationMode.moveToTop);
+    final tNavigatorMode = TestNavigatorMode(
+      StandardPageNavigationMode.moveToTop,
+    );
 
     final App tApp = createApp(
       appWidget: Provider<TestNavigatorMode>.value(
@@ -795,20 +676,12 @@ void main() {
 
       _checkPageInstances(
         tApp,
-        expectedPageInstanceNames: [
-          'TestNestedA',
-          'TestPageA',
-        ],
-        expectedRootPageInstanceNames: [
-          'TestNestedA',
-        ],
+        expectedPageInstanceNames: ['TestNestedA', 'TestPageA'],
+        expectedRootPageInstanceNames: ['TestNestedA'],
         expectedNestedPageInstanceNames: {
           'TestNestedA': ['TestPageA'],
         },
-        expectedActiveStates: [
-          true,
-          true,
-        ],
+        expectedActiveStates: [true, true],
       );
 
       await tester.tap(find.byKey(const ValueKey(kTestButtonGoE)));
@@ -825,22 +698,13 @@ void main() {
           'TestPageB',
           'TestPageE',
         ],
-        expectedRootPageInstanceNames: [
-          'TestNestedA',
-        ],
+        expectedRootPageInstanceNames: ['TestNestedA'],
         expectedNestedPageInstanceNames: {
           'TestNestedA': ['TestPageA', 'TestNestedB'],
           'TestNestedB': ['TestNestedC', 'TestPageE'],
           'TestNestedC': ['TestPageB'],
         },
-        expectedActiveStates: [
-          true,
-          false,
-          true,
-          false,
-          false,
-          true,
-        ],
+        expectedActiveStates: [true, false, true, false, false, true],
       );
 
       // When TestPageB is popped, TestNestedC is also popped, but since the root page of TestNestedB is TestNestedC, it is added again.
@@ -863,22 +727,13 @@ void main() {
           'TestPageB',
           'TestPageE',
         ],
-        expectedRootPageInstanceNames: [
-          'TestNestedA',
-        ],
+        expectedRootPageInstanceNames: ['TestNestedA'],
         expectedNestedPageInstanceNames: {
           'TestNestedA': ['TestPageA', 'TestNestedB'],
           'TestNestedB': ['TestNestedC', 'TestPageE'],
           'TestNestedC': ['TestPageB'],
         },
-        expectedActiveStates: [
-          true,
-          false,
-          true,
-          false,
-          false,
-          true,
-        ],
+        expectedActiveStates: [true, false, true, false, false, true],
       );
     });
 
@@ -886,210 +741,188 @@ void main() {
   });
 
   testWidgets(
-      'Standard Nested Page Context Go Test. Navigating to the same page as the current navigator page.',
-      (WidgetTester tester) async {
-    await _setTestDeviceSize(tester);
+    'Standard Nested Page Context Go Test. Navigating to the same page as the current navigator page.',
+    (WidgetTester tester) async {
+      await _setTestDeviceSize(tester);
 
-    final tNavigatorMode =
-        TestNavigatorMode(StandardPageNavigationMode.moveToTop);
+      final tNavigatorMode = TestNavigatorMode(
+        StandardPageNavigationMode.moveToTop,
+      );
 
-    final App tApp = createApp(
-      appWidget: Provider<TestNavigatorMode>.value(
-        value: tNavigatorMode,
-        child: StandardMaterialApp(
-          onGenerateTitle: (context) => 'Generate Test Title',
-          pages: [
-            StandardPageWithNestedNavigatorFactory<TestNestedA>(
-              create: (data) => TestNestedA(),
-              nestedPageFactories: [
-                StandardPageWithNestedNavigatorFactory<TestNestedB>(
-                  create: (data) => TestNestedB(),
-                  nestedPageFactories: [
-                    StandardPageFactory<TestPageA, void>(
-                      create: (data) => TestPageA(),
-                    ),
-                    StandardPageFactory<TestPageB, void>(
-                      create: (data) => TestPageB(),
-                    ),
-                  ],
-                ),
-                StandardPageWithNestedNavigatorFactory<TestNestedC>(
-                  create: (data) => TestNestedC(),
-                  nestedPageFactories: [
-                    StandardPageFactory<TestPageC, void>(
-                      create: (data) => TestPageC(),
-                    ),
-                    StandardPageFactory<TestPageD, void>(
-                      create: (data) => TestPageD(),
-                    ),
-                    StandardPageFactory<TestPageE, void>(
-                      create: (data) => TestPageE(),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ],
+      final App tApp = createApp(
+        appWidget: Provider<TestNavigatorMode>.value(
+          value: tNavigatorMode,
+          child: StandardMaterialApp(
+            onGenerateTitle: (context) => 'Generate Test Title',
+            pages: [
+              StandardPageWithNestedNavigatorFactory<TestNestedA>(
+                create: (data) => TestNestedA(),
+                nestedPageFactories: [
+                  StandardPageWithNestedNavigatorFactory<TestNestedB>(
+                    create: (data) => TestNestedB(),
+                    nestedPageFactories: [
+                      StandardPageFactory<TestPageA, void>(
+                        create: (data) => TestPageA(),
+                      ),
+                      StandardPageFactory<TestPageB, void>(
+                        create: (data) => TestPageB(),
+                      ),
+                    ],
+                  ),
+                  StandardPageWithNestedNavigatorFactory<TestNestedC>(
+                    create: (data) => TestNestedC(),
+                    nestedPageFactories: [
+                      StandardPageFactory<TestPageC, void>(
+                        create: (data) => TestPageC(),
+                      ),
+                      StandardPageFactory<TestPageD, void>(
+                        create: (data) => TestPageD(),
+                      ),
+                      StandardPageFactory<TestPageE, void>(
+                        create: (data) => TestPageE(),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
-      ),
-    );
-
-    await tApp.run();
-
-    await tApp.runProcess(() async {
-      await tester.pumpAndSettle();
-      expect(find.text('Test Title'), findsOneWidget);
-
-      await tester.tap(find.byKey(const ValueKey(kTestButtonGoB)));
-      await tester.pumpAndSettle();
-      expect(find.text('Test Title B'), findsOneWidget);
-
-      await tester.tap(find.byKey(const ValueKey(kTestButtonGoC)));
-      await tester.pumpAndSettle();
-      expect(find.text('Test Title C'), findsOneWidget);
-
-      await tester.tap(find.byKey(const ValueKey(kTestButtonGoD)));
-      await tester.pumpAndSettle();
-      expect(find.text('Test Title D'), findsOneWidget);
-
-      await tester.tap(find.byKey(const ValueKey(kTestButtonGoE)));
-      await tester.pumpAndSettle();
-      expect(find.text('Test Title E'), findsOneWidget);
-
-      _checkPageInstances(
-        tApp,
-        expectedPageInstanceNames: [
-          'TestNestedA',
-          'TestNestedB',
-          'TestPageA',
-          'TestPageB',
-          'TestNestedC',
-          'TestPageC',
-          'TestPageD',
-          'TestPageE',
-        ],
-        expectedRootPageInstanceNames: [
-          'TestNestedA',
-        ],
-        expectedNestedPageInstanceNames: {
-          'TestNestedA': ['TestNestedB', 'TestNestedC'],
-          'TestNestedB': ['TestPageA', 'TestPageB'],
-          'TestNestedC': ['TestPageC', 'TestPageD', 'TestPageE'],
-        },
-        expectedActiveStates: [
-          true,
-          false,
-          false,
-          false,
-          true,
-          false,
-          false,
-          true,
-        ],
       );
 
-      await tester.tap(find.byKey(const ValueKey(kTestButtonGoNC)));
-      await tester.pumpAndSettle();
-      expect(find.text('Test Title C'), findsOneWidget);
+      await tApp.run();
 
-      _checkPageInstances(
-        tApp,
-        expectedPageInstanceNames: [
-          'TestNestedA',
-          'TestNestedB',
-          'TestPageA',
-          'TestPageB',
-          'TestNestedC',
-          'TestPageC',
-        ],
-        expectedRootPageInstanceNames: [
-          'TestNestedA',
-        ],
-        expectedNestedPageInstanceNames: {
-          'TestNestedA': ['TestNestedB', 'TestNestedC'],
-          'TestNestedB': ['TestPageA', 'TestPageB'],
-          'TestNestedC': ['TestPageC'],
-        },
-        expectedActiveStates: [
-          true,
-          false,
-          false,
-          false,
-          true,
-          true,
-        ],
-      );
+      await tApp.runProcess(() async {
+        await tester.pumpAndSettle();
+        expect(find.text('Test Title'), findsOneWidget);
 
-      await tester.tap(find.byKey(const ValueKey(kTestButtonGoNC)));
-      await tester.pumpAndSettle();
-      expect(find.text('Test Title C'), findsOneWidget);
+        await tester.tap(find.byKey(const ValueKey(kTestButtonGoB)));
+        await tester.pumpAndSettle();
+        expect(find.text('Test Title B'), findsOneWidget);
 
-      _checkPageInstances(
-        tApp,
-        expectedPageInstanceNames: [
-          'TestNestedA',
-          'TestNestedB',
-          'TestPageA',
-          'TestPageB',
-          'TestNestedC',
-          'TestPageC',
-        ],
-        expectedRootPageInstanceNames: [
-          'TestNestedA',
-        ],
-        expectedNestedPageInstanceNames: {
-          'TestNestedA': ['TestNestedB', 'TestNestedC'],
-          'TestNestedB': ['TestPageA', 'TestPageB'],
-          'TestNestedC': ['TestPageC'],
-        },
-        expectedActiveStates: [
-          true,
-          false,
-          false,
-          false,
-          true,
-          true,
-        ],
-      );
+        await tester.tap(find.byKey(const ValueKey(kTestButtonGoC)));
+        await tester.pumpAndSettle();
+        expect(find.text('Test Title C'), findsOneWidget);
 
-      await tester.tap(find.byKey(const ValueKey(kTestButtonGoNA)));
-      await tester.pumpAndSettle();
-      expect(find.text('Test Title'), findsOneWidget);
+        await tester.tap(find.byKey(const ValueKey(kTestButtonGoD)));
+        await tester.pumpAndSettle();
+        expect(find.text('Test Title D'), findsOneWidget);
 
-      _checkPageInstances(
-        tApp,
-        expectedPageInstanceNames: [
-          'TestNestedA',
-          'TestNestedB',
-          'TestPageA',
-        ],
-        expectedRootPageInstanceNames: [
-          'TestNestedA',
-        ],
-        expectedNestedPageInstanceNames: {
-          'TestNestedA': ['TestNestedB'],
-          'TestNestedB': ['TestPageA'],
-        },
-        expectedActiveStates: [
-          true,
-          true,
-          true,
-        ],
-      );
-    });
+        await tester.tap(find.byKey(const ValueKey(kTestButtonGoE)));
+        await tester.pumpAndSettle();
+        expect(find.text('Test Title E'), findsOneWidget);
 
-    tApp.dispose();
-  });
+        _checkPageInstances(
+          tApp,
+          expectedPageInstanceNames: [
+            'TestNestedA',
+            'TestNestedB',
+            'TestPageA',
+            'TestPageB',
+            'TestNestedC',
+            'TestPageC',
+            'TestPageD',
+            'TestPageE',
+          ],
+          expectedRootPageInstanceNames: ['TestNestedA'],
+          expectedNestedPageInstanceNames: {
+            'TestNestedA': ['TestNestedB', 'TestNestedC'],
+            'TestNestedB': ['TestPageA', 'TestPageB'],
+            'TestNestedC': ['TestPageC', 'TestPageD', 'TestPageE'],
+          },
+          expectedActiveStates: [
+            true,
+            false,
+            false,
+            false,
+            true,
+            false,
+            false,
+            true,
+          ],
+        );
+
+        await tester.tap(find.byKey(const ValueKey(kTestButtonGoNC)));
+        await tester.pumpAndSettle();
+        expect(find.text('Test Title C'), findsOneWidget);
+
+        _checkPageInstances(
+          tApp,
+          expectedPageInstanceNames: [
+            'TestNestedA',
+            'TestNestedB',
+            'TestPageA',
+            'TestPageB',
+            'TestNestedC',
+            'TestPageC',
+          ],
+          expectedRootPageInstanceNames: ['TestNestedA'],
+          expectedNestedPageInstanceNames: {
+            'TestNestedA': ['TestNestedB', 'TestNestedC'],
+            'TestNestedB': ['TestPageA', 'TestPageB'],
+            'TestNestedC': ['TestPageC'],
+          },
+          expectedActiveStates: [true, false, false, false, true, true],
+        );
+
+        await tester.tap(find.byKey(const ValueKey(kTestButtonGoNC)));
+        await tester.pumpAndSettle();
+        expect(find.text('Test Title C'), findsOneWidget);
+
+        _checkPageInstances(
+          tApp,
+          expectedPageInstanceNames: [
+            'TestNestedA',
+            'TestNestedB',
+            'TestPageA',
+            'TestPageB',
+            'TestNestedC',
+            'TestPageC',
+          ],
+          expectedRootPageInstanceNames: ['TestNestedA'],
+          expectedNestedPageInstanceNames: {
+            'TestNestedA': ['TestNestedB', 'TestNestedC'],
+            'TestNestedB': ['TestPageA', 'TestPageB'],
+            'TestNestedC': ['TestPageC'],
+          },
+          expectedActiveStates: [true, false, false, false, true, true],
+        );
+
+        await tester.tap(find.byKey(const ValueKey(kTestButtonGoNA)));
+        await tester.pumpAndSettle();
+        expect(find.text('Test Title'), findsOneWidget);
+
+        _checkPageInstances(
+          tApp,
+          expectedPageInstanceNames: [
+            'TestNestedA',
+            'TestNestedB',
+            'TestPageA',
+          ],
+          expectedRootPageInstanceNames: ['TestNestedA'],
+          expectedNestedPageInstanceNames: {
+            'TestNestedA': ['TestNestedB'],
+            'TestNestedB': ['TestPageA'],
+          },
+          expectedActiveStates: [true, true, true],
+        );
+      });
+
+      tApp.dispose();
+    },
+  );
 
   group('Standard Nested Page Test. popGestureEnabled', () {
     // Assuming Android's predictive back gesture, check the state of popGestureEnabled.
     // The back gesture is enabled only when both isCurrent and popGestureEnabled of the Route are true.
-    testWidgets('Standard Nested Page Test. popGestureEnabled pattern 1',
-        (WidgetTester tester) async {
+    testWidgets('Standard Nested Page Test. popGestureEnabled pattern 1', (
+      WidgetTester tester,
+    ) async {
       await _setTestDeviceSize(tester);
 
-      final tNavigatorMode =
-          TestNavigatorMode(StandardPageNavigationMode.moveToTop);
+      final tNavigatorMode = TestNavigatorMode(
+        StandardPageNavigationMode.moveToTop,
+      );
 
       final App tApp = createApp(
         appWidget: Provider<TestNavigatorMode>.value(
@@ -1154,146 +987,128 @@ void main() {
             .map((e) => ModalRoute.of(e.standardPageKey.currentContext!)!)
             .toList();
 
-        expect(
-          tRouteList.map((e) => (e.isCurrent, e.popGestureEnabled)),
-          [
-            // TestNestedA
-            (false, false),
-            // TestPageA
-            (false, false),
-            // TestPageB
-            (true, false),
-            // TestNestedB
-            (true, true),
-            // TestPageC
-            (true, false),
-          ],
-        );
+        expect(tRouteList.map((e) => (e.isCurrent, e.popGestureEnabled)), [
+          // TestNestedA
+          (false, false),
+          // TestPageA
+          (false, false),
+          // TestPageB
+          (true, false),
+          // TestNestedB
+          (true, true),
+          // TestPageC
+          (true, false),
+        ]);
 
         // The root navigator's current is TestNestedA, the current within TestNestedA is TestPageB, and the current within TestNestedB is TestPageC.
         await tester.tap(find.byKey(const ValueKey(kTestButtonGoNA)));
         await tester.pumpAndSettle();
         expect(find.text('Test Title B'), findsOneWidget);
 
-        expect(
-          tRouteList.map((e) => (e.isCurrent, e.popGestureEnabled)),
-          [
-            (true, false),
-            (false, false),
-            (true, true),
-            (false, false),
-            (true, false),
-          ],
-        );
+        expect(tRouteList.map((e) => (e.isCurrent, e.popGestureEnabled)), [
+          (true, false),
+          (false, false),
+          (true, true),
+          (false, false),
+          (true, false),
+        ]);
 
         // The root navigator's current is Dialog, the current within TestNestedA is TestPageB, and the current within TestNestedB is TestPageC.
         await tester.tap(find.byKey(const ValueKey(kTestButtonShowDialogRoot)));
         await tester.pumpAndSettle();
 
-        expect(
-          tRouteList.map((e) => (e.isCurrent, e.popGestureEnabled)),
-          [
-            (false, false),
-            (false, false),
-            (true, false),
-            (false, false),
-            (true, false),
-          ],
-        );
+        expect(tRouteList.map((e) => (e.isCurrent, e.popGestureEnabled)), [
+          (false, false),
+          (false, false),
+          (true, false),
+          (false, false),
+          (true, false),
+        ]);
 
         await tester.tap(find.byKey(const ValueKey(kTestButtonDialogPop)));
         await tester.pumpAndSettle();
 
-        expect(
-          tRouteList.map((e) => (e.isCurrent, e.popGestureEnabled)),
-          [
-            (true, false),
-            (false, false),
-            (true, true),
-            (false, false),
-            (true, false),
-          ],
-        );
+        expect(tRouteList.map((e) => (e.isCurrent, e.popGestureEnabled)), [
+          (true, false),
+          (false, false),
+          (true, true),
+          (false, false),
+          (true, false),
+        ]);
 
         // When executing removeRoute instead of Pop.
         await tester.tap(find.byKey(const ValueKey(kTestButtonShowDialogRoot)));
         await tester.pumpAndSettle();
 
-        await tester
-            .tap(find.byKey(const ValueKey(kTestButtonDialogRemoveRoute)));
+        await tester.tap(
+          find.byKey(const ValueKey(kTestButtonDialogRemoveRoute)),
+        );
         await tester.pumpAndSettle();
 
-        expect(
-          tRouteList.map((e) => (e.isCurrent, e.popGestureEnabled)),
-          [
-            (true, false),
-            (false, false),
-            (true, true),
-            (false, false),
-            (true, false),
-          ],
-        );
+        expect(tRouteList.map((e) => (e.isCurrent, e.popGestureEnabled)), [
+          (true, false),
+          (false, false),
+          (true, true),
+          (false, false),
+          (true, false),
+        ]);
 
         // The root navigator's current is TestNestedA, the current within TestNestedA is Dialog, and the current within TestNestedB is TestPageC.
-        await tester
-            .tap(find.byKey(const ValueKey(kTestButtonShowDialogCurrent)));
+        await tester.tap(
+          find.byKey(const ValueKey(kTestButtonShowDialogCurrent)),
+        );
         await tester.pumpAndSettle();
 
-        expect(
-          tRouteList.map((e) => (e.isCurrent, e.popGestureEnabled)),
-          [
-            (true, false),
-            (false, false),
-            (false, true),
-            (false, false),
-            (true, false),
-          ],
-        );
+        expect(tRouteList.map((e) => (e.isCurrent, e.popGestureEnabled)), [
+          (true, false),
+          (false, false),
+          (false, true),
+          (false, false),
+          (true, false),
+        ]);
 
         await tester.tap(find.byKey(const ValueKey(kTestButtonDialogPop)));
         await tester.pumpAndSettle();
 
-        expect(
-          tRouteList.map((e) => (e.isCurrent, e.popGestureEnabled)),
-          [
-            (true, false),
-            (false, false),
-            (true, true),
-            (false, false),
-            (true, false),
-          ],
-        );
+        expect(tRouteList.map((e) => (e.isCurrent, e.popGestureEnabled)), [
+          (true, false),
+          (false, false),
+          (true, true),
+          (false, false),
+          (true, false),
+        ]);
 
         // When executing removeRoute instead of Pop.
-        await tester
-            .tap(find.byKey(const ValueKey(kTestButtonShowDialogCurrent)));
-        await tester.pumpAndSettle();
-
-        await tester
-            .tap(find.byKey(const ValueKey(kTestButtonDialogRemoveRoute)));
-        await tester.pumpAndSettle();
-
-        expect(
-          tRouteList.map((e) => (e.isCurrent, e.popGestureEnabled)),
-          [
-            (true, false),
-            (false, false),
-            (true, true),
-            (false, false),
-            (true, false),
-          ],
+        await tester.tap(
+          find.byKey(const ValueKey(kTestButtonShowDialogCurrent)),
         );
+        await tester.pumpAndSettle();
+
+        await tester.tap(
+          find.byKey(const ValueKey(kTestButtonDialogRemoveRoute)),
+        );
+        await tester.pumpAndSettle();
+
+        expect(tRouteList.map((e) => (e.isCurrent, e.popGestureEnabled)), [
+          (true, false),
+          (false, false),
+          (true, true),
+          (false, false),
+          (true, false),
+        ]);
       });
 
       tApp.dispose();
     });
 
-    testWidgets('Standard Nested Page Test. popGestureEnabled pattern 2',
-        (WidgetTester tester) async {
+    testWidgets('Standard Nested Page Test. popGestureEnabled pattern 2', (
+      WidgetTester tester,
+    ) async {
       await _setTestDeviceSize(tester);
 
-      final tNavigatorMode =
-          TestNavigatorMode(StandardPageNavigationMode.moveToTop);
+      final tNavigatorMode = TestNavigatorMode(
+        StandardPageNavigationMode.moveToTop,
+      );
 
       final App tApp = createApp(
         appWidget: Provider<TestNavigatorMode>.value(
@@ -1365,140 +1180,125 @@ void main() {
             .map((e) => ModalRoute.of(e.standardPageKey.currentContext!)!)
             .toList();
 
-        expect(
-          tRouteList.map((e) => (e.isCurrent, e.popGestureEnabled)),
-          [
-            // TestNestedA
-            (true, false),
-            // TestNestedB
-            (false, false),
-            // TestPageA
-            (false, false),
-            // TestPageB
-            (true, false),
-            // TestNestedC
-            (true, true),
-            // TestPageC
-            (true, false),
-          ],
-        );
+        expect(tRouteList.map((e) => (e.isCurrent, e.popGestureEnabled)), [
+          // TestNestedA
+          (true, false),
+          // TestNestedB
+          (false, false),
+          // TestPageA
+          (false, false),
+          // TestPageB
+          (true, false),
+          // TestNestedC
+          (true, true),
+          // TestPageC
+          (true, false),
+        ]);
 
         // The root navigator's current is Dialog, the current within TestNestedA is TestNestedC, and the current within TestNestedC is TestPageC.
         // Also, the current within TestNestedB is TestPageB.
         await tester.tap(find.byKey(const ValueKey(kTestButtonShowDialogRoot)));
         await tester.pumpAndSettle();
 
-        expect(
-          tRouteList.map((e) => (e.isCurrent, e.popGestureEnabled)),
-          [
-            (false, false),
-            (false, false),
-            (false, false),
-            (true, false),
-            (true, false),
-            (true, false),
-          ],
-        );
+        expect(tRouteList.map((e) => (e.isCurrent, e.popGestureEnabled)), [
+          (false, false),
+          (false, false),
+          (false, false),
+          (true, false),
+          (true, false),
+          (true, false),
+        ]);
 
         await tester.tap(find.byKey(const ValueKey(kTestButtonDialogPop)));
         await tester.pumpAndSettle();
 
-        expect(
-          tRouteList.map((e) => (e.isCurrent, e.popGestureEnabled)),
-          [
-            (true, false),
-            (false, false),
-            (false, false),
-            (true, false),
-            (true, true),
-            (true, false),
-          ],
-        );
+        expect(tRouteList.map((e) => (e.isCurrent, e.popGestureEnabled)), [
+          (true, false),
+          (false, false),
+          (false, false),
+          (true, false),
+          (true, true),
+          (true, false),
+        ]);
 
         // When executing removeRoute instead of Pop.
         await tester.tap(find.byKey(const ValueKey(kTestButtonShowDialogRoot)));
         await tester.pumpAndSettle();
 
-        await tester
-            .tap(find.byKey(const ValueKey(kTestButtonDialogRemoveRoute)));
+        await tester.tap(
+          find.byKey(const ValueKey(kTestButtonDialogRemoveRoute)),
+        );
         await tester.pumpAndSettle();
 
-        expect(
-          tRouteList.map((e) => (e.isCurrent, e.popGestureEnabled)),
-          [
-            (true, false),
-            (false, false),
-            (false, false),
-            (true, false),
-            (true, true),
-            (true, false),
-          ],
-        );
+        expect(tRouteList.map((e) => (e.isCurrent, e.popGestureEnabled)), [
+          (true, false),
+          (false, false),
+          (false, false),
+          (true, false),
+          (true, true),
+          (true, false),
+        ]);
 
         // The root navigator's current is TestNestedA, the current within TestNestedA is TestNestedC, and the current within TestNestedC is Dialog.
         // Also, the current within TestNestedB is TestPageB.
-        await tester
-            .tap(find.byKey(const ValueKey(kTestButtonShowDialogCurrent)));
+        await tester.tap(
+          find.byKey(const ValueKey(kTestButtonShowDialogCurrent)),
+        );
         await tester.pumpAndSettle();
 
-        expect(
-          tRouteList.map((e) => (e.isCurrent, e.popGestureEnabled)),
-          [
-            (true, false),
-            (false, false),
-            (false, false),
-            (true, false),
-            (true, false),
-            (false, false),
-          ],
-        );
+        expect(tRouteList.map((e) => (e.isCurrent, e.popGestureEnabled)), [
+          (true, false),
+          (false, false),
+          (false, false),
+          (true, false),
+          (true, false),
+          (false, false),
+        ]);
 
         await tester.tap(find.byKey(const ValueKey(kTestButtonDialogPop)));
         await tester.pumpAndSettle();
 
-        expect(
-          tRouteList.map((e) => (e.isCurrent, e.popGestureEnabled)),
-          [
-            (true, false),
-            (false, false),
-            (false, false),
-            (true, false),
-            (true, true),
-            (true, false),
-          ],
-        );
+        expect(tRouteList.map((e) => (e.isCurrent, e.popGestureEnabled)), [
+          (true, false),
+          (false, false),
+          (false, false),
+          (true, false),
+          (true, true),
+          (true, false),
+        ]);
 
         // When executing removeRoute instead of Pop.
-        await tester
-            .tap(find.byKey(const ValueKey(kTestButtonShowDialogCurrent)));
-        await tester.pumpAndSettle();
-
-        await tester
-            .tap(find.byKey(const ValueKey(kTestButtonDialogRemoveRoute)));
-        await tester.pumpAndSettle();
-
-        expect(
-          tRouteList.map((e) => (e.isCurrent, e.popGestureEnabled)),
-          [
-            (true, false),
-            (false, false),
-            (false, false),
-            (true, false),
-            (true, true),
-            (true, false),
-          ],
+        await tester.tap(
+          find.byKey(const ValueKey(kTestButtonShowDialogCurrent)),
         );
+        await tester.pumpAndSettle();
+
+        await tester.tap(
+          find.byKey(const ValueKey(kTestButtonDialogRemoveRoute)),
+        );
+        await tester.pumpAndSettle();
+
+        expect(tRouteList.map((e) => (e.isCurrent, e.popGestureEnabled)), [
+          (true, false),
+          (false, false),
+          (false, false),
+          (true, false),
+          (true, true),
+          (true, false),
+        ]);
       });
 
       tApp.dispose();
     });
 
-    testWidgets('Standard Nested Page Test. popGestureEnabled pattern 3',
-        (WidgetTester tester) async {
+    testWidgets('Standard Nested Page Test. popGestureEnabled pattern 3', (
+      WidgetTester tester,
+    ) async {
       await _setTestDeviceSize(tester);
 
-      final tNavigatorMode =
-          TestNavigatorMode(StandardPageNavigationMode.moveToTop);
+      final tNavigatorMode = TestNavigatorMode(
+        StandardPageNavigationMode.moveToTop,
+      );
 
       final App tApp = createApp(
         appWidget: Provider<TestNavigatorMode>.value(
@@ -1547,114 +1347,99 @@ void main() {
             .map((e) => ModalRoute.of(e.standardPageKey.currentContext!)!)
             .toList();
 
-        expect(
-          tRouteList.map((e) => (e.isCurrent, e.popGestureEnabled)),
-          [
-            // TestNestedA
-            (true, false),
-            // TestNestedB
-            (true, false),
-            // TestPageA
-            (true, false),
-          ],
-        );
+        expect(tRouteList.map((e) => (e.isCurrent, e.popGestureEnabled)), [
+          // TestNestedA
+          (true, false),
+          // TestNestedB
+          (true, false),
+          // TestPageA
+          (true, false),
+        ]);
 
         // The root navigator's current is Dialog, the current within TestNestedA is TestNestedB, and the current within TestNestedB is TestPageA.
         await tester.tap(find.byKey(const ValueKey(kTestButtonShowDialogRoot)));
         await tester.pumpAndSettle();
 
-        expect(
-          tRouteList.map((e) => (e.isCurrent, e.popGestureEnabled)),
-          [
-            (false, false),
-            (true, false),
-            (true, false),
-          ],
-        );
+        expect(tRouteList.map((e) => (e.isCurrent, e.popGestureEnabled)), [
+          (false, false),
+          (true, false),
+          (true, false),
+        ]);
 
         await tester.tap(find.byKey(const ValueKey(kTestButtonDialogPop)));
         await tester.pumpAndSettle();
 
-        expect(
-          tRouteList.map((e) => (e.isCurrent, e.popGestureEnabled)),
-          [
-            (true, false),
-            (true, false),
-            (true, false),
-          ],
-        );
+        expect(tRouteList.map((e) => (e.isCurrent, e.popGestureEnabled)), [
+          (true, false),
+          (true, false),
+          (true, false),
+        ]);
 
         // When executing removeRoute instead of Pop.
         await tester.tap(find.byKey(const ValueKey(kTestButtonShowDialogRoot)));
         await tester.pumpAndSettle();
 
-        await tester
-            .tap(find.byKey(const ValueKey(kTestButtonDialogRemoveRoute)));
+        await tester.tap(
+          find.byKey(const ValueKey(kTestButtonDialogRemoveRoute)),
+        );
         await tester.pumpAndSettle();
 
-        expect(
-          tRouteList.map((e) => (e.isCurrent, e.popGestureEnabled)),
-          [
-            (true, false),
-            (true, false),
-            (true, false),
-          ],
-        );
+        expect(tRouteList.map((e) => (e.isCurrent, e.popGestureEnabled)), [
+          (true, false),
+          (true, false),
+          (true, false),
+        ]);
 
         // The root navigator's current is TestNestedA, the current within TestNestedA is TestNestedB, and the current within TestNestedB is Dialog.
-        await tester
-            .tap(find.byKey(const ValueKey(kTestButtonShowDialogCurrent)));
+        await tester.tap(
+          find.byKey(const ValueKey(kTestButtonShowDialogCurrent)),
+        );
         await tester.pumpAndSettle();
 
-        expect(
-          tRouteList.map((e) => (e.isCurrent, e.popGestureEnabled)),
-          [
-            (true, false),
-            (true, false),
-            (false, false),
-          ],
-        );
+        expect(tRouteList.map((e) => (e.isCurrent, e.popGestureEnabled)), [
+          (true, false),
+          (true, false),
+          (false, false),
+        ]);
 
         await tester.tap(find.byKey(const ValueKey(kTestButtonDialogPop)));
         await tester.pumpAndSettle();
 
-        expect(
-          tRouteList.map((e) => (e.isCurrent, e.popGestureEnabled)),
-          [
-            (true, false),
-            (true, false),
-            (true, false),
-          ],
-        );
+        expect(tRouteList.map((e) => (e.isCurrent, e.popGestureEnabled)), [
+          (true, false),
+          (true, false),
+          (true, false),
+        ]);
 
         // When executing removeRoute instead of Pop.
-        await tester
-            .tap(find.byKey(const ValueKey(kTestButtonShowDialogCurrent)));
-        await tester.pumpAndSettle();
-
-        await tester
-            .tap(find.byKey(const ValueKey(kTestButtonDialogRemoveRoute)));
-        await tester.pumpAndSettle();
-
-        expect(
-          tRouteList.map((e) => (e.isCurrent, e.popGestureEnabled)),
-          [
-            (true, false),
-            (true, false),
-            (true, false),
-          ],
+        await tester.tap(
+          find.byKey(const ValueKey(kTestButtonShowDialogCurrent)),
         );
+        await tester.pumpAndSettle();
+
+        await tester.tap(
+          find.byKey(const ValueKey(kTestButtonDialogRemoveRoute)),
+        );
+        await tester.pumpAndSettle();
+
+        expect(tRouteList.map((e) => (e.isCurrent, e.popGestureEnabled)), [
+          (true, false),
+          (true, false),
+          (true, false),
+        ]);
       });
 
       tApp.dispose();
     });
 
-    testWidgets('Standard Nested Page Test. popGestureEnabled pattern 4',
-        (WidgetTester tester) async {
+    testWidgets('Standard Nested Page Test. popGestureEnabled pattern 4', (
+      WidgetTester tester,
+    ) async {
       await _setTestDeviceSize(tester);
 
-      final tNavigatorMode =
-          TestNavigatorMode(StandardPageNavigationMode.moveToTop);
+      final tNavigatorMode = TestNavigatorMode(
+        StandardPageNavigationMode.moveToTop,
+      );
 
       final App tApp = createApp(
         appWidget: Provider<TestNavigatorMode>.value(
@@ -1673,39 +1458,40 @@ void main() {
                   ),
                   StandardPageFactory<TestCustomPageA, void>(
                     create: (data) => TestCustomPageA(),
-                    pageBuilder: (
-                      child,
-                      name,
-                      pageData,
-                      pageKey,
-                      restorationId,
-                      standardPageKey,
-                      factoryObject,
-                    ) =>
-                        StandardCustomPage(
-                      name: 'Test Custom Standard Page',
-                      key: const ValueKey('test-custom-key'),
-                      restorationId: 'custom-restorationId',
-                      standardPageKey: standardPageKey,
-                      factoryObject: factoryObject,
-                      barrierColor: Colors.blueAccent,
-                      child: Column(
-                        children: [
-                          Expanded(child: child),
-                          const Text('add-custom-standard-page-widget'),
-                        ],
-                      ),
-                      transitionDuration: const Duration(milliseconds: 500),
-                      transitionBuilder:
-                          (context, animation, secondaryAnimation, child) {
-                        return SlideTransition(
-                          position: Tween<Offset>(
-                                  begin: const Offset(0, 1), end: Offset.zero)
-                              .animate(animation),
-                          child: child,
-                        );
-                      },
-                    ),
+                    pageBuilder:
+                        (
+                          child,
+                          name,
+                          pageData,
+                          pageKey,
+                          restorationId,
+                          standardPageKey,
+                          factoryObject,
+                        ) => StandardCustomPage(
+                          name: 'Test Custom Standard Page',
+                          key: const ValueKey('test-custom-key'),
+                          restorationId: 'custom-restorationId',
+                          standardPageKey: standardPageKey,
+                          factoryObject: factoryObject,
+                          barrierColor: Colors.blueAccent,
+                          child: Column(
+                            children: [
+                              Expanded(child: child),
+                              const Text('add-custom-standard-page-widget'),
+                            ],
+                          ),
+                          transitionDuration: const Duration(milliseconds: 500),
+                          transitionBuilder:
+                              (context, animation, secondaryAnimation, child) {
+                                return SlideTransition(
+                                  position: Tween<Offset>(
+                                    begin: const Offset(0, 1),
+                                    end: Offset.zero,
+                                  ).animate(animation),
+                                  child: child,
+                                );
+                              },
+                        ),
                   ),
                 ],
               ),
@@ -1741,103 +1527,86 @@ void main() {
             .map((e) => ModalRoute.of(e.standardPageKey.currentContext!)!)
             .toList();
 
-        expect(
-          tRouteList.map((e) => (e.isCurrent, e.popGestureEnabled)),
-          [
-            // TestNestedA
-            (true, false),
-            // TestPageA
-            (false, false),
-            // TestCustomPageA
-            (true, true),
-          ],
-        );
+        expect(tRouteList.map((e) => (e.isCurrent, e.popGestureEnabled)), [
+          // TestNestedA
+          (true, false),
+          // TestPageA
+          (false, false),
+          // TestCustomPageA
+          (true, true),
+        ]);
 
         // The root navigator's current is Dialog, the current within TestNestedA is TestCustomPageA.
         await tester.tap(find.byKey(const ValueKey(kTestButtonShowDialogRoot)));
         await tester.pumpAndSettle();
 
-        expect(
-          tRouteList.map((e) => (e.isCurrent, e.popGestureEnabled)),
-          [
-            (false, false),
-            (false, false),
-            (true, false),
-          ],
-        );
+        expect(tRouteList.map((e) => (e.isCurrent, e.popGestureEnabled)), [
+          (false, false),
+          (false, false),
+          (true, false),
+        ]);
 
         await tester.tap(find.byKey(const ValueKey(kTestButtonDialogPop)));
         await tester.pumpAndSettle();
 
-        expect(
-          tRouteList.map((e) => (e.isCurrent, e.popGestureEnabled)),
-          [
-            (true, false),
-            (false, false),
-            (true, true),
-          ],
-        );
+        expect(tRouteList.map((e) => (e.isCurrent, e.popGestureEnabled)), [
+          (true, false),
+          (false, false),
+          (true, true),
+        ]);
 
         // When executing removeRoute instead of Pop.
         await tester.tap(find.byKey(const ValueKey(kTestButtonShowDialogRoot)));
         await tester.pumpAndSettle();
 
-        await tester
-            .tap(find.byKey(const ValueKey(kTestButtonDialogRemoveRoute)));
+        await tester.tap(
+          find.byKey(const ValueKey(kTestButtonDialogRemoveRoute)),
+        );
         await tester.pumpAndSettle();
 
-        expect(
-          tRouteList.map((e) => (e.isCurrent, e.popGestureEnabled)),
-          [
-            (true, false),
-            (false, false),
-            (true, true),
-          ],
-        );
+        expect(tRouteList.map((e) => (e.isCurrent, e.popGestureEnabled)), [
+          (true, false),
+          (false, false),
+          (true, true),
+        ]);
 
         // The root navigator's current is TestNestedA, the current within TestNestedA is Dialog.
-        await tester
-            .tap(find.byKey(const ValueKey(kTestButtonShowDialogCurrent)));
+        await tester.tap(
+          find.byKey(const ValueKey(kTestButtonShowDialogCurrent)),
+        );
         await tester.pumpAndSettle();
 
-        expect(
-          tRouteList.map((e) => (e.isCurrent, e.popGestureEnabled)),
-          [
-            (true, false),
-            (false, false),
-            (false, true),
-          ],
-        );
+        expect(tRouteList.map((e) => (e.isCurrent, e.popGestureEnabled)), [
+          (true, false),
+          (false, false),
+          (false, true),
+        ]);
 
         await tester.tap(find.byKey(const ValueKey(kTestButtonDialogPop)));
         await tester.pumpAndSettle();
 
-        expect(
-          tRouteList.map((e) => (e.isCurrent, e.popGestureEnabled)),
-          [
-            (true, false),
-            (false, false),
-            (true, true),
-          ],
-        );
+        expect(tRouteList.map((e) => (e.isCurrent, e.popGestureEnabled)), [
+          (true, false),
+          (false, false),
+          (true, true),
+        ]);
 
         // When executing removeRoute instead of Pop.
-        await tester
-            .tap(find.byKey(const ValueKey(kTestButtonShowDialogCurrent)));
-        await tester.pumpAndSettle();
-
-        await tester
-            .tap(find.byKey(const ValueKey(kTestButtonDialogRemoveRoute)));
-        await tester.pumpAndSettle();
-
-        expect(
-          tRouteList.map((e) => (e.isCurrent, e.popGestureEnabled)),
-          [
-            (true, false),
-            (false, false),
-            (true, true),
-          ],
+        await tester.tap(
+          find.byKey(const ValueKey(kTestButtonShowDialogCurrent)),
         );
+        await tester.pumpAndSettle();
+
+        await tester.tap(
+          find.byKey(const ValueKey(kTestButtonDialogRemoveRoute)),
+        );
+        await tester.pumpAndSettle();
+
+        expect(tRouteList.map((e) => (e.isCurrent, e.popGestureEnabled)), [
+          (true, false),
+          (false, false),
+          (true, true),
+        ]);
       });
 
       tApp.dispose();
@@ -1845,8 +1614,9 @@ void main() {
   });
 
   group('Standard Nested Page StandardPageNavigationMode Test', () {
-    final tNavigatorMode =
-        TestNavigatorMode(StandardPageNavigationMode.moveToTop);
+    final tNavigatorMode = TestNavigatorMode(
+      StandardPageNavigationMode.moveToTop,
+    );
 
     App fCreateApp() {
       tNavigatorMode.mode = StandardPageNavigationMode.moveToTop;
@@ -1894,274 +1664,257 @@ void main() {
     }
 
     testWidgets(
-        'Standard Nested Page StandardPageNavigationMode Test. StandardPageNavigationMode.replace',
-        (WidgetTester tester) async {
-      await _setTestDeviceSize(tester);
+      'Standard Nested Page StandardPageNavigationMode Test. StandardPageNavigationMode.replace',
+      (WidgetTester tester) async {
+        await _setTestDeviceSize(tester);
 
-      final App tApp = fCreateApp();
+        final App tApp = fCreateApp();
 
-      await tApp.run();
+        await tApp.run();
 
-      await tApp.runProcess(() async {
-        await tester.pumpAndSettle();
+        await tApp.runProcess(() async {
+          await tester.pumpAndSettle();
 
-        await tester.tap(find.byKey(const ValueKey(kTestButtonGoB)));
-        await tester.pumpAndSettle();
-        await tester.tap(find.byKey(const ValueKey(kTestButtonGoC)));
-        await tester.pumpAndSettle();
-        await tester.tap(find.byKey(const ValueKey(kTestButtonGoD)));
-        await tester.pumpAndSettle();
-        await tester.tap(find.byKey(const ValueKey(kTestButtonGoE)));
-        await tester.pumpAndSettle();
+          await tester.tap(find.byKey(const ValueKey(kTestButtonGoB)));
+          await tester.pumpAndSettle();
+          await tester.tap(find.byKey(const ValueKey(kTestButtonGoC)));
+          await tester.pumpAndSettle();
+          await tester.tap(find.byKey(const ValueKey(kTestButtonGoD)));
+          await tester.pumpAndSettle();
+          await tester.tap(find.byKey(const ValueKey(kTestButtonGoE)));
+          await tester.pumpAndSettle();
 
-        _checkPageInstances(
-          tApp,
-          expectedPageInstanceNames: [
-            'TestNestedA',
-            'TestNestedB',
-            'TestPageA',
-            'TestPageB',
-            'TestPageC',
-            'TestNestedC',
-            'TestPageD',
-            'TestPageE',
-          ],
-          expectedRootPageInstanceNames: [
-            'TestNestedA',
-          ],
-          expectedNestedPageInstanceNames: {
-            'TestNestedA': ['TestNestedB', 'TestNestedC'],
-            'TestNestedB': ['TestPageA', 'TestPageB', 'TestPageC'],
-            'TestNestedC': ['TestPageD', 'TestPageE'],
-          },
-          expectedActiveStates: [
-            true,
-            false,
-            false,
-            false,
-            false,
-            true,
-            false,
-            true,
-          ],
-        );
+          _checkPageInstances(
+            tApp,
+            expectedPageInstanceNames: [
+              'TestNestedA',
+              'TestNestedB',
+              'TestPageA',
+              'TestPageB',
+              'TestPageC',
+              'TestNestedC',
+              'TestPageD',
+              'TestPageE',
+            ],
+            expectedRootPageInstanceNames: ['TestNestedA'],
+            expectedNestedPageInstanceNames: {
+              'TestNestedA': ['TestNestedB', 'TestNestedC'],
+              'TestNestedB': ['TestPageA', 'TestPageB', 'TestPageC'],
+              'TestNestedC': ['TestPageD', 'TestPageE'],
+            },
+            expectedActiveStates: [
+              true,
+              false,
+              false,
+              false,
+              false,
+              true,
+              false,
+              true,
+            ],
+          );
 
-        tNavigatorMode.mode = StandardPageNavigationMode.replace;
+          tNavigatorMode.mode = StandardPageNavigationMode.replace;
 
-        await tester.tap(find.byKey(const ValueKey(kTestButtonGoB)));
-        await tester.pumpAndSettle();
+          await tester.tap(find.byKey(const ValueKey(kTestButtonGoB)));
+          await tester.pumpAndSettle();
 
-        _checkPageInstances(
-          tApp,
-          expectedPageInstanceNames: [
-            'TestNestedA',
-            'TestNestedC',
-            'TestPageD',
-            'TestNestedB',
-            'TestPageA',
-            'TestPageC',
-            'TestPageB',
-          ],
-          expectedRootPageInstanceNames: [
-            'TestNestedA',
-          ],
-          expectedNestedPageInstanceNames: {
-            'TestNestedA': ['TestNestedC', 'TestNestedB'],
-            'TestNestedB': ['TestPageA', 'TestPageC', 'TestPageB'],
-            'TestNestedC': ['TestPageD'],
-          },
-          expectedActiveStates: [
-            true,
-            false,
-            false,
-            true,
-            false,
-            false,
-            true,
-          ],
-        );
-      });
+          _checkPageInstances(
+            tApp,
+            expectedPageInstanceNames: [
+              'TestNestedA',
+              'TestNestedC',
+              'TestPageD',
+              'TestNestedB',
+              'TestPageA',
+              'TestPageC',
+              'TestPageB',
+            ],
+            expectedRootPageInstanceNames: ['TestNestedA'],
+            expectedNestedPageInstanceNames: {
+              'TestNestedA': ['TestNestedC', 'TestNestedB'],
+              'TestNestedB': ['TestPageA', 'TestPageC', 'TestPageB'],
+              'TestNestedC': ['TestPageD'],
+            },
+            expectedActiveStates: [
+              true,
+              false,
+              false,
+              true,
+              false,
+              false,
+              true,
+            ],
+          );
+        });
 
-      tApp.dispose();
-    });
+        tApp.dispose();
+      },
+    );
 
     testWidgets(
-        'Standard Nested Page StandardPageNavigationMode Test. StandardPageNavigationMode.removeAbove',
-        (WidgetTester tester) async {
-      await _setTestDeviceSize(tester);
+      'Standard Nested Page StandardPageNavigationMode Test. StandardPageNavigationMode.removeAbove',
+      (WidgetTester tester) async {
+        await _setTestDeviceSize(tester);
 
-      final App tApp = fCreateApp();
+        final App tApp = fCreateApp();
 
-      await tApp.run();
+        await tApp.run();
 
-      await tApp.runProcess(() async {
-        await tester.pumpAndSettle();
+        await tApp.runProcess(() async {
+          await tester.pumpAndSettle();
 
-        await tester.tap(find.byKey(const ValueKey(kTestButtonGoB)));
-        await tester.pumpAndSettle();
-        await tester.tap(find.byKey(const ValueKey(kTestButtonGoC)));
-        await tester.pumpAndSettle();
-        await tester.tap(find.byKey(const ValueKey(kTestButtonGoD)));
-        await tester.pumpAndSettle();
-        await tester.tap(find.byKey(const ValueKey(kTestButtonGoE)));
-        await tester.pumpAndSettle();
+          await tester.tap(find.byKey(const ValueKey(kTestButtonGoB)));
+          await tester.pumpAndSettle();
+          await tester.tap(find.byKey(const ValueKey(kTestButtonGoC)));
+          await tester.pumpAndSettle();
+          await tester.tap(find.byKey(const ValueKey(kTestButtonGoD)));
+          await tester.pumpAndSettle();
+          await tester.tap(find.byKey(const ValueKey(kTestButtonGoE)));
+          await tester.pumpAndSettle();
 
-        _checkPageInstances(
-          tApp,
-          expectedPageInstanceNames: [
-            'TestNestedA',
-            'TestNestedB',
-            'TestPageA',
-            'TestPageB',
-            'TestPageC',
-            'TestNestedC',
-            'TestPageD',
-            'TestPageE',
-          ],
-          expectedRootPageInstanceNames: [
-            'TestNestedA',
-          ],
-          expectedNestedPageInstanceNames: {
-            'TestNestedA': ['TestNestedB', 'TestNestedC'],
-            'TestNestedB': ['TestPageA', 'TestPageB', 'TestPageC'],
-            'TestNestedC': ['TestPageD', 'TestPageE'],
-          },
-          expectedActiveStates: [
-            true,
-            false,
-            false,
-            false,
-            false,
-            true,
-            false,
-            true,
-          ],
-        );
+          _checkPageInstances(
+            tApp,
+            expectedPageInstanceNames: [
+              'TestNestedA',
+              'TestNestedB',
+              'TestPageA',
+              'TestPageB',
+              'TestPageC',
+              'TestNestedC',
+              'TestPageD',
+              'TestPageE',
+            ],
+            expectedRootPageInstanceNames: ['TestNestedA'],
+            expectedNestedPageInstanceNames: {
+              'TestNestedA': ['TestNestedB', 'TestNestedC'],
+              'TestNestedB': ['TestPageA', 'TestPageB', 'TestPageC'],
+              'TestNestedC': ['TestPageD', 'TestPageE'],
+            },
+            expectedActiveStates: [
+              true,
+              false,
+              false,
+              false,
+              false,
+              true,
+              false,
+              true,
+            ],
+          );
 
-        tNavigatorMode.mode = StandardPageNavigationMode.removeAbove;
+          tNavigatorMode.mode = StandardPageNavigationMode.removeAbove;
 
-        await tester.tap(find.byKey(const ValueKey(kTestButtonGoB)));
-        await tester.pumpAndSettle();
+          await tester.tap(find.byKey(const ValueKey(kTestButtonGoB)));
+          await tester.pumpAndSettle();
 
-        _checkPageInstances(
-          tApp,
-          expectedPageInstanceNames: [
-            'TestNestedA',
-            'TestNestedB',
-            'TestPageA',
-            'TestPageB',
-          ],
-          expectedRootPageInstanceNames: [
-            'TestNestedA',
-          ],
-          expectedNestedPageInstanceNames: {
-            'TestNestedA': ['TestNestedB'],
-            'TestNestedB': ['TestPageA', 'TestPageB'],
-          },
-          expectedActiveStates: [
-            true,
-            true,
-            false,
-            true,
-          ],
-        );
-      });
+          _checkPageInstances(
+            tApp,
+            expectedPageInstanceNames: [
+              'TestNestedA',
+              'TestNestedB',
+              'TestPageA',
+              'TestPageB',
+            ],
+            expectedRootPageInstanceNames: ['TestNestedA'],
+            expectedNestedPageInstanceNames: {
+              'TestNestedA': ['TestNestedB'],
+              'TestNestedB': ['TestPageA', 'TestPageB'],
+            },
+            expectedActiveStates: [true, true, false, true],
+          );
+        });
 
-      tApp.dispose();
-    });
+        tApp.dispose();
+      },
+    );
 
     testWidgets(
-        'Standard Nested Page StandardPageNavigationMode Test.StandardPageNavigationMode.removeAll',
-        (WidgetTester tester) async {
-      await _setTestDeviceSize(tester);
+      'Standard Nested Page StandardPageNavigationMode Test.StandardPageNavigationMode.removeAll',
+      (WidgetTester tester) async {
+        await _setTestDeviceSize(tester);
 
-      final App tApp = fCreateApp();
+        final App tApp = fCreateApp();
 
-      await tApp.run();
+        await tApp.run();
 
-      await tApp.runProcess(() async {
-        await tester.pumpAndSettle();
+        await tApp.runProcess(() async {
+          await tester.pumpAndSettle();
 
-        await tester.tap(find.byKey(const ValueKey(kTestButtonGoB)));
-        await tester.pumpAndSettle();
-        await tester.tap(find.byKey(const ValueKey(kTestButtonGoC)));
-        await tester.pumpAndSettle();
-        await tester.tap(find.byKey(const ValueKey(kTestButtonGoD)));
-        await tester.pumpAndSettle();
-        await tester.tap(find.byKey(const ValueKey(kTestButtonGoE)));
-        await tester.pumpAndSettle();
+          await tester.tap(find.byKey(const ValueKey(kTestButtonGoB)));
+          await tester.pumpAndSettle();
+          await tester.tap(find.byKey(const ValueKey(kTestButtonGoC)));
+          await tester.pumpAndSettle();
+          await tester.tap(find.byKey(const ValueKey(kTestButtonGoD)));
+          await tester.pumpAndSettle();
+          await tester.tap(find.byKey(const ValueKey(kTestButtonGoE)));
+          await tester.pumpAndSettle();
 
-        _checkPageInstances(
-          tApp,
-          expectedPageInstanceNames: [
-            'TestNestedA',
-            'TestNestedB',
-            'TestPageA',
-            'TestPageB',
-            'TestPageC',
-            'TestNestedC',
-            'TestPageD',
-            'TestPageE',
-          ],
-          expectedRootPageInstanceNames: [
-            'TestNestedA',
-          ],
-          expectedNestedPageInstanceNames: {
-            'TestNestedA': ['TestNestedB', 'TestNestedC'],
-            'TestNestedB': ['TestPageA', 'TestPageB', 'TestPageC'],
-            'TestNestedC': ['TestPageD', 'TestPageE'],
-          },
-          expectedActiveStates: [
-            true,
-            false,
-            false,
-            false,
-            false,
-            true,
-            false,
-            true,
-          ],
-        );
+          _checkPageInstances(
+            tApp,
+            expectedPageInstanceNames: [
+              'TestNestedA',
+              'TestNestedB',
+              'TestPageA',
+              'TestPageB',
+              'TestPageC',
+              'TestNestedC',
+              'TestPageD',
+              'TestPageE',
+            ],
+            expectedRootPageInstanceNames: ['TestNestedA'],
+            expectedNestedPageInstanceNames: {
+              'TestNestedA': ['TestNestedB', 'TestNestedC'],
+              'TestNestedB': ['TestPageA', 'TestPageB', 'TestPageC'],
+              'TestNestedC': ['TestPageD', 'TestPageE'],
+            },
+            expectedActiveStates: [
+              true,
+              false,
+              false,
+              false,
+              false,
+              true,
+              false,
+              true,
+            ],
+          );
 
-        tNavigatorMode.mode = StandardPageNavigationMode.removeAll;
+          tNavigatorMode.mode = StandardPageNavigationMode.removeAll;
 
-        await tester.tap(find.byKey(const ValueKey(kTestButtonGoB)));
-        await tester.pumpAndSettle();
+          await tester.tap(find.byKey(const ValueKey(kTestButtonGoB)));
+          await tester.pumpAndSettle();
 
-        _checkPageInstances(
-          tApp,
-          expectedPageInstanceNames: [
-            'TestNestedA',
-            'TestNestedB',
-            'TestPageA',
-            'TestPageB',
-          ],
-          expectedRootPageInstanceNames: [
-            'TestNestedA',
-          ],
-          expectedNestedPageInstanceNames: {
-            'TestNestedA': ['TestNestedB'],
-            'TestNestedB': ['TestPageA', 'TestPageB'],
-          },
-          expectedActiveStates: [
-            true,
-            true,
-            false,
-            true,
-          ],
-        );
-      });
+          _checkPageInstances(
+            tApp,
+            expectedPageInstanceNames: [
+              'TestNestedA',
+              'TestNestedB',
+              'TestPageA',
+              'TestPageB',
+            ],
+            expectedRootPageInstanceNames: ['TestNestedA'],
+            expectedNestedPageInstanceNames: {
+              'TestNestedA': ['TestNestedB'],
+              'TestNestedB': ['TestPageA', 'TestPageB'],
+            },
+            expectedActiveStates: [true, true, false, true],
+          );
+        });
 
-      tApp.dispose();
-    });
+        tApp.dispose();
+      },
+    );
   });
 
-  testWidgets('Standard Nested Page Remove Route Test',
-      (WidgetTester tester) async {
+  testWidgets('Standard Nested Page Remove Route Test', (
+    WidgetTester tester,
+  ) async {
     await _setTestDeviceSize(tester);
 
-    final tNavigatorMode =
-        TestNavigatorMode(StandardPageNavigationMode.moveToTop);
+    final tNavigatorMode = TestNavigatorMode(
+      StandardPageNavigationMode.moveToTop,
+    );
 
     final App tApp = createApp(
       appWidget: Provider<TestNavigatorMode>.value(
@@ -2235,15 +1988,7 @@ void main() {
           'TestNestedB': ['TestPageA', 'TestPageB'],
           'TestNestedC': ['TestPageC', 'TestPageD'],
         },
-        expectedActiveStates: [
-          true,
-          false,
-          false,
-          false,
-          true,
-          false,
-          true,
-        ],
+        expectedActiveStates: [true, false, false, false, true, false, true],
       );
 
       await tester.tap(find.byKey(const ValueKey(kTestButtonRemoveRoute)));
@@ -2265,14 +2010,7 @@ void main() {
           'TestNestedB': ['TestPageA', 'TestPageB'],
           'TestNestedC': ['TestPageC'],
         },
-        expectedActiveStates: [
-          true,
-          false,
-          false,
-          false,
-          true,
-          true,
-        ],
+        expectedActiveStates: [true, false, false, false, true, true],
       );
 
       await tester.tap(find.byKey(const ValueKey(kTestButtonRemoveRoute)));
@@ -2291,24 +2029,21 @@ void main() {
           'TestNestedA': ['TestNestedB'],
           'TestNestedB': ['TestPageA', 'TestPageB'],
         },
-        expectedActiveStates: [
-          true,
-          true,
-          false,
-          true,
-        ],
+        expectedActiveStates: [true, true, false, true],
       );
     });
 
     tApp.dispose();
   });
 
-  testWidgets('Standard Nested Page Any Navigator Test',
-      (WidgetTester tester) async {
+  testWidgets('Standard Nested Page Any Navigator Test', (
+    WidgetTester tester,
+  ) async {
     await _setTestDeviceSize(tester);
 
-    final tNavigatorMode =
-        TestNavigatorMode(StandardPageNavigationMode.moveToTop);
+    final tNavigatorMode = TestNavigatorMode(
+      StandardPageNavigationMode.moveToTop,
+    );
 
     final App tApp = createApp(
       appWidget: Provider<TestNavigatorMode>.value(
@@ -2370,21 +2105,13 @@ void main() {
           'TestNestedB',
           'TestPageA',
         ],
-        expectedRootPageInstanceNames: [
-          'TestNestedA',
-        ],
+        expectedRootPageInstanceNames: ['TestNestedA'],
         expectedNestedPageInstanceNames: {
           'TestNestedA': ['TestNestedC', 'TestNestedB'],
           'TestNestedB': ['TestPageA'],
           'TestNestedC': ['TestPageB'],
         },
-        expectedActiveStates: [
-          true,
-          false,
-          false,
-          true,
-          true,
-        ],
+        expectedActiveStates: [true, false, false, true, true],
       );
 
       await tester.tap(find.byKey(const ValueKey(kTestButtonGoC)));
@@ -2406,14 +2133,7 @@ void main() {
           'TestNestedB': ['TestPageA', 'TestPageC'],
           'TestNestedC': ['TestPageB'],
         },
-        expectedActiveStates: [
-          true,
-          false,
-          false,
-          true,
-          false,
-          true,
-        ],
+        expectedActiveStates: [true, false, false, true, false, true],
       );
 
       await tester.tap(find.byKey(const ValueKey(kTestButtonGoNC)));
@@ -2440,27 +2160,21 @@ void main() {
           'TestNestedB': ['TestPageA', 'TestPageC'],
           'TestNestedC': ['TestPageB', 'TestPageC'],
         },
-        expectedActiveStates: [
-          true,
-          false,
-          false,
-          false,
-          true,
-          false,
-          true,
-        ],
+        expectedActiveStates: [true, false, false, false, true, false, true],
       );
     });
 
     tApp.dispose();
   });
 
-  testWidgets('Standard Nested Page Group Root Test',
-      (WidgetTester tester) async {
+  testWidgets('Standard Nested Page Group Root Test', (
+    WidgetTester tester,
+  ) async {
     await _setTestDeviceSize(tester);
 
-    final tNavigatorMode =
-        TestNavigatorMode(StandardPageNavigationMode.moveToTop);
+    final tNavigatorMode = TestNavigatorMode(
+      StandardPageNavigationMode.moveToTop,
+    );
 
     final App tApp = createApp(
       appWidget: Provider<TestNavigatorMode>.value(
@@ -2468,9 +2182,7 @@ void main() {
         child: StandardMaterialApp(
           onGenerateTitle: (context) => 'Generate Test Title',
           pages: [
-            StandardPageFactory<TestPageA, void>(
-              create: (data) => TestPageA(),
-            ),
+            StandardPageFactory<TestPageA, void>(create: (data) => TestPageA()),
             StandardPageWithNestedNavigatorFactory<TestNestedA>(
               create: (data) => TestNestedA(),
               nestedPageFactories: [
@@ -2496,23 +2208,12 @@ void main() {
 
       _checkPageInstances(
         tApp,
-        expectedPageInstanceNames: [
-          'TestNestedA',
-          'TestPageB',
-          'TestPageA',
-        ],
-        expectedRootPageInstanceNames: [
-          'TestNestedA',
-          'TestPageA',
-        ],
+        expectedPageInstanceNames: ['TestNestedA', 'TestPageB', 'TestPageA'],
+        expectedRootPageInstanceNames: ['TestNestedA', 'TestPageA'],
         expectedNestedPageInstanceNames: {
           'TestNestedA': ['TestPageB'],
         },
-        expectedActiveStates: [
-          false,
-          false,
-          true,
-        ],
+        expectedActiveStates: [false, false, true],
       );
     });
 
@@ -2522,8 +2223,9 @@ void main() {
   testWidgets('Standard Nested Page Link Test', (WidgetTester tester) async {
     await _setTestDeviceSize(tester);
 
-    final tNavigatorMode =
-        TestNavigatorMode(StandardPageNavigationMode.moveToTop);
+    final tNavigatorMode = TestNavigatorMode(
+      StandardPageNavigationMode.moveToTop,
+    );
 
     final App tApp = createApp(
       appWidget: Provider<TestNavigatorMode>.value(
@@ -2537,55 +2239,41 @@ void main() {
                 // /b
                 StandardPageFactory<TestPageB, void>(
                   create: (data) => TestPageB(),
-                  links: {
-                    r'b': (match, path) {},
-                  },
+                  links: {r'b': (match, path) {}},
                   linkGenerator: (pageData) => 'b',
                 ),
                 // /
                 StandardPageFactory<TestPageA, void>(
                   create: (data) => TestPageA(),
-                  links: {
-                    r'': (match, path) {},
-                  },
+                  links: {r'': (match, path) {}},
                   linkGenerator: (pageData) => '',
                 ),
                 StandardPageWithNestedNavigatorFactory<TestNestedB>(
                   create: (data) => TestNestedB(),
-                  links: {
-                    r'nested-b': (match, path) {},
-                  },
+                  links: {r'nested-b': (match, path) {}},
                   linkGenerator: (pageData) => 'nested-b',
                   nestedPageFactories: [
                     // /nested-b/c
                     StandardPageFactory<TestPageC, void>(
                       create: (data) => TestPageC(),
-                      links: {
-                        r'c': (match, path) {},
-                      },
+                      links: {r'c': (match, path) {}},
                       linkGenerator: (pageData) => 'c',
                     ),
                     // /d
                     StandardPageFactory<TestPageD, void>(
                       create: (data) => TestPageD(),
-                      links: {
-                        r'/d': (match, path) {},
-                      },
+                      links: {r'/d': (match, path) {}},
                       linkGenerator: (pageData) => '/d',
                     ),
                     StandardPageWithNestedNavigatorFactory<TestNestedC>(
-                      links: {
-                        r'nested-c': (match, path) {},
-                      },
+                      links: {r'nested-c': (match, path) {}},
                       linkGenerator: (pageData) => 'nested-c',
                       create: (data) => TestNestedC(),
                       nestedPageFactories: [
                         // /nested-b/nested-c/e
                         StandardPageFactory<TestPageE, void>(
                           create: (data) => TestPageE(),
-                          links: {
-                            r'e': (match, path) {},
-                          },
+                          links: {r'e': (match, path) {}},
                           linkGenerator: (pageData) => 'e',
                         ),
                       ],
@@ -2665,16 +2353,18 @@ void _checkPageInstances(
 
   if (expectedNestedPageInstanceNames != null) {
     expect(
-      app.standardAppPlugin.delegate?.nestedPageInstances
-          .map((k, v) => MapEntry(k.name, v.map((e) => e.name).toList())),
+      app.standardAppPlugin.delegate?.nestedPageInstances.map(
+        (k, v) => MapEntry(k.name, v.map((e) => e.name).toList()),
+      ),
       expectedNestedPageInstanceNames,
     );
   }
 
   if (expectedActiveStates != null) {
     expect(
-      app.standardAppPlugin.delegate?.pageInstances
-          .map((e) => e.standardPageKey.currentState!.active),
+      app.standardAppPlugin.delegate?.pageInstances.map(
+        (e) => e.standardPageKey.currentState!.active,
+      ),
       expectedActiveStates,
     );
   }
@@ -2709,7 +2399,9 @@ List<Widget> _buildNavigateButtons(BuildContext context) {
       key: const ValueKey(kTestButtonGoA),
       onPressed: () {
         context.go<TestPageA, void>(
-            null, context.read<TestNavigatorMode>().mode);
+          null,
+          context.read<TestNavigatorMode>().mode,
+        );
       },
       child: const Text('Go to Test Page A'),
     ),
@@ -2717,7 +2409,9 @@ List<Widget> _buildNavigateButtons(BuildContext context) {
       key: const ValueKey(kTestButtonGoB),
       onPressed: () {
         context.go<TestPageB, void>(
-            null, context.read<TestNavigatorMode>().mode);
+          null,
+          context.read<TestNavigatorMode>().mode,
+        );
       },
       child: const Text('Go to Test Page B'),
     ),
@@ -2725,7 +2419,9 @@ List<Widget> _buildNavigateButtons(BuildContext context) {
       key: const ValueKey(kTestButtonGoC),
       onPressed: () {
         context.go<TestPageC, void>(
-            null, context.read<TestNavigatorMode>().mode);
+          null,
+          context.read<TestNavigatorMode>().mode,
+        );
       },
       child: const Text('Go to Test Page C'),
     ),
@@ -2733,7 +2429,9 @@ List<Widget> _buildNavigateButtons(BuildContext context) {
       key: const ValueKey(kTestButtonGoD),
       onPressed: () {
         context.go<TestPageD, void>(
-            null, context.read<TestNavigatorMode>().mode);
+          null,
+          context.read<TestNavigatorMode>().mode,
+        );
       },
       child: const Text('Go to Test Page D'),
     ),
@@ -2741,7 +2439,9 @@ List<Widget> _buildNavigateButtons(BuildContext context) {
       key: const ValueKey(kTestButtonGoE),
       onPressed: () {
         context.go<TestPageE, void>(
-            null, context.read<TestNavigatorMode>().mode);
+          null,
+          context.read<TestNavigatorMode>().mode,
+        );
       },
       child: const Text('Go to Test Page E'),
     ),
@@ -2749,7 +2449,9 @@ List<Widget> _buildNavigateButtons(BuildContext context) {
       key: const ValueKey(kTestButtonGoNA),
       onPressed: () {
         context.go<TestNestedA, void>(
-            null, context.read<TestNavigatorMode>().mode);
+          null,
+          context.read<TestNavigatorMode>().mode,
+        );
       },
       child: const Text('Go to Test Nested A'),
     ),
@@ -2757,7 +2459,9 @@ List<Widget> _buildNavigateButtons(BuildContext context) {
       key: const ValueKey(kTestButtonGoNB),
       onPressed: () {
         context.go<TestNestedB, void>(
-            null, context.read<TestNavigatorMode>().mode);
+          null,
+          context.read<TestNavigatorMode>().mode,
+        );
       },
       child: const Text('Go to Test Nested B'),
     ),
@@ -2765,7 +2469,9 @@ List<Widget> _buildNavigateButtons(BuildContext context) {
       key: const ValueKey(kTestButtonGoNC),
       onPressed: () {
         context.go<TestNestedC, void>(
-            null, context.read<TestNavigatorMode>().mode);
+          null,
+          context.read<TestNavigatorMode>().mode,
+        );
       },
       child: const Text('Go to Test Nested C'),
     ),
@@ -2773,7 +2479,9 @@ List<Widget> _buildNavigateButtons(BuildContext context) {
       key: const ValueKey(kTestButtonGoCustomA),
       onPressed: () {
         context.go<TestCustomPageA, void>(
-            null, context.read<TestNavigatorMode>().mode);
+          null,
+          context.read<TestNavigatorMode>().mode,
+        );
       },
       child: const Text('Go to Test Custom A'),
     ),
@@ -2863,9 +2571,7 @@ class TestPageA extends StandardPage<void> {
   @override
   Widget buildPage(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Test Title'),
-      ),
+      appBar: AppBar(title: const Text('Test Title')),
       body: SingleChildScrollView(
         child: Column(
           children: [
@@ -2888,9 +2594,7 @@ class TestPageB extends StandardPage<void> {
   @override
   Widget buildPage(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Test Title B'),
-      ),
+      appBar: AppBar(title: const Text('Test Title B')),
       body: SingleChildScrollView(
         child: Column(
           children: [
@@ -2913,9 +2617,7 @@ class TestPageC extends StandardPage<void> {
   @override
   Widget buildPage(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Test Title C'),
-      ),
+      appBar: AppBar(title: const Text('Test Title C')),
       body: SingleChildScrollView(
         child: Column(
           children: [
@@ -2938,9 +2640,7 @@ class TestPageD extends StandardPage<void> {
   @override
   Widget buildPage(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Test Title D'),
-      ),
+      appBar: AppBar(title: const Text('Test Title D')),
       body: SingleChildScrollView(
         child: Column(
           children: [
@@ -2963,9 +2663,7 @@ class TestPageE extends StandardPage<void> {
   @override
   Widget buildPage(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Test Title E'),
-      ),
+      appBar: AppBar(title: const Text('Test Title E')),
       body: SingleChildScrollView(
         child: Column(
           children: [
@@ -2988,17 +2686,9 @@ class TestCustomPageA extends StandardPage<void> {
   @override
   Widget buildPage(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          l(context, 'Test Title Custom A'),
-        ),
-      ),
+      appBar: AppBar(title: Text(l(context, 'Test Title Custom A'))),
       body: SingleChildScrollView(
-        child: Column(
-          children: [
-            ..._buildNavigateButtons(context),
-          ],
-        ),
+        child: Column(children: [..._buildNavigateButtons(context)]),
       ),
     );
   }

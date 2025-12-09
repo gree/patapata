@@ -60,7 +60,9 @@ abstract class StartupState extends LogicState {
   /// If another state switches without calling [completer],
   /// the [Future] returns false.
   Future<bool> navigateToPage(
-      Object page, StartupPageCompleter completer) async {
+    Object page,
+    StartupPageCompleter completer,
+  ) async {
     final tPlugin = startupSequence._startupNavigator;
     assert(tPlugin != null);
 
@@ -70,7 +72,8 @@ abstract class StartupState extends LogicState {
       throw LogicStateNotCurrent(this);
     }
     assert(
-        _navigateCompleter == null || _navigateCompleter?.isCompleted == true);
+      _navigateCompleter == null || _navigateCompleter?.isCompleted == true,
+    );
     final tCompleter = Completer<bool>();
     _navigateCompleter = tCompleter;
 
@@ -102,17 +105,19 @@ abstract class StartupState extends LogicState {
     super.init(data);
 
     Timer.run(() {
-      process(data).then<void>((_) {
-        if (this()) {
-          complete();
-        }
-      }).catchError((e, stackTrace) {
-        return startupSequence.waitForSplash().whenComplete(() async {
-          if (this()) {
-            completeError(e, stackTrace);
-          }
-        });
-      });
+      process(data)
+          .then<void>((_) {
+            if (this()) {
+              complete();
+            }
+          })
+          .catchError((e, stackTrace) {
+            return startupSequence.waitForSplash().whenComplete(() async {
+              if (this()) {
+                completeError(e, stackTrace);
+              }
+            });
+          });
     });
   }
 
@@ -156,9 +161,9 @@ class StartupSequence {
     Duration? waitSplashScreenDuration,
     this.onSuccess,
     this.onError,
-  })  : _startupStateFactories = startupStateFactories,
-        _waitSplashScreenDuration =
-            waitSplashScreenDuration ?? const Duration(milliseconds: 1000);
+  }) : _startupStateFactories = startupStateFactories,
+       _waitSplashScreenDuration =
+           waitSplashScreenDuration ?? const Duration(milliseconds: 1000);
 
   LogicStateMachine? _machine;
   final List<StartupStateFactory> _startupStateFactories;
@@ -193,7 +198,7 @@ class StartupSequence {
   List<LogicStateFactory> _createLogicStateFactories() {
     return [
       for (final factory in _startupStateFactories)
-        factory._toLogicStateFactory(this)
+        factory._toLogicStateFactory(this),
     ];
   }
 
@@ -290,7 +295,10 @@ class StartupSequence {
             onError?.call(tError.error, tError.stackTrace);
           } else {
             _logger.severe(
-                tError.error.toString(), tError.error, tError.stackTrace);
+              tError.error.toString(),
+              tError.error,
+              tError.stackTrace,
+            );
           }
         } else {
           _startupCompleter?.complete();
@@ -324,9 +332,8 @@ class StartupNavigatorObserver extends NavigatorObserver {
 
   final StartupSequence _startupSequence;
 
-  StartupNavigatorObserver({
-    required StartupSequence startupSequence,
-  }) : _startupSequence = startupSequence;
+  StartupNavigatorObserver({required StartupSequence startupSequence})
+    : _startupSequence = startupSequence;
 
   @override
   void didPush(Route<dynamic> route, Route<dynamic>? previousRoute) {

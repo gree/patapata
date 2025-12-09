@@ -23,10 +23,7 @@ class RemoteMessageNotification {
   /// Create a [RemoteMessageNotification]
   /// [title] represents the title of the notification,
   /// and [body] is the content of the message was shown in the notification.
-  const RemoteMessageNotification({
-    this.title,
-    this.body,
-  });
+  const RemoteMessageNotification({this.title, this.body});
 
   @override
   String toString() {
@@ -156,10 +153,12 @@ class ProxyRemoteMessaging extends RemoteMessaging {
   /// Add [remoteMessaging] to the [RemoteMessaging]s managed by [ProxyRemoteMessaging].
   Future<void> addRemoteMessaging(RemoteMessaging remoteMessaging) async {
     await remoteMessaging.init(_app);
-    _subscriptions[remoteMessaging] =
-        remoteMessaging.messages.listen(_onMessage);
-    _tokenSubscriptions[remoteMessaging] =
-        remoteMessaging.tokens.listen(_onToken);
+    _subscriptions[remoteMessaging] = remoteMessaging.messages.listen(
+      _onMessage,
+    );
+    _tokenSubscriptions[remoteMessaging] = remoteMessaging.tokens.listen(
+      _onToken,
+    );
     _remoteMessagings.add(remoteMessaging);
   }
 
@@ -195,14 +194,10 @@ class ProxyRemoteMessaging extends RemoteMessaging {
   Future<RemoteMessage?> getInitialMessage() {
     // Only get the first message.
     return Future.wait<RemoteMessage?>(
-        _remoteMessagings.map<Future<RemoteMessage?>>(
-      (v) => v.getInitialMessage(),
-    )).then(
-      (v) => v.firstWhere(
-        (b) => b != null,
-        orElse: () => null,
+      _remoteMessagings.map<Future<RemoteMessage?>>(
+        (v) => v.getInitialMessage(),
       ),
-    );
+    ).then((v) => v.firstWhere((b) => b != null, orElse: () => null));
   }
 
   /// The stream of all [RemoteMessage]s managed by this class.
@@ -219,7 +214,8 @@ class ProxyRemoteMessaging extends RemoteMessaging {
     assert(() {
       if (_remoteMessagings.length > 1) {
         _logger.fine(
-            'Multiple RemoteMessaging registered in ProxyRemoteMessaging. Only returning first one found.');
+          'Multiple RemoteMessaging registered in ProxyRemoteMessaging. Only returning first one found.',
+        );
       }
 
       return true;
@@ -243,16 +239,10 @@ class ProxyRemoteMessaging extends RemoteMessaging {
   @override
   FutureOr<bool> listenChannel(String channel) {
     return Future.wait<bool>(
-      _remoteMessagings
-          .map<Future<bool>>((v) async => v.listenChannel(channel)),
-    )
-        .then(
-      (v) => v.firstWhere(
-        (b) => b,
-        orElse: () => false,
+      _remoteMessagings.map<Future<bool>>(
+        (v) async => v.listenChannel(channel),
       ),
-    )
-        .then((v) async {
+    ).then((v) => v.firstWhere((b) => b, orElse: () => false)).then((v) async {
       await super.listenChannel(channel);
       return v;
     });
@@ -263,16 +253,10 @@ class ProxyRemoteMessaging extends RemoteMessaging {
   @override
   FutureOr<bool> ignoreChannel(String channel) {
     return Future.wait<bool>(
-      _remoteMessagings
-          .map<Future<bool>>((v) async => v.ignoreChannel(channel)),
-    )
-        .then(
-      (v) => v.firstWhere(
-        (b) => b,
-        orElse: () => false,
+      _remoteMessagings.map<Future<bool>>(
+        (v) async => v.ignoreChannel(channel),
       ),
-    )
-        .then((v) async {
+    ).then((v) => v.firstWhere((b) => b, orElse: () => false)).then((v) async {
       await super.ignoreChannel(channel);
       return v;
     });
@@ -294,10 +278,10 @@ class MockRemoteMessaging extends RemoteMessaging {
     Stream<RemoteMessage> Function()? messages,
     Stream<String?> Function()? tokenStream,
     Future<String?> Function()? getToken,
-  })  : _getInitialMessage = getInitialMessage,
-        _messages = messages,
-        _tokens = tokenStream,
-        _getToken = getToken;
+  }) : _getInitialMessage = getInitialMessage,
+       _messages = messages,
+       _tokens = tokenStream,
+       _getToken = getToken;
 
   @override
   Future<RemoteMessage?> getInitialMessage() {

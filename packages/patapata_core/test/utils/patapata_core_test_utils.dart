@@ -20,25 +20,20 @@ class Environment with I18nEnvironment, NotificationsEnvironment {
   const Environment();
 
   @override
-  List<String>? get l10nPaths => [
-        'l10n',
-      ];
+  List<String>? get l10nPaths => ['l10n'];
 
   @override
-  List<Locale>? get supportedL10ns => [
-        const Locale('ja'),
-        const Locale('en'),
-      ];
+  List<Locale>? get supportedL10ns => [const Locale('ja'), const Locale('en')];
 
   @override
   List<AndroidNotificationChannel> get notificationsAndroidChannels => [
-        const AndroidNotificationChannel(
-          'custom',
-          'Patapata Test Channel',
-          importance: Importance.max,
-          enableLights: true,
-        )
-      ];
+    const AndroidNotificationChannel(
+      'custom',
+      'Patapata Test Channel',
+      importance: Importance.max,
+      enableLights: true,
+    ),
+  ];
 
   @override
   String get notificationsAndroidDefaultIcon => 'ic_notification';
@@ -162,11 +157,7 @@ home
 
     try {
       final tByteData = ByteData.view(
-        Uint8List.fromList(
-          utf8.encode(
-            tYamlMap[key]!,
-          ),
-        ).buffer,
+        Uint8List.fromList(utf8.encode(tYamlMap[key]!)).buffer,
       );
       tCompleter.complete(tByteData);
     } catch (e, stackTrace) {
@@ -196,9 +187,7 @@ class _MockStreamHandler extends MockStreamHandler {
 class _MockStreamHandlerEventSink extends TestMockStreamHandlerEventSink {
   final MockStreamHandlerEventSink other;
 
-  _MockStreamHandlerEventSink({
-    required this.other,
-  });
+  _MockStreamHandlerEventSink({required this.other});
 
   @override
   void endOfStream() {
@@ -228,13 +217,12 @@ void testInitialize() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
   testSetMockMethodCallHandler = TestDefaultBinaryMessengerBinding
-      .instance.defaultBinaryMessenger.setMockMethodCallHandler;
+      .instance
+      .defaultBinaryMessenger
+      .setMockMethodCallHandler;
   testSetMockStreamHandler = (channel, handler) {
     TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
-        .setMockStreamHandler(
-      channel,
-      _MockStreamHandler(handler),
-    );
+        .setMockStreamHandler(channel, _MockStreamHandler(handler));
   };
 
   PackageInfoPlugin.setMockValues(
@@ -266,9 +254,7 @@ App createApp({
         StandardMaterialApp(
           onGenerateTitle: (context) => 'title',
           pages: [
-            StandardPageFactory<HomePage, void>(
-              create: (data) => HomePage(),
-            ),
+            StandardPageFactory<HomePage, void>(create: (data) => HomePage()),
             StandardPageFactory<NotificationPage, void>(
               create: (pageData) => NotificationPage(),
               links: {r'notification/': (match, uri) {}},
@@ -279,10 +265,7 @@ App createApp({
             ),
           ],
           routableBuilder: (context, child) {
-            return KeyedSubtree(
-              key: _patapataCoreTestKey,
-              child: child!,
-            );
+            return KeyedSubtree(key: _patapataCoreTestKey, child: child!);
           },
         ),
     startupSequence: startupSequence,

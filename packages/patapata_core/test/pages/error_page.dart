@@ -12,11 +12,7 @@ class ErrorPage extends StandardPage<ReportRecord> {
   Widget buildPage(BuildContext context) {
     final tError = pageData.error as PatapataException;
     return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          tError.localizedMessage,
-        ),
-      ),
+      appBar: AppBar(title: Text(tError.localizedMessage)),
       body: const SizedBox.shrink(),
     );
   }

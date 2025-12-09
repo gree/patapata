@@ -42,10 +42,7 @@ Element? _findTreeChildElement(List<Type> tree) {
   return tResult;
 }
 
-Element? _findChildElement(
-  Element element,
-  Type elementType,
-) {
+Element? _findChildElement(Element element, Type elementType) {
   Element? tResult;
 
   if (element.widget.runtimeType == elementType) {
@@ -121,7 +118,8 @@ class StandardAppPlugin extends Plugin with StartupNavigatorMixin {
   /// The link handler intercepts the link provided as an argument in [StandardAppRouterContext.route].
   /// It is used when you want to perform additional processing when receiving deep links or external notifications without triggering page navigation.
   StandardAppPluginLinkHandlerKey addLinkHandler(
-      bool Function(Uri link) callback) {
+    bool Function(Uri link) callback,
+  ) {
     final tKey = StandardAppPluginLinkHandlerKey();
 
     _linkHandlers[tKey] = callback;
@@ -139,8 +137,9 @@ class StandardAppPlugin extends Plugin with StartupNavigatorMixin {
   /// [link] is a string set in [StandardPageFactory] under `links`.
   /// {@endtemplate}
   void route(String link, [bool pushParentPage = true]) async {
-    final tRouteInformation = await parser
-        ?.parseRouteInformation(RouteInformation(uri: Uri.parse(link)));
+    final tRouteInformation = await parser?.parseRouteInformation(
+      RouteInformation(uri: Uri.parse(link)),
+    );
 
     if (tRouteInformation != null) {
       delegate?.routeWithConfiguration(tRouteInformation, null, pushParentPage);
@@ -152,8 +151,11 @@ class StandardAppPlugin extends Plugin with StartupNavigatorMixin {
   /// [P] is the type of the destination page, [R] is the type of page data, and [E] is the data type of the value that the page returns.
   /// These should be the same as what you set in your [StandardPageWithResultFactory].
   /// {@endtemplate}
-  String? generateLinkWithResult<P extends StandardPageWithResult<R, E>,
-      R extends Object?, E extends Object?>(R pageData) {
+  String? generateLinkWithResult<
+    P extends StandardPageWithResult<R, E>,
+    R extends Object?,
+    E extends Object?
+  >(R pageData) {
     return delegate?.getPageFactory<P, R, E>().linkGenerator?.call(pageData);
   }
 
@@ -162,7 +164,8 @@ class StandardAppPlugin extends Plugin with StartupNavigatorMixin {
   /// [P] is the type of the destination page, [R] is the type of page data, and they should be consistent with what you have set in your [StandardPage].
   /// {@endtemplate}
   String? generateLink<P extends StandardPage<R>, R extends Object?>(
-      R pageData) {
+    R pageData,
+  ) {
     return delegate?.getPageFactory<P, R, void>().linkGenerator?.call(pageData);
   }
 
@@ -201,14 +204,14 @@ mixin StandardAppRoutePluginMixin on Plugin {
   /// A function that parses the route information [routeInformation] and converts it to [StandardRouteData] for [StandardRouterDelegate].
   /// If the plugin's [parseRouteInformation] is implemented and returns a route, the processing of [transformRouteInformation] is ignored.
   Future<StandardRouteData?> parseRouteInformation(
-          RouteInformation routeInformation) =>
-      SynchronousFuture(null);
+    RouteInformation routeInformation,
+  ) => SynchronousFuture(null);
 
   /// A function to transform the route information [routeInformation] into another transformed route information [RouteInformation].
   /// This needs to be implemented when you want to redirect from one route to another based on the received route on the plugin side.
   Future<RouteInformation?> transformRouteInformation(
-          RouteInformation routeInformation) =>
-      SynchronousFuture(null);
+    RouteInformation routeInformation,
+  ) => SynchronousFuture(null);
 
   /// The process of creating [StandardRouteData] to be passed from the plugin to the screen, and this data is passed to [StandardRouterDelegate.routeWithConfiguration].
   /// If multiple plugins implement [getInitialRouteData], the [getInitialRouteData] of the first found plugin will be executed.
@@ -228,34 +231,33 @@ mixin StandardAppRoutePluginMixin on Plugin {
     RemoteMessaging? Function()? createRemoteMessaging,
     List<NavigatorObserver> Function()? navigatorObservers,
     Future<StandardRouteData?> Function(RouteInformation routeInformation)?
-        parseRouteInformation,
+    parseRouteInformation,
     Future<RouteInformation?> Function(RouteInformation routeInformation)?
-        transformRouteInformation,
+    transformRouteInformation,
     Future<StandardRouteData?> Function()? getInitialRouteData,
-  }) =>
-      _StandardAppRoutePluginMixinInline(
-        name: name,
-        dependencies: dependencies,
-        requireRemoteConfig: requireRemoteConfig,
-        init: init,
-        dispose: dispose,
-        createAppWidgetWrapper: createAppWidgetWrapper,
-        createRemoteConfig: createRemoteConfig,
-        createLocalConfig: createLocalConfig,
-        createRemoteMessaging: createRemoteMessaging,
-        navigatorObservers: navigatorObservers,
-        parseRouteInformation: parseRouteInformation,
-        transformRouteInformation: transformRouteInformation,
-        getInitialRouteData: getInitialRouteData,
-      );
+  }) => _StandardAppRoutePluginMixinInline(
+    name: name,
+    dependencies: dependencies,
+    requireRemoteConfig: requireRemoteConfig,
+    init: init,
+    dispose: dispose,
+    createAppWidgetWrapper: createAppWidgetWrapper,
+    createRemoteConfig: createRemoteConfig,
+    createLocalConfig: createLocalConfig,
+    createRemoteMessaging: createRemoteMessaging,
+    navigatorObservers: navigatorObservers,
+    parseRouteInformation: parseRouteInformation,
+    transformRouteInformation: transformRouteInformation,
+    getInitialRouteData: getInitialRouteData,
+  );
 }
 
 class _StandardAppRoutePluginMixinInline extends InlinePlugin
     with StandardAppRoutePluginMixin {
   final Future<StandardRouteData?> Function(RouteInformation routeInformation)?
-      _parseRouteInformation;
+  _parseRouteInformation;
   final Future<RouteInformation?> Function(RouteInformation routeInformation)?
-      _transformRouteInformation;
+  _transformRouteInformation;
   final Future<StandardRouteData?> Function()? _getInitialRouteData;
 
   _StandardAppRoutePluginMixinInline({
@@ -270,33 +272,33 @@ class _StandardAppRoutePluginMixinInline extends InlinePlugin
     super.createRemoteMessaging,
     super.navigatorObservers,
     Future<StandardRouteData?> Function(RouteInformation routeInformation)?
-        parseRouteInformation,
+    parseRouteInformation,
     Future<RouteInformation?> Function(RouteInformation routeInformation)?
-        transformRouteInformation,
+    transformRouteInformation,
     Future<StandardRouteData?> Function()? getInitialRouteData,
-  })  : _parseRouteInformation = parseRouteInformation,
-        _transformRouteInformation = transformRouteInformation,
-        _getInitialRouteData = getInitialRouteData;
+  }) : _parseRouteInformation = parseRouteInformation,
+       _transformRouteInformation = transformRouteInformation,
+       _getInitialRouteData = getInitialRouteData;
 
   @override
   Future<StandardRouteData?> parseRouteInformation(
-          RouteInformation routeInformation) =>
-      _parseRouteInformation != null
-          ? _parseRouteInformation(routeInformation)
-          : super.parseRouteInformation(routeInformation);
+    RouteInformation routeInformation,
+  ) => _parseRouteInformation != null
+      ? _parseRouteInformation(routeInformation)
+      : super.parseRouteInformation(routeInformation);
 
   @override
   Future<RouteInformation?> transformRouteInformation(
-          RouteInformation routeInformation) =>
-      _transformRouteInformation != null
-          ? _transformRouteInformation(routeInformation)
-          : super.transformRouteInformation(routeInformation);
+    RouteInformation routeInformation,
+  ) => _transformRouteInformation != null
+      ? _transformRouteInformation(routeInformation)
+      : super.transformRouteInformation(routeInformation);
 
   @override
   Future<StandardRouteData?> getInitialRouteData() =>
       _getInitialRouteData != null
-          ? _getInitialRouteData()
-          : super.getInitialRouteData();
+      ? _getInitialRouteData()
+      : super.getInitialRouteData();
 }
 
 /// A mixin for allowing a [Plugin] to modify how a [StandardPage] or [StandardPageWithResult] works.
@@ -322,20 +324,19 @@ mixin StandardPagePluginMixin on Plugin {
     RemoteMessaging? Function()? createRemoteMessaging,
     List<NavigatorObserver> Function()? navigatorObservers,
     required Widget Function(BuildContext context, Widget child) buildPage,
-  }) =>
-      _StandardPagePluginMixinInline(
-        name: name,
-        dependencies: dependencies,
-        requireRemoteConfig: requireRemoteConfig,
-        init: init,
-        dispose: dispose,
-        createAppWidgetWrapper: createAppWidgetWrapper,
-        createRemoteConfig: createRemoteConfig,
-        createLocalConfig: createLocalConfig,
-        createRemoteMessaging: createRemoteMessaging,
-        navigatorObservers: navigatorObservers,
-        buildPage: buildPage,
-      );
+  }) => _StandardPagePluginMixinInline(
+    name: name,
+    dependencies: dependencies,
+    requireRemoteConfig: requireRemoteConfig,
+    init: init,
+    dispose: dispose,
+    createAppWidgetWrapper: createAppWidgetWrapper,
+    createRemoteConfig: createRemoteConfig,
+    createLocalConfig: createLocalConfig,
+    createRemoteMessaging: createRemoteMessaging,
+    navigatorObservers: navigatorObservers,
+    buildPage: buildPage,
+  );
 }
 
 class _StandardPagePluginMixinInline extends InlinePlugin
@@ -382,7 +383,7 @@ extension StandardAppRouter on Router {
 
   /// {@macro patapata_widgets.StandardRouteDelegate.nestedPageInstances}
   Map<StandardPageInterface, List<StandardPageInterface>>
-      get nestedPageInstances {
+  get nestedPageInstances {
     assert(routerDelegate is StandardRouterDelegate);
     final tDelegate = routerDelegate as StandardRouterDelegate;
 
@@ -391,9 +392,10 @@ extension StandardAppRouter on Router {
 
   /// {@macro patapata_widgets.StandardRouteDelegate.getPageFactory}
   StandardPageWithResultFactory<T, R, E> getPageFactory<
-      T extends StandardPageWithResult<R, E>,
-      R extends Object?,
-      E extends Object?>() {
+    T extends StandardPageWithResult<R, E>,
+    R extends Object?,
+    E extends Object?
+  >() {
     assert(routerDelegate is StandardRouterDelegate);
     final tDelegate = routerDelegate as StandardRouterDelegate;
 
@@ -407,14 +409,22 @@ extension StandardAppRouter on Router {
   }
 
   /// {@macro patapata_widgets.StandardRouteDelegate.goWithResult}
-  Future<E?> goWithResult<T extends StandardPageWithResult<R, E>,
-          R extends Object?, E extends Object?>(R pageData,
-      [StandardPageNavigationMode? navigationMode,
-      bool pushParentPage = false]) {
+  Future<E?> goWithResult<
+    T extends StandardPageWithResult<R, E>,
+    R extends Object?,
+    E extends Object?
+  >(
+    R pageData, [
+    StandardPageNavigationMode? navigationMode,
+    bool pushParentPage = false,
+  ]) {
     assert(routerDelegate is StandardRouterDelegate);
     final tDelegate = routerDelegate as StandardRouterDelegate;
     return tDelegate.goWithResult<T, R, E>(
-        pageData, navigationMode, pushParentPage);
+      pageData,
+      navigationMode,
+      pushParentPage,
+    );
   }
 
   /// {@macro patapata_widgets.StandardRouteDelegate.go}
@@ -439,12 +449,16 @@ extension StandardAppRouter on Router {
   ]) async {
     assert(routerDelegate is StandardRouterDelegate);
     final tDelegate = routerDelegate as StandardRouterDelegate;
-    final tConfiguration = await routeInformationParser
-        ?.parseRouteInformation(RouteInformation(uri: Uri.parse(location)));
+    final tConfiguration = await routeInformationParser?.parseRouteInformation(
+      RouteInformation(uri: Uri.parse(location)),
+    );
 
     if (tConfiguration != null) {
       tDelegate.routeWithConfiguration(
-          tConfiguration, navigationMode, pushParentPage);
+        tConfiguration,
+        navigationMode,
+        pushParentPage,
+      );
     }
   }
 
@@ -471,20 +485,26 @@ extension StandardAppRouterContext on BuildContext {
   Router get router => Router.of(this);
 
   /// {@macro patapata_widgets.StandardRouteDelegate.goWithResult}
-  Future<E?> goWithResult<T extends StandardPageWithResult<R, E>,
-      R extends Object?, E extends Object?>(
+  Future<E?> goWithResult<
+    T extends StandardPageWithResult<R, E>,
+    R extends Object?,
+    E extends Object?
+  >(
     R pageData, [
     StandardPageNavigationMode? navigationMode,
     bool pushParentPage = false,
   ]) {
-    return Router.of(this)
-        .goWithResult<T, R, E>(pageData, navigationMode, pushParentPage);
+    return Router.of(
+      this,
+    ).goWithResult<T, R, E>(pageData, navigationMode, pushParentPage);
   }
 
   /// {@macro patapata_widgets.StandardRouteDelegate.go}
-  Future<void> go<T extends StandardPage<R>, R extends Object?>(R pageData,
-      [StandardPageNavigationMode? navigationMode,
-      bool pushParentPage = false]) {
+  Future<void> go<T extends StandardPage<R>, R extends Object?>(
+    R pageData, [
+    StandardPageNavigationMode? navigationMode,
+    bool pushParentPage = false,
+  ]) {
     return Router.of(this).go<T, R>(pageData, navigationMode, pushParentPage);
   }
 
@@ -503,13 +523,14 @@ extension StandardAppRouterContext on BuildContext {
 
   /// {@macro patapata_widgets.StandardRouteDelegate.nestedPageInstances}
   Map<StandardPageInterface, List<StandardPageInterface>>
-      get nestedPageInstances => Router.of(this).nestedPageInstances;
+  get nestedPageInstances => Router.of(this).nestedPageInstances;
 
   /// {@macro patapata_widgets.StandardRouteDelegate.getPageFactory}
   StandardPageWithResultFactory<T, R, E> getPageFactory<
-      T extends StandardPageWithResult<R, E>,
-      R extends Object?,
-      E extends Object?>() {
+    T extends StandardPageWithResult<R, E>,
+    R extends Object?,
+    E extends Object?
+  >() {
     return Router.of(this).getPageFactory<T, R, E>();
   }
 
@@ -525,8 +546,10 @@ extension StandardAppApp on App {
   StandardAppPlugin get standardAppPlugin {
     final tPlugin = getPlugin<StandardAppPlugin>();
 
-    assert(tPlugin != null,
-        'Could not find StandardApp. Was it removed from the plugins?');
+    assert(
+      tPlugin != null,
+      'Could not find StandardApp. Was it removed from the plugins?',
+    );
 
     return tPlugin!;
   }
@@ -547,15 +570,19 @@ extension StandardAppApp on App {
       standardAppPlugin.delegate!.currentNavigator;
 
   /// {@macro patapata_widgets.StandardRouteDelegate.goWithResult}
-  Future<E?> goWithResult<T extends StandardPageWithResult<R, E>,
-          R extends Object?, E extends Object?>(R pageData,
-      [StandardPageNavigationMode? navigationMode]) {
+  Future<E?> goWithResult<
+    T extends StandardPageWithResult<R, E>,
+    R extends Object?,
+    E extends Object?
+  >(R pageData, [StandardPageNavigationMode? navigationMode]) {
     return navigatorContext.goWithResult<T, R, E>(pageData, navigationMode);
   }
 
   /// {@macro patapata_widgets.StandardRouteDelegate.goWithResult}
-  Future<void> go<T extends StandardPage<R>, R extends Object?>(R pageData,
-      [StandardPageNavigationMode? navigationMode]) {
+  Future<void> go<T extends StandardPage<R>, R extends Object?>(
+    R pageData, [
+    StandardPageNavigationMode? navigationMode,
+  ]) {
     return navigatorContext.go<T, R>(pageData, navigationMode);
   }
 
@@ -571,14 +598,18 @@ extension StandardAppApp on App {
   }
 
   /// {@macro patapata_widgets.StandardAppPlugin.generateLinkWithResult}
-  String? generateLinkWithResult<P extends StandardPageWithResult<R, E>,
-      R extends Object?, E extends Object?>(R pageData) {
+  String? generateLinkWithResult<
+    P extends StandardPageWithResult<R, E>,
+    R extends Object?,
+    E extends Object?
+  >(R pageData) {
     return standardAppPlugin.generateLinkWithResult<P, R, E>(pageData);
   }
 
   /// {@macro patapata_widgets.StandardAppPlugin.generateLink}
   String? generateLink<P extends StandardPage<R>, R extends Object?>(
-      R pageData) {
+    R pageData,
+  ) {
     return standardAppPlugin.generateLink<P, R>(pageData);
   }
 }

@@ -19,21 +19,13 @@ void main() {
     late App app;
 
     app = createApp();
-    app.permissions.testSetRequested(
-      trackingRequested: true,
-    );
+    app.permissions.testSetRequested(trackingRequested: true);
 
-    expect(
-      app.permissions.trackingRequested,
-      true,
-    );
+    expect(app.permissions.trackingRequested, true);
 
     app.permissions.testSetRequested(trackingRequested: false);
 
-    expect(
-      app.permissions.trackingRequested,
-      false,
-    );
+    expect(app.permissions.trackingRequested, false);
 
     app.dispose();
   });
@@ -42,21 +34,13 @@ void main() {
     late App app;
 
     app = createApp();
-    app.permissions.testSetRequested(
-      notificationsRequested: true,
-    );
+    app.permissions.testSetRequested(notificationsRequested: true);
 
-    expect(
-      app.permissions.notificationsRequested,
-      true,
-    );
+    expect(app.permissions.notificationsRequested, true);
 
     app.permissions.testSetRequested(notificationsRequested: false);
 
-    expect(
-      app.permissions.notificationsRequested,
-      false,
-    );
+    expect(app.permissions.notificationsRequested, false);
 
     app.dispose();
   });
@@ -152,9 +136,7 @@ void main() {
     );
 
     for (PermissionTrackingResult tResult in PermissionTrackingResult.values) {
-      app.permissions.testSetPermissionTrackingResult(
-        tResult,
-      );
+      app.permissions.testSetPermissionTrackingResult(tResult);
 
       await app.permissions.requestTracking();
     }

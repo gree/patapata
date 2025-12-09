@@ -17,8 +17,9 @@ void main() {
       final tNetworkInformation = NetworkInformation.unknown();
 
       expect(
-        tNetworkInformation.connectivities
-            .contains(NetworkConnectivity.unknown),
+        tNetworkInformation.connectivities.contains(
+          NetworkConnectivity.unknown,
+        ),
         isTrue,
       );
     });
@@ -26,10 +27,7 @@ void main() {
     test('toString', () async {
       final tNetworkInformation = NetworkInformation.unknown();
 
-      expect(
-        tNetworkInformation.toString().isNotEmpty,
-        isTrue,
-      );
+      expect(tNetworkInformation.toString().isNotEmpty, isTrue);
     });
 
     test('copyWith', () async {
@@ -37,8 +35,9 @@ void main() {
       tNetworkInformation = tNetworkInformation.copyWith();
 
       expect(
-        tNetworkInformation.connectivities
-            .contains(NetworkConnectivity.unknown),
+        tNetworkInformation.connectivities.contains(
+          NetworkConnectivity.unknown,
+        ),
         isTrue,
       );
     });
@@ -56,22 +55,13 @@ void main() {
         connectivities: [NetworkConnectivity.wifi],
       );
 
-      expect(
-        tNetworkInformationMobile1 == tNetworkInformationMobile2,
-        isTrue,
-      );
+      expect(tNetworkInformationMobile1 == tNetworkInformationMobile2, isTrue);
 
-      expect(
-        tNetworkInformationMobile1 == tNetworkInformationWifi,
-        isFalse,
-      );
+      expect(tNetworkInformationMobile1 == tNetworkInformationWifi, isFalse);
     });
 
     test('getter hashCode', () async {
-      expect(
-        NetworkInformation.unknown().hashCode != 0,
-        isTrue,
-      );
+      expect(NetworkInformation.unknown().hashCode != 0, isTrue);
     });
   });
 
@@ -79,10 +69,7 @@ void main() {
     test('getter information', () async {
       final NetworkPlugin tNetwork = NetworkPlugin();
 
-      expect(
-        tNetwork.information == NetworkInformation.unknown(),
-        isTrue,
-      );
+      expect(tNetwork.information == NetworkInformation.unknown(), isTrue);
     });
 
     test('Function init', () async {
@@ -90,10 +77,7 @@ void main() {
       final App tApp = createApp();
 
       final bool tResult = await tNetwork.init(tApp);
-      expect(
-        tResult,
-        isTrue,
-      );
+      expect(tResult, isTrue);
 
       tNetwork.dispose();
     });
@@ -151,19 +135,22 @@ void main() {
       );
     });
 
-    test('Function _onConnectivityChanged NetworkConnectivity.mobile',
-        () async {
-      final NetworkPlugin tNetwork = NetworkPlugin();
+    test(
+      'Function _onConnectivityChanged NetworkConnectivity.mobile',
+      () async {
+        final NetworkPlugin tNetwork = NetworkPlugin();
 
-      testOnConnectivityChangedValue = [NetworkConnectivity.mobile];
-      await tNetwork.didChangeAppLifecycleState(AppLifecycleState.resumed);
+        testOnConnectivityChangedValue = [NetworkConnectivity.mobile];
+        await tNetwork.didChangeAppLifecycleState(AppLifecycleState.resumed);
 
-      expect(
-        tNetwork.information.connectivities
-            .contains(NetworkConnectivity.mobile),
-        isTrue,
-      );
-    });
+        expect(
+          tNetwork.information.connectivities.contains(
+            NetworkConnectivity.mobile,
+          ),
+          isTrue,
+        );
+      },
+    );
 
     test('Function _onConnectivityChanged NetworkConnectivity.wifi', () async {
       final NetworkPlugin tNetwork = NetworkPlugin();
@@ -177,33 +164,39 @@ void main() {
       );
     });
 
-    test('Function _onConnectivityChanged NetworkConnectivity.ethernet',
-        () async {
-      final NetworkPlugin tNetwork = NetworkPlugin();
+    test(
+      'Function _onConnectivityChanged NetworkConnectivity.ethernet',
+      () async {
+        final NetworkPlugin tNetwork = NetworkPlugin();
 
-      testOnConnectivityChangedValue = [NetworkConnectivity.ethernet];
-      await tNetwork.didChangeAppLifecycleState(AppLifecycleState.resumed);
+        testOnConnectivityChangedValue = [NetworkConnectivity.ethernet];
+        await tNetwork.didChangeAppLifecycleState(AppLifecycleState.resumed);
 
-      expect(
-        tNetwork.information.connectivities
-            .contains(NetworkConnectivity.ethernet),
-        isTrue,
-      );
-    });
+        expect(
+          tNetwork.information.connectivities.contains(
+            NetworkConnectivity.ethernet,
+          ),
+          isTrue,
+        );
+      },
+    );
 
-    test('Function _onConnectivityChanged NetworkConnectivity.bluetooth',
-        () async {
-      final NetworkPlugin tNetwork = NetworkPlugin();
+    test(
+      'Function _onConnectivityChanged NetworkConnectivity.bluetooth',
+      () async {
+        final NetworkPlugin tNetwork = NetworkPlugin();
 
-      testOnConnectivityChangedValue = [NetworkConnectivity.bluetooth];
-      await tNetwork.didChangeAppLifecycleState(AppLifecycleState.resumed);
+        testOnConnectivityChangedValue = [NetworkConnectivity.bluetooth];
+        await tNetwork.didChangeAppLifecycleState(AppLifecycleState.resumed);
 
-      expect(
-        tNetwork.information.connectivities
-            .contains(NetworkConnectivity.bluetooth),
-        isTrue,
-      );
-    });
+        expect(
+          tNetwork.information.connectivities.contains(
+            NetworkConnectivity.bluetooth,
+          ),
+          isTrue,
+        );
+      },
+    );
 
     test('Function _onConnectivityChanged NetworkConnectivity.vpn', () async {
       final NetworkPlugin tNetwork = NetworkPlugin();
@@ -223,10 +216,7 @@ void main() {
       await tNetwork.init(tApp);
       await tNetwork.dispose();
 
-      expect(
-        tNetwork.disposed,
-        isTrue,
-      );
+      expect(tNetwork.disposed, isTrue);
     });
   });
 }

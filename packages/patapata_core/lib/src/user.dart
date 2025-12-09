@@ -93,14 +93,12 @@ class UserChangeData {
   /// Retrieves the [properties] that have been overridden for each [Type].
   Map<String, Object?> getPropertiesFor<T>() =>
       propertiesOverrides.containsKey(T)
-          ? (Map.from(properties)..addAll(propertiesOverrides[T]!))
-          : Map.from(properties);
+      ? (Map.from(properties)..addAll(propertiesOverrides[T]!))
+      : Map.from(properties);
 
   /// Sets all values of properties to null.
   void removeAllProperties() {
-    final tOldProperties = {
-      for (var i in properties.keys) i: null,
-    };
+    final tOldProperties = {for (var i in properties.keys) i: null};
 
     properties
       ..clear()
@@ -116,9 +114,7 @@ class User extends ProviderModel<User> {
   /// The [App] that was passed in the constructor.
   final App app;
 
-  User({
-    required this.app,
-  });
+  User({required this.app});
 
   final _key = ProviderLockKey('patapata.UserKey');
 
@@ -160,14 +156,14 @@ class User extends ProviderModel<User> {
   /// The value obtained may not be the latest.
   Map<String, Object?> getPropertiesFor<T>() =>
       _propertiesOverrides.containsKey(T)
-          ? (properties..addAll(_propertiesOverrides[T]!))
-          : properties;
+      ? (properties..addAll(_propertiesOverrides[T]!))
+      : properties;
 
   late final ProviderModelVariable<_CompareMap> _data =
       createVariable<_CompareMap>(_CompareMap());
 
   final List<FutureOr<void> Function(User user, UserChangeData changes)>
-      _synchronousChangeListeners = [];
+  _synchronousChangeListeners = [];
 
   /// Adds a listener to monitor updates to user data.
   ///
@@ -179,33 +175,24 @@ class User extends ProviderModel<User> {
   /// the final values in [changes] are committed.
   /// If any listener returns an error, the changes are discarded.
   void addSynchronousChangeListener(
-          FutureOr<void> Function(User user, UserChangeData changes)
-              callback) =>
-      _synchronousChangeListeners.add(callback);
+    FutureOr<void> Function(User user, UserChangeData changes) callback,
+  ) => _synchronousChangeListeners.add(callback);
 
   /// Removes the listener that was added using [addSynchronousChangeListener].
   void removeSynchronousChangeListener(
-          FutureOr<void> Function(User user, UserChangeData changes)
-              callback) =>
-      _synchronousChangeListeners.remove(callback);
+    FutureOr<void> Function(User user, UserChangeData changes) callback,
+  ) => _synchronousChangeListeners.remove(callback);
 
   /// All values of [User].
   ///
   /// `[id, properties, data]`
-  List<ProviderModelVariable> get variables => [
-        _id,
-        _properties,
-        _data,
-      ];
+  List<ProviderModelVariable> get variables => [_id, _properties, _data];
 
   /// Sets arbitrary data.
   ///
   /// This value can be used for data exchange within the application and
   /// is not intended to be sent to external packages.
-  Future<void> setData<T extends Object?>(
-    String key,
-    T value,
-  ) async {
+  Future<void> setData<T extends Object?>(String key, T value) async {
     await lock((batch) {
       _logger.fine('setData:$key=$value');
       final tNewData = _CompareMap(batch.get(_data));
@@ -258,8 +245,8 @@ class User extends ProviderModel<User> {
   /// The value obtained may not be the latest.
   T? getProperty<T>(String key, [T? defaultValue]) =>
       _properties.unsafeValue.containsKey(key)
-          ? _properties.unsafeValue[key] as T?
-          : defaultValue;
+      ? _properties.unsafeValue[key] as T?
+      : defaultValue;
 
   Future<void> _runSynchronousChangeListeners(ProviderModelBatch lock) async {
     final tChangeData = UserChangeData(
@@ -270,8 +257,9 @@ class User extends ProviderModel<User> {
       propertiesOverrides: Map.from(_propertiesOverrides),
     );
 
-    final tSynchronousChangeListeners =
-        _synchronousChangeListeners.toList(growable: false);
+    final tSynchronousChangeListeners = _synchronousChangeListeners.toList(
+      growable: false,
+    );
     final tPossibleExternalChanges = tSynchronousChangeListeners.isNotEmpty;
 
     if (tPossibleExternalChanges) {
@@ -282,20 +270,23 @@ class User extends ProviderModel<User> {
       });
 
       if (_id.unsafeValue != tChangeData.id) {
-        _logger
-            .info('Synchronous change listener changed id: ${tChangeData.id}');
+        _logger.info(
+          'Synchronous change listener changed id: ${tChangeData.id}',
+        );
         lock.set(_id, tChangeData.id);
       }
 
       if (_properties.unsafeValue != tChangeData.properties) {
         _logger.info(
-            'Synchronous change listener changed properties: ${tChangeData.properties}');
+          'Synchronous change listener changed properties: ${tChangeData.properties}',
+        );
         lock.set<_CompareMap>(_properties, _CompareMap(tChangeData.properties));
       }
 
       if (_data.unsafeValue != tChangeData.data) {
         _logger.info(
-            'Synchronous change listener changed data: ${tChangeData.data}');
+          'Synchronous change listener changed data: ${tChangeData.data}',
+        );
         lock.set<_CompareMap>(_data, _CompareMap(tChangeData.data));
       }
 
@@ -304,8 +295,11 @@ class User extends ProviderModel<User> {
         ..addAll(tChangeData.idOverrides);
       _propertiesOverrides
         ..clear()
-        ..addAll(tChangeData.propertiesOverrides
-            .map((key, value) => MapEntry(key, _CompareMap()..addAll(value))));
+        ..addAll(
+          tChangeData.propertiesOverrides.map(
+            (key, value) => MapEntry(key, _CompareMap()..addAll(value)),
+          ),
+        );
     }
   }
 
@@ -396,9 +390,7 @@ class User extends ProviderModel<User> {
     }
 
     // notify listeners to remove old properties.
-    final tOldProperties = {
-      for (var i in batch.get(_properties).keys) i: null,
-    };
+    final tOldProperties = {for (var i in batch.get(_properties).keys) i: null};
 
     final tProperties = _CompareMap(tOldProperties);
 
@@ -481,9 +473,7 @@ class User extends ProviderModel<User> {
     await _runSynchronousChangeListeners(batch);
 
     try {
-      await app.remoteConfig.fetch(
-        force: batch.get(_id) != _id.unsafeValue,
-      );
+      await app.remoteConfig.fetch(force: batch.get(_id) != _id.unsafeValue);
     } catch (e, stackTrace) {
       _logger.info('Failed to refresh RemoteConfig.', e, stackTrace);
     }

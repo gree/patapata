@@ -17,23 +17,27 @@ class SynchronousErrorableFuture<T> implements Future<T> {
   final bool _hasError;
 
   SynchronousErrorableFuture(T value)
-      : _hasError = false,
-        _stackTrace = null,
-        _value = value;
+    : _hasError = false,
+      _stackTrace = null,
+      _value = value;
 
   SynchronousErrorableFuture.error(Object error, [this._stackTrace])
-      : _hasError = true,
-        _value = error;
+    : _hasError = true,
+      _value = error;
 
   @override
-  Future<R> then<R>(FutureOr<R> Function(T value) onValue,
-      {Function? onError}) {
+  Future<R> then<R>(
+    FutureOr<R> Function(T value) onValue, {
+    Function? onError,
+  }) {
     try {
       final FutureOr<R> tResult;
       if (_hasError) {
         if (onError == null) {
           return SynchronousErrorableFuture<R>.error(
-              _value, _stackTrace ?? StackTrace.empty);
+            _value,
+            _stackTrace ?? StackTrace.empty,
+          );
         }
 
         if (onError is Function(Object, StackTrace)) {
@@ -42,10 +46,11 @@ class SynchronousErrorableFuture<T> implements Future<T> {
           tResult = onError(_value);
         } else {
           throw ArgumentError.value(
-              onError,
-              "onError",
-              "Error handler must accept one Object or one Object and a StackTrace"
-                  " as arguments, and return a value of the returned future's type");
+            onError,
+            "onError",
+            "Error handler must accept one Object or one Object and a StackTrace"
+                " as arguments, and return a value of the returned future's type",
+          );
         }
       } else {
         tResult = onValue(_value);
@@ -112,8 +117,11 @@ class SynchronousErrorableFuture<T> implements Future<T> {
   }
 
   /// When including [SynchronousErrorableFuture] in [Future.wait], use this method instead.
-  static Future<List<T>> wait<T>(Iterable<Future<T>> futures,
-      {bool eagerError = false, void Function(T successValue)? cleanUp}) {
+  static Future<List<T>> wait<T>(
+    Iterable<Future<T>> futures, {
+    bool eagerError = false,
+    void Function(T successValue)? cleanUp,
+  }) {
     final List<Future<T>> tOtherFutures = [];
     final List<SynchronousErrorableFuture<T>> tSyncFutures = [];
     final tFutureTracker = <bool>[];
@@ -151,16 +159,18 @@ class SynchronousErrorableFuture<T> implements Future<T> {
     Object? tError;
     StackTrace? tStackTrace;
     for (final tFuture in tSyncFutures) {
-      tFuture.then((value) {
-        tSyncValues.add(value);
-      }).catchError((e, stackTrace) {
-        if (tError == null) {
-          tError = e;
-          tStackTrace = stackTrace;
-        }
+      tFuture
+          .then((value) {
+            tSyncValues.add(value);
+          })
+          .catchError((e, stackTrace) {
+            if (tError == null) {
+              tError = e;
+              tStackTrace = stackTrace;
+            }
 
-        throw e;
-      });
+            throw e;
+          });
     }
 
     if (tError != null) {
@@ -176,21 +186,23 @@ class SynchronousErrorableFuture<T> implements Future<T> {
     // Mixed...
     final tCompleter = Completer<List<T>>();
 
-    tAsyncFutures!.then((asyncValues) {
-      // We have both value lists now. Assemble in the right order and return.
-      var tSyncIndex = 0;
-      var tAsyncIndex = 0;
+    tAsyncFutures!
+        .then((asyncValues) {
+          // We have both value lists now. Assemble in the right order and return.
+          var tSyncIndex = 0;
+          var tAsyncIndex = 0;
 
-      tCompleter.complete([
-        for (var sync in tFutureTracker)
-          if (sync) ...[
-            tSyncValues[tSyncIndex++],
-          ] else if (!sync)
-            asyncValues[tAsyncIndex++],
-      ]);
-    }).catchError((e, stackTrace) {
-      tCompleter.completeError(e, stackTrace);
-    });
+          tCompleter.complete([
+            for (var sync in tFutureTracker)
+              if (sync) ...[
+                tSyncValues[tSyncIndex++],
+              ] else if (!sync)
+                asyncValues[tAsyncIndex++],
+          ]);
+        })
+        .catchError((e, stackTrace) {
+          tCompleter.completeError(e, stackTrace);
+        });
 
     return tCompleter.future;
   }

@@ -56,10 +56,10 @@ String l(
   String key, [
   Map<String, Object>? namedParameters,
 ]) =>
-    Localizations.of<L10n>(context, L10n)?.lookup(
-      key,
-      namedParameters: namedParameters,
-    ) ??
+    Localizations.of<L10n>(
+      context,
+      L10n,
+    )?.lookup(key, namedParameters: namedParameters) ??
     key;
 
 /// Provides functionality required to switch the language of the application.
@@ -137,17 +137,14 @@ class I18nPlugin extends Plugin {
   }
 
   @override
-  Widget createAppWidgetWrapper(Widget child) => _L10nAssetReloader(
-        child: child,
-      );
+  Widget createAppWidgetWrapper(Widget child) =>
+      _L10nAssetReloader(child: child);
 }
 
 class _L10nAssetReloader extends StatefulWidget {
   final Widget child;
 
-  const _L10nAssetReloader({
-    required this.child,
-  });
+  const _L10nAssetReloader({required this.child});
 
   @override
   State<_L10nAssetReloader> createState() => __L10nAssetReloaderState();
@@ -169,6 +166,7 @@ class __L10nAssetReloaderState extends State<_L10nAssetReloader> {
       _reassembling = false;
     });
   }
+
   // coverage:ignore-end
 }
 
@@ -176,10 +174,7 @@ class _LoadYamlParcel {
   final String source;
   final Uri? sourceUri;
 
-  const _LoadYamlParcel(
-    this.source,
-    this.sourceUri,
-  );
+  const _LoadYamlParcel(this.source, this.sourceUri);
 }
 
 Map<String, Object> _loadYaml(_LoadYamlParcel parcel) {
@@ -201,16 +196,10 @@ Map<String, Object> _loadYaml(_LoadYamlParcel parcel) {
     }
   };
 
-  final tYaml = loadYaml(
-    parcel.source,
-    sourceUrl: parcel.sourceUri,
-  );
+  final tYaml = loadYaml(parcel.source, sourceUrl: parcel.sourceUri);
 
   if (tYaml is YamlMap) {
-    fProcessMap(
-      tYaml,
-      null,
-    );
+    fProcessMap(tYaml, null);
   } else {
     throw ArgumentError.value(
       parcel.source,
@@ -261,49 +250,45 @@ class L10n {
     List<String> paths,
   ) =>
       Future.wait([
-        for (var i in paths)
-          assetBundle
-              .loadString(
-                '$i/$fileName.yaml',
-                cache: false,
-              )
-              .catchError((e, stackTrace) {
-                if (!kIsTest) {
-                  // coverage:ignore-start
-                  _logger.warning(
-                    'Failed to load l10n file: $i/$fileName.yaml\nDid you configure I18nEnvironment correctly?',
-                    L10nLoadAssetsException(original: e),
-                    stackTrace,
-                  );
-                  // coverage:ignore-end
-                }
+            for (var i in paths)
+              assetBundle
+                  .loadString('$i/$fileName.yaml', cache: false)
+                  .catchError((e, stackTrace) {
+                    if (!kIsTest) {
+                      // coverage:ignore-start
+                      _logger.warning(
+                        'Failed to load l10n file: $i/$fileName.yaml\nDid you configure I18nEnvironment correctly?',
+                        L10nLoadAssetsException(original: e),
+                        stackTrace,
+                      );
+                      // coverage:ignore-end
+                    }
 
-                return 'patapata_dummy_never: dummy';
-              })
-              .then<Map<String, Object>>(
-                (v) => platformCompute(
-                  _loadYaml,
-                  _LoadYamlParcel(
-                    v,
-                    Uri.tryParse('$i/$fileName.yaml'),
-                  ),
-                  debugLabel: 'patapata_core:i18n:loadYaml',
-                ),
-              )
-              .catchError((e, stackTrace) {
-                _logger.warning(
-                  'Failed to parse l10n file: $i/$fileName.yaml',
-                  L10nLoadAssetsException(original: e),
-                  stackTrace,
-                );
+                    return 'patapata_dummy_never: dummy';
+                  })
+                  .then<Map<String, Object>>(
+                    (v) => platformCompute(
+                      _loadYaml,
+                      _LoadYamlParcel(v, Uri.tryParse('$i/$fileName.yaml')),
+                      debugLabel: 'patapata_core:i18n:loadYaml',
+                    ),
+                  )
+                  .catchError((e, stackTrace) {
+                    _logger.warning(
+                      'Failed to parse l10n file: $i/$fileName.yaml',
+                      L10nLoadAssetsException(original: e),
+                      stackTrace,
+                    );
 
-                return <String, Object>{};
-              }),
-      ])
+                    return <String, Object>{};
+                  }),
+          ])
           .then<Map<String, Object>>(
-              (maps) => maps.reduce((v, e) => v..addAll(e)))
-          .then((v) =>
-              platformCompute(_prepareMap, _PrepareMapParcel(locale, v)));
+            (maps) => maps.reduce((v, e) => v..addAll(e)),
+          )
+          .then(
+            (v) => platformCompute(_prepareMap, _PrepareMapParcel(locale, v)),
+          );
 
   /// Load the yaml file corresponding to [Locale] from the asset.
   ///
@@ -339,10 +324,7 @@ class L10n {
   /// formatting compliant with [MessageFormat] is possible.
   ///
   /// This method is called from the [l] method.
-  String lookup(
-    String key, {
-    Map<String, Object>? namedParameters,
-  }) {
+  String lookup(String key, {Map<String, Object>? namedParameters}) {
     final tValue = _map[key];
 
     if (tValue == null) {
@@ -363,8 +345,7 @@ class L10n {
   static bool containsKey({
     required BuildContext context,
     required String key,
-  }) =>
-      Localizations.of<L10n>(context, L10n)?.containsMessageKey(key) ?? false;
+  }) => Localizations.of<L10n>(context, L10n)?.containsMessageKey(key) ?? false;
 }
 
 /// Factory to load resources for [L10n].
@@ -387,10 +368,10 @@ class L10nDelegate extends LocalizationsDelegate<L10n> {
 
   @override
   Future<L10n> load(Locale locale) => L10n.fromAssets(
-        locale: locale,
-        paths: _i18n._l10nPaths,
-        assetBundle: mockL10nAssetBundle,
-      ).then((value) => _l10n = value);
+    locale: locale,
+    paths: _i18n._l10nPaths,
+    assetBundle: mockL10nAssetBundle,
+  ).then((value) => _l10n = value);
 
   // coverage:ignore-start
   @override
@@ -403,7 +384,6 @@ AssetBundle? mockL10nAssetBundle;
 
 /// Thrown if the loading of an asset in [L10n] fails.
 class L10nLoadAssetsException extends PatapataCoreException {
-  L10nLoadAssetsException({
-    super.original,
-  }) : super(code: PatapataCoreExceptionCode.PPE401);
+  L10nLoadAssetsException({super.original})
+    : super(code: PatapataCoreExceptionCode.PPE401);
 }

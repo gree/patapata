@@ -6,9 +6,7 @@
 part of 'repository.dart';
 
 class _RepositoryCacheMap<K, V> extends MapBase<K, V> {
-  _RepositoryCacheMap({
-    required this.maximumSize,
-  });
+  _RepositoryCacheMap({required this.maximumSize});
 
   final _accessor = HashMap<K, V>();
   // ignore: prefer_collection_literals

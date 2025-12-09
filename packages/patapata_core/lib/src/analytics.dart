@@ -28,7 +28,7 @@ mixin AnalyticsEventFilterEnvironment {
   /// You can use this to force certain events to only be sent to certain
   /// plugins or other types as well as transform the event.
   Map<Type, AnalyticsEvent? Function(AnalyticsEvent event)>
-      get analyticsEventFilter;
+  get analyticsEventFilter;
 }
 
 /// An analytics class that notifies and monitors information related to events within the app,
@@ -46,8 +46,8 @@ class Analytics {
   Stream<AnalyticsEvent> eventsFor<T>() {
     return events
         .map<AnalyticsEvent?>((event) {
-          final tEnvironment =
-              getApp().environmentAs<AnalyticsEventFilterEnvironment>();
+          final tEnvironment = getApp()
+              .environmentAs<AnalyticsEventFilterEnvironment>();
 
           if (tEnvironment?.analyticsEventFilter.containsKey(T) == true) {
             return tEnvironment!.analyticsEventFilter[T]!(event);
@@ -158,10 +158,7 @@ class Analytics {
   ///   name: 'Custom Hogehoge Event',
   /// ));
   /// ```
-  void rawEvent(
-    AnalyticsEvent event, {
-    Level logLevel = Level.INFO,
-  }) {
+  void rawEvent(AnalyticsEvent event, {Level logLevel = Level.INFO}) {
     event._navigationInteractionContextData = navigationInteractionContextData;
 
     _logger.log(logLevel, () => '$event');
@@ -291,7 +288,9 @@ class Analytics {
 
   /// Convert [object] into a loggable JSON parameter with the prefix [prefix].
   static Map<String, Object> tryConvertToLoggableJsonParameters(
-      String prefix, Object? object) {
+    String prefix,
+    Object? object,
+  ) {
     if (object == null) {
       return const {};
     }
@@ -314,9 +313,11 @@ class Analytics {
     final tCharacters = tJson.characters;
 
     var i = 0;
-    for (;; i++) {
+    for (; ; i++) {
       final tPart = tCharacters.getRange(
-          _kMaxJsonParameterLength * i, _kMaxJsonParameterLength * (i + 1));
+        _kMaxJsonParameterLength * i,
+        _kMaxJsonParameterLength * (i + 1),
+      );
 
       if (tPart.isEmpty) {
         break;
@@ -352,11 +353,8 @@ class AnalyticsEvent {
   /// Creates an [AnalyticsEvent].
   /// Specify the name for this [AnalyticsEvent] to be created with [name], and pass the data for this event to [data].
   /// If you provide [context], it will merge the data specified in [context] in to [data] with [data] being prioritized.
-  AnalyticsEvent({
-    required this.name,
-    this.data,
-    AnalyticsContext? context,
-  }) : contextData = context?.resolve();
+  AnalyticsEvent({required this.name, this.data, AnalyticsContext? context})
+    : contextData = context?.resolve();
 
   /// A flat map from [contextData] and [data].
   Map<String, Object?>? get flatData => <String, Object?>{}
@@ -371,16 +369,16 @@ class AnalyticsEvent {
   @override
   operator ==(Object other) => other is AnalyticsEvent
       ? name == other.name &&
-          mapEquals(data, other.data) &&
-          mapEquals(contextData, contextData)
+            mapEquals(data, other.data) &&
+            mapEquals(contextData, contextData)
       : false;
 
   @override
   int get hashCode => Object.hashAll([
-        name,
-        const MapEquality<String, Object?>().hash(data),
-        const MapEquality<String, Object?>().hash(contextData),
-      ]);
+    name,
+    const MapEquality<String, Object?>().hash(data),
+    const MapEquality<String, Object?>().hash(contextData),
+  ]);
 }
 
 /// Context class for using analytics functionality,
@@ -398,17 +396,13 @@ class AnalyticsContext {
     AnalyticsContext parent,
     AnalyticsContext child,
   ) =>
-      AnalyticsContext(
-        Map<String, Object?>.from(child._data),
-      ).._parent = parent;
+      AnalyticsContext(Map<String, Object?>.from(child._data))
+        .._parent = parent;
 
   /// Recursively examines parent [AnalyticsContext]s,
   /// and merges any data from them in to this [AnalyticsContext]'s data and returns the result.
   Map<String, Object?> resolve() => _parent != null
-      ? {
-          ..._parent!.resolve(),
-          ..._data,
-        }
+      ? {..._parent!.resolve(), ..._data}
       : Map<String, Object?>.from(_data);
 
   @override
@@ -418,9 +412,9 @@ class AnalyticsContext {
 
   @override
   int get hashCode => Object.hashAll([
-        _parent,
-        const MapEquality<String, Object?>().hash(_data),
-      ]);
+    _parent,
+    const MapEquality<String, Object?>().hash(_data),
+  ]);
 
   @override
   String toString() => 'AnalyticsContext:${resolve()}';
@@ -432,8 +426,8 @@ class _MultiAnalyticsContext implements AnalyticsContext {
 
   @override
   Map<String, Object?> get _data => {
-        for (var i in _globalContextMap.values) ...i.resolve(),
-      };
+    for (var i in _globalContextMap.values) ...i.resolve(),
+  };
 
   final _globalContextMap = <Object, AnalyticsContext>{};
 
@@ -503,10 +497,7 @@ class AnalyticsContextProvider extends SingleChildStatelessWidget {
 
     return _AnalyticsContextProviderRenderWidget(
       analyticsContext: tContext,
-      child: Provider<AnalyticsContext>.value(
-        value: tContext,
-        child: child,
-      ),
+      child: Provider<AnalyticsContext>.value(value: tContext, child: child),
     );
   }
 }
@@ -522,8 +513,8 @@ class _AnalyticsContextProviderRenderWidget
 
   @override
   _AnalyticsContextProviderRenderObject createRenderObject(
-          BuildContext context) =>
-      _AnalyticsContextProviderRenderObject(analyticsContext);
+    BuildContext context,
+  ) => _AnalyticsContextProviderRenderObject(analyticsContext);
 
   @override
   void updateRenderObject(
@@ -544,10 +535,7 @@ class _AnalyticsContextProviderRenderObject extends RenderProxyBox {
 /// While this class is publicly accessible, it is not typically used directly by an application.
 /// @nodoc
 class AnalyticsPointerEventListener extends SingleChildRenderObjectWidget {
-  const AnalyticsPointerEventListener({
-    super.key,
-    required super.child,
-  });
+  const AnalyticsPointerEventListener({super.key, required super.child});
 
   @override
   RenderObject createRenderObject(BuildContext context) =>
@@ -632,8 +620,8 @@ class AnalyticsEventWidget extends StatelessWidget {
     this.data,
     this.event,
     this.child,
-  })  : assert(event == null || name == null),
-        assert(data == null || event == null);
+  }) : assert(event == null || name == null),
+       assert(data == null || event == null);
 
   @override
   Widget build(BuildContext context) {
@@ -646,10 +634,10 @@ class AnalyticsEventWidget extends StatelessWidget {
           context.read<Analytics>().rawEvent(event!);
         } else {
           context.read<Analytics>().event(
-                name: name!,
-                data: data,
-                context: context,
-              );
+            name: name!,
+            data: data,
+            context: context,
+          );
         }
       },
       child: child,
@@ -690,8 +678,8 @@ class AnalyticsSingletonEventWidget extends SingleChildStatefulWidget {
     this.data,
     this.event,
     super.child,
-  })  : assert(event == null || name == null),
-        assert(data == null || event == null);
+  }) : assert(event == null || name == null),
+       assert(data == null || event == null);
 
   @override
   // ignore: library_private_types_in_public_api
@@ -727,10 +715,10 @@ class _AnalyticsSingletonEventWidgetState
       context.read<Analytics>().rawEvent(widget.event!);
     } else {
       context.read<Analytics>().event(
-            name: widget.name!,
-            data: widget.data,
-            context: context,
-          );
+        name: widget.name!,
+        data: widget.data,
+        context: context,
+      );
     }
   }
 }
@@ -797,8 +785,10 @@ class AnalyticsImpressionWidget extends SingleChildStatefulWidget {
 
   /// This function is used to create batch data. When set, it sends impression information as a batch.
   final Map<String, Object?> Function(
-          List<Map<String, Object?>> datas, List<AnalyticsContext> contexts)?
-      batchGenerator;
+    List<Map<String, Object?>> datas,
+    List<AnalyticsContext> contexts,
+  )?
+  batchGenerator;
 
   /// A list of names of analytics context keys to ignore in batch sending.
   final Set<String> batchDataToIgnore;
@@ -810,19 +800,18 @@ class AnalyticsImpressionWidget extends SingleChildStatefulWidget {
     this.name,
     this.data,
     this.event,
-    this.durationThreshold = const Duration(
-      seconds: 1,
-    ),
+    this.durationThreshold = const Duration(seconds: 1),
     this.visibleThreshold,
     this.thresholdCallback,
     this.once = false,
     this.batchGenerator,
     this.batchDataToIgnore = const {},
-  })  : assert(
-            (event == null && name != null) || (name == null && event != null)),
-        assert(data == null || event == null),
-        assert(visibleThreshold != null || thresholdCallback != null),
-        assert(!(event != null && batchGenerator != null));
+  }) : assert(
+         (event == null && name != null) || (name == null && event != null),
+       ),
+       assert(data == null || event == null),
+       assert(visibleThreshold != null || thresholdCallback != null),
+       assert(!(event != null && batchGenerator != null));
 
   @override
   // ignore: library_private_types_in_public_api
@@ -840,8 +829,9 @@ class _AnalyticsImpressionWidgetState
 
   void _copyData() {
     _eventSent = false;
-    _currentData =
-        widget.data == null ? null : Map<String, Object?>.from(widget.data!);
+    _currentData = widget.data == null
+        ? null
+        : Map<String, Object?>.from(widget.data!);
   }
 
   @override
@@ -927,14 +917,20 @@ class _AnalyticsImpressionWidgetState
     AnalyticsContext context,
     String name,
     Map<String, Object?> Function(
-            List<Map<String, Object?>> datas, List<AnalyticsContext> contexts)
-        generator,
+      List<Map<String, Object?>> datas,
+      List<AnalyticsContext> contexts,
+    )
+    generator,
   ) {
     final tAnalyticsContext = context.resolve()
       ..removeWhere((key, value) => widget.batchDataToIgnore.contains(key));
 
     return Object.hash(
-        name, analytics, tAnalyticsContext.toString(), generator);
+      name,
+      analytics,
+      tAnalyticsContext.toString(),
+      generator,
+    );
   }
 
   void _scheduleBatch() {
@@ -961,11 +957,7 @@ class _AnalyticsImpressionWidgetState
           : i.generator(i.datas, i.contexts);
 
       i.analytics.rawEvent(
-        AnalyticsEvent(
-          name: i.name,
-          data: tData,
-          context: i.contexts.first,
-        ),
+        AnalyticsEvent(name: i.name, data: tData, context: i.contexts.first),
       );
     }
   }
@@ -978,14 +970,18 @@ class _AnalyticsImpressionWidgetState
       final tAnalyticsContext = context.read<AnalyticsContext>();
 
       _batches.putIfAbsent(
-        _batchHash(tAnalytics, tAnalyticsContext, widget.name!,
-            widget.batchGenerator!),
-        () => _ImpressionBatch(
-          widget.name!,
-          tAnalytics,
-          widget.batchGenerator!,
-        ),
-      )
+          _batchHash(
+            tAnalytics,
+            tAnalyticsContext,
+            widget.name!,
+            widget.batchGenerator!,
+          ),
+          () => _ImpressionBatch(
+            widget.name!,
+            tAnalytics,
+            widget.batchGenerator!,
+          ),
+        )
         ..datas.add(widget.data ?? const {})
         ..contexts.add(tAnalyticsContext);
       _scheduleBatch();
@@ -1009,14 +1005,12 @@ class _ImpressionBatch {
   final String name;
   final Analytics analytics;
   final Map<String, Object?> Function(
-          List<Map<String, Object?>> datas, List<AnalyticsContext> contexts)
-      generator;
+    List<Map<String, Object?>> datas,
+    List<AnalyticsContext> contexts,
+  )
+  generator;
 
-  _ImpressionBatch(
-    this.name,
-    this.analytics,
-    this.generator,
-  );
+  _ImpressionBatch(this.name, this.analytics, this.generator);
 }
 
 /// A class representing the names of analytics events as strings.
@@ -1047,10 +1041,7 @@ class AnalyticsNavigationType {
 extension AnalyticsTryGetContext on BuildContext {
   /// If [AnalyticsContext] can be retrieved from the widget tree, it returns that context.
   AnalyticsContext? maybeGetAnalyticsContext() {
-    return Provider.of<AnalyticsContext?>(
-      this,
-      listen: false,
-    );
+    return Provider.of<AnalyticsContext?>(this, listen: false);
   }
 }
 
@@ -1077,49 +1068,51 @@ class AnalyticsRouteViewEvent extends AnalyticsEvent {
     required Route route,
     required String navigationType,
   }) : super(
-          name: AnalyticsEventName.routeView,
-          data: {
-            'isFirst': route.isFirst,
-            if (route.settings.arguments != null)
-              'arguments': route.settings.arguments?.toString(),
-            if (route.settings is StandardPageInterface) ...{
-              'pageData': (route.settings as StandardPageInterface)
-                          .standardPageKey
-                          .currentState !=
-                      null
-                  ? (route.settings as StandardPageInterface)
-                      .standardPageKey
-                      .currentState!
-                      .pageData
-                  : route.settings.arguments,
-              'pageLink': (route.settings as StandardPageInterface)
-                          .standardPageKey
-                          .currentState !=
-                      null
-                  ? (route.settings as StandardPageInterface)
-                      .standardPageKey
-                      .currentState!
-                      .link
-                  : (route.settings as StandardPageInterface)
-                      .factoryObject
-                      .generateLink(route.settings.arguments),
-              ...Analytics.tryConvertToLoggableJsonParameters(
-                  'pageDataJson',
-                  (route.settings as StandardPageInterface)
-                              .standardPageKey
-                              .currentState !=
-                          null
-                      ? (route.settings as StandardPageInterface)
-                          .standardPageKey
-                          .currentState!
-                          .pageData
-                      : route.settings.arguments),
-            },
-            if (route.settings.name != null) 'routeName': route.settings.name,
-            'navigationType': navigationType,
-          },
-          context: route.navigator?.context.maybeGetAnalyticsContext(),
-        );
+         name: AnalyticsEventName.routeView,
+         data: {
+           'isFirst': route.isFirst,
+           if (route.settings.arguments != null)
+             'arguments': route.settings.arguments?.toString(),
+           if (route.settings is StandardPageInterface) ...{
+             'pageData':
+                 (route.settings as StandardPageInterface)
+                         .standardPageKey
+                         .currentState !=
+                     null
+                 ? (route.settings as StandardPageInterface)
+                       .standardPageKey
+                       .currentState!
+                       .pageData
+                 : route.settings.arguments,
+             'pageLink':
+                 (route.settings as StandardPageInterface)
+                         .standardPageKey
+                         .currentState !=
+                     null
+                 ? (route.settings as StandardPageInterface)
+                       .standardPageKey
+                       .currentState!
+                       .link
+                 : (route.settings as StandardPageInterface).factoryObject
+                       .generateLink(route.settings.arguments),
+             ...Analytics.tryConvertToLoggableJsonParameters(
+               'pageDataJson',
+               (route.settings as StandardPageInterface)
+                           .standardPageKey
+                           .currentState !=
+                       null
+                   ? (route.settings as StandardPageInterface)
+                         .standardPageKey
+                         .currentState!
+                         .pageData
+                   : route.settings.arguments,
+             ),
+           },
+           if (route.settings.name != null) 'routeName': route.settings.name,
+           'navigationType': navigationType,
+         },
+         context: route.navigator?.context.maybeGetAnalyticsContext(),
+       );
 }
 
 /// The necessary NavigatorObserver for the analytics system to monitor page navigation.
@@ -1128,9 +1121,8 @@ class AnalyticsRouteViewEvent extends AnalyticsEvent {
 class AnalyticsNavigatorObserver extends NavigatorObserver {
   final Analytics _analytics;
 
-  AnalyticsNavigatorObserver({
-    required Analytics analytics,
-  }) : _analytics = analytics;
+  AnalyticsNavigatorObserver({required Analytics analytics})
+    : _analytics = analytics;
 
   @override
   void didPush(Route<dynamic> route, Route<dynamic>? previousRoute) {
@@ -1229,7 +1221,9 @@ class AnalyticsNavigatorObserver extends NavigatorObserver {
   // coverage:ignore-start
   @override
   void didStartUserGesture(
-      Route<dynamic> route, Route<dynamic>? previousRoute) {
+    Route<dynamic> route,
+    Route<dynamic>? previousRoute,
+  ) {
     _logger.finer('AnalyticsNavigatorObserver:didStartUserGesture');
   }
   // coverage:ignore-end
@@ -1239,6 +1233,7 @@ class AnalyticsNavigatorObserver extends NavigatorObserver {
   void didStopUserGesture() {
     _logger.finer('AnalyticsNavigatorObserver:didStopUserGesture');
   }
+
   // coverage:ignore-end
 }
 
@@ -1293,15 +1288,15 @@ class AnalyticsRevenueEvent extends AnalyticsEvent {
     Map<String, Object?>? data,
     super.context,
   }) : super(
-          name: eventName ?? AnalyticsEventName.revenue,
-          data: {
-            kDataKeyRevenue: revenue,
-            if (currency?.isNotEmpty == true) kDataKeyCurrency: currency,
-            if (orderId?.isNotEmpty == true) kDataKeyOrderId: orderId,
-            if (receipt?.isNotEmpty == true) kDataKeyReceipt: receipt,
-            if (productId?.isNotEmpty == true) kDataKeyProductId: productId,
-            if (productName?.isNotEmpty == true)
-              kDataKeyProductName: productName,
-          }..addAll(data ?? const {}),
-        );
+         name: eventName ?? AnalyticsEventName.revenue,
+         data: {
+           kDataKeyRevenue: revenue,
+           if (currency?.isNotEmpty == true) kDataKeyCurrency: currency,
+           if (orderId?.isNotEmpty == true) kDataKeyOrderId: orderId,
+           if (receipt?.isNotEmpty == true) kDataKeyReceipt: receipt,
+           if (productId?.isNotEmpty == true) kDataKeyProductId: productId,
+           if (productName?.isNotEmpty == true)
+             kDataKeyProductName: productName,
+         }..addAll(data ?? const {}),
+       );
 }

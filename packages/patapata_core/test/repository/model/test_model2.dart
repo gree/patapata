@@ -15,9 +15,7 @@ mixin Filter1 {
 }
 
 class TestModel with SimpleRepositoryModel<TestModel, int>, Filter1 {
-  TestModel({
-    required this.id,
-  });
+  TestModel({required this.id});
 
   TestModel.init(this.id, {int? v1, double? v2, String? v3}) {
     _value1 = v1;
@@ -25,10 +23,8 @@ class TestModel with SimpleRepositoryModel<TestModel, int>, Filter1 {
     _text = v3;
   }
 
-  TestModel.fromRecord(
-    int id,
-    TestRecord v,
-  ) : this.init(id, v1: v.$1, v2: v.$2, v3: v.$3);
+  TestModel.fromRecord(int id, TestRecord v)
+    : this.init(id, v1: v.$1, v2: v.$2, v3: v.$3);
 
   @override
   final int id;
@@ -59,12 +55,10 @@ class TestModel with SimpleRepositoryModel<TestModel, int>, Filter1 {
 }
 
 class TestModelWithNotifier extends TestModel with ChangeNotifier {
-  TestModelWithNotifier({
-    required super.id,
-  });
+  TestModelWithNotifier({required super.id});
 
   TestModelWithNotifier.init(super.id, {super.v1, super.v2, super.v3})
-      : super.init();
+    : super.init();
 
   void setText(String text) {
     _text = text;

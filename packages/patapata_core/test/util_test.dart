@@ -22,97 +22,105 @@ void main() {
         tValue = 1;
       });
 
-      expect(
-        tValue,
-        equals(1),
-      );
+      expect(tValue, equals(1));
     },
   );
 
   test(
-      'A SequentialWorkQueue can add multiple work items and they will all execute in order',
-      () async {
-    final tQueue = SequentialWorkQueue();
-    String tValue = '';
+    'A SequentialWorkQueue can add multiple work items and they will all execute in order',
+    () async {
+      final tQueue = SequentialWorkQueue();
+      String tValue = '';
 
-    tQueue.add<void>(() {
-      tValue += '0';
-    });
+      tQueue.add<void>(() {
+        tValue += '0';
+      });
 
-    tQueue.add<void>(() {
-      tValue += '1';
-    });
+      tQueue.add<void>(() {
+        tValue += '1';
+      });
 
-    await tQueue.add<void>(() {
-      tValue += '2';
-    });
+      await tQueue.add<void>(() {
+        tValue += '2';
+      });
 
-    expect(
-      tValue,
-      equals('012'),
-    );
-  });
+      expect(tValue, equals('012'));
+    },
+  );
 
   test(
-      'A SequentialWorkQueue completes all work\'s futures successfully, no matter the actual work\'s result',
-      () async {
-    final tQueue = SequentialWorkQueue();
-    String tValue = '';
-    List<Future<void>> tFutures = [];
+    'A SequentialWorkQueue completes all work\'s futures successfully, no matter the actual work\'s result',
+    () async {
+      final tQueue = SequentialWorkQueue();
+      String tValue = '';
+      List<Future<void>> tFutures = [];
 
-    tFutures.add(tQueue.add<void>(() {
-      tValue += '0';
-    }));
+      tFutures.add(
+        tQueue.add<void>(() {
+          tValue += '0';
+        }),
+      );
 
-    tFutures.add(tQueue.add<void>(() async {
-      throw Error();
-    }).catchError((error) => null));
+      tFutures.add(
+        tQueue
+            .add<void>(() async {
+              throw Error();
+            })
+            .catchError((error) => null),
+      );
 
-    tFutures.add(tQueue.add<void>(() {
-      tValue += '2';
-    }));
+      tFutures.add(
+        tQueue.add<void>(() {
+          tValue += '2';
+        }),
+      );
 
-    await Future.wait(tFutures);
+      await Future.wait(tFutures);
 
-    expect(
-      tValue,
-      equals('02'),
-    );
-  });
+      expect(tValue, equals('02'));
+    },
+  );
 
-  test('A SequentialWorkQueue can have work added to it even inside other work',
-      () async {
-    final tQueue = SequentialWorkQueue();
-    String tValue = '';
-    List<Future<void>> tFutures = [];
+  test(
+    'A SequentialWorkQueue can have work added to it even inside other work',
+    () async {
+      final tQueue = SequentialWorkQueue();
+      String tValue = '';
+      List<Future<void>> tFutures = [];
 
-    tFutures.add(tQueue.add<void>(() {
-      tValue += '0';
+      tFutures.add(
+        tQueue.add<void>(() {
+          tValue += '0';
 
-      tFutures.add(tQueue.add<void>(() {
-        tValue += '1';
-      }));
-    }));
+          tFutures.add(
+            tQueue.add<void>(() {
+              tValue += '1';
+            }),
+          );
+        }),
+      );
 
-    tFutures.add(tQueue.add<void>(() {
-      tFutures.add(tQueue.add<void>(() {
-        tValue += '2';
-      }));
+      tFutures.add(
+        tQueue.add<void>(() {
+          tFutures.add(
+            tQueue.add<void>(() {
+              tValue += '2';
+            }),
+          );
 
-      tValue += '3';
-    }));
+          tValue += '3';
+        }),
+      );
 
-    while (tFutures.isNotEmpty) {
-      final tFuturesCopy = tFutures.toList();
-      tFutures.clear();
-      await Future.wait(tFuturesCopy);
-    }
+      while (tFutures.isNotEmpty) {
+        final tFuturesCopy = tFutures.toList();
+        tFutures.clear();
+        await Future.wait(tFuturesCopy);
+      }
 
-    expect(
-      tValue,
-      equals('0132'),
-    );
-  });
+      expect(tValue, equals('0132'));
+    },
+  );
 
   test(
     'A SequentialWorkQueue can be cleared, cancelling all current work that can be cancelled',
@@ -122,15 +130,19 @@ void main() {
       List<Future<void>> tFutures = [];
       String tValue = '';
 
-      tFutures.add(tQueue.add<void>(() {
-        tValue += '0';
-      }, onCancel: () => true));
+      tFutures.add(
+        tQueue.add<void>(() {
+          tValue += '0';
+        }, onCancel: () => true),
+      );
 
       tQueue.clear();
 
-      tFutures.add(tQueue.add<void>(() {
-        tValue += '1';
-      }, onCancel: () => true));
+      tFutures.add(
+        tQueue.add<void>(() {
+          tValue += '1';
+        }, onCancel: () => true),
+      );
 
       while (tFutures.isNotEmpty) {
         final tFuturesCopy = tFutures.toList();
@@ -138,27 +150,27 @@ void main() {
         await Future.wait(tFuturesCopy);
       }
 
-      expect(
-        tValue,
-        equals('01'),
-        reason: 'No async',
-      );
+      expect(tValue, equals('01'), reason: 'No async');
 
       // Async cancelled
       tQueue = SequentialWorkQueue();
       tFutures.clear();
       tValue = '';
 
-      tFutures.add(tQueue.add<void>(() async {
-        await Future.microtask(() => null);
-        tValue += '0';
-      }, onCancel: () async => await Future.microtask(() => true)));
+      tFutures.add(
+        tQueue.add<void>(() async {
+          await Future.microtask(() => null);
+          tValue += '0';
+        }, onCancel: () async => await Future.microtask(() => true)),
+      );
 
       tQueue.clear();
 
-      tFutures.add(tQueue.add<void>(() {
-        tValue += '1';
-      }, onCancel: () async => true));
+      tFutures.add(
+        tQueue.add<void>(() {
+          tValue += '1';
+        }, onCancel: () async => true),
+      );
 
       while (tFutures.isNotEmpty) {
         final tFuturesCopy = tFutures.toList();
@@ -166,39 +178,43 @@ void main() {
         await Future.wait(tFuturesCopy);
       }
 
-      expect(
-        tValue,
-        equals('1'),
-        reason: 'Async cancelled',
-      );
+      expect(tValue, equals('1'), reason: 'Async cancelled');
 
       // Async cancelled multiple times
       tQueue = SequentialWorkQueue();
       tFutures.clear();
       tValue = '';
 
-      tFutures.add(tQueue.add<void>(() async {
-        await Future.microtask(() => null);
-        tValue += '0';
-      }, onCancel: () async => await Future.microtask(() => true)));
+      tFutures.add(
+        tQueue.add<void>(() async {
+          await Future.microtask(() => null);
+          tValue += '0';
+        }, onCancel: () async => await Future.microtask(() => true)),
+      );
 
-      tFutures.add(tQueue.add<void>(() async {
-        await Future.microtask(() => null);
-        tValue += '0';
-      }, onCancel: () async => await Future.microtask(() => true)));
-
-      tQueue.clear();
-
-      tFutures.add(tQueue.add<void>(() async {
-        await Future.microtask(() => null);
-        tValue += '0';
-      }, onCancel: () async => await Future.microtask(() => true)));
+      tFutures.add(
+        tQueue.add<void>(() async {
+          await Future.microtask(() => null);
+          tValue += '0';
+        }, onCancel: () async => await Future.microtask(() => true)),
+      );
 
       tQueue.clear();
 
-      tFutures.add(tQueue.add<void>(() {
-        tValue += '1';
-      }, onCancel: () async => true));
+      tFutures.add(
+        tQueue.add<void>(() async {
+          await Future.microtask(() => null);
+          tValue += '0';
+        }, onCancel: () async => await Future.microtask(() => true)),
+      );
+
+      tQueue.clear();
+
+      tFutures.add(
+        tQueue.add<void>(() {
+          tValue += '1';
+        }, onCancel: () async => true),
+      );
 
       while (tFutures.isNotEmpty) {
         final tFuturesCopy = tFutures.toList();
@@ -206,27 +222,27 @@ void main() {
         await Future.wait(tFuturesCopy);
       }
 
-      expect(
-        tValue,
-        equals('1'),
-        reason: 'Async cancelled',
-      );
+      expect(tValue, equals('1'), reason: 'Async cancelled');
 
       // Async no cancel
       tQueue = SequentialWorkQueue();
       tFutures.clear();
       tValue = '';
 
-      tFutures.add(tQueue.add<void>(() async {
-        await Future.microtask(() => null);
-        tValue += '0';
-      }, onCancel: () async => await Future.microtask(() => false)));
+      tFutures.add(
+        tQueue.add<void>(() async {
+          await Future.microtask(() => null);
+          tValue += '0';
+        }, onCancel: () async => await Future.microtask(() => false)),
+      );
 
       tQueue.clear();
 
-      tFutures.add(tQueue.add<void>(() {
-        tValue += '1';
-      }, onCancel: () async => true));
+      tFutures.add(
+        tQueue.add<void>(() {
+          tValue += '1';
+        }, onCancel: () async => true),
+      );
 
       while (tFutures.isNotEmpty) {
         final tFuturesCopy = tFutures.toList();
@@ -234,27 +250,25 @@ void main() {
         await Future.wait(tFuturesCopy);
       }
 
-      expect(
-        tValue,
-        equals('01'),
-        reason: 'Async no cancel',
-      );
+      expect(tValue, equals('01'), reason: 'Async no cancel');
     },
   );
 
   test(
-      'typeIs should return true if the type of List<T> is List<S> with the same type',
-      () {
-    expect(typeIs<int, int>(), isTrue);
-    expect(typeIs<String, String>(), isTrue);
-  });
+    'typeIs should return true if the type of List<T> is List<S> with the same type',
+    () {
+      expect(typeIs<int, int>(), isTrue);
+      expect(typeIs<String, String>(), isTrue);
+    },
+  );
 
   test(
-      'typeIs should return false if the type of List<T> is List<S> with different types',
-      () {
-    expect(typeIs<int, String>(), isFalse);
-    expect(typeIs<String, int>(), isFalse);
-  });
+    'typeIs should return false if the type of List<T> is List<S> with different types',
+    () {
+      expect(typeIs<int, String>(), isFalse);
+      expect(typeIs<String, int>(), isFalse);
+    },
+  );
 
   test(
     'now should return the current DateTime',
@@ -262,45 +276,36 @@ void main() {
       final tNow = now.toUTCIso8601StringNoMSUS();
       final tCurrentDateTime = DateTime.now().toUTCIso8601StringNoMSUS();
 
-      expect(
-        tNow,
-        equals(tCurrentDateTime),
-      );
+      expect(tNow, equals(tCurrentDateTime));
     },
     // In the case of low probability failure, perform several retries.
     retry: 5,
   );
 
-  test(
-    'platformCompute test',
-    () async {
-      const int tData = 5;
+  test('platformCompute test', () async {
+    const int tData = 5;
 
-      final tResult = await platformCompute<int, int>(
-        (input) => input * 2,
-        tData,
+    final tResult = await platformCompute<int, int>(
+      (input) => input * 2,
+      tData,
+    );
+
+    expect(tResult, 10);
+  });
+
+  test('platformCompute throw exception test', () async {
+    const int tTestData = 5;
+
+    Future<void> testFunction() async {
+      await platformCompute<int, int>(
+        (input) async => throw Exception('error'),
+        tTestData,
       );
+    }
 
-      expect(tResult, 10);
-    },
-  );
-
-  test(
-    'platformCompute throw exception test',
-    () async {
-      const int tTestData = 5;
-
-      Future<void> testFunction() async {
-        await platformCompute<int, int>(
-          (input) async => throw Exception('error'),
-          tTestData,
-        );
-      }
-
-      // Assert check
-      expect(testFunction, throwsException);
-    },
-  );
+    // Assert check
+    expect(testFunction, throwsException);
+  });
 
   testWidgets(
     'scheduleFunction should schedule the provided function to be executed after the next frame if frames are enabled',
@@ -333,8 +338,7 @@ void main() {
     tearDown(() {
       tz.setLocalLocation(tOriginalTimeZone);
     });
-    test('toUTCIso8601StringNoMSUS should return the date in ISO8601 format',
-        () {
+    test('toUTCIso8601StringNoMSUS should return the date in ISO8601 format', () {
       // I want to test changes from a time zone other than UTC, so I will test with the time zone set to Asia/Tokyo.
       final tz.Location tTimeZone = tz.getLocation('Asia/Tokyo');
 
@@ -355,9 +359,7 @@ void main() {
     final App tApp = createApp(
       appWidget: const MaterialApp(
         debugShowCheckedModeBanner: false,
-        home: Scaffold(
-          body: SizedBox.shrink(),
-        ),
+        home: Scaffold(body: SizedBox.shrink()),
       ),
     );
 
@@ -426,21 +428,26 @@ void main() {
   testWidgets("DateTime load fake now test", (WidgetTester tester) async {
     // Create an instance of the App before calling the setFakeNow function,
     // as setFakeNow internally invokes getApp().
-    final tDateTimeNow =
-        DateTime(2022, 1, 1, 14, 0, 0, 0, 0).toUTCIso8601StringNoMSUS();
+    final tDateTimeNow = DateTime(
+      2022,
+      1,
+      1,
+      14,
+      0,
+      0,
+      0,
+      0,
+    ).toUTCIso8601StringNoMSUS();
 
     final App tApp = createApp(
       appWidget: const MaterialApp(
         debugShowCheckedModeBanner: false,
-        home: Scaffold(
-          body: SizedBox.shrink(),
-        ),
+        home: Scaffold(body: SizedBox.shrink()),
       ),
       plugins: [
         Plugin.inline(
-          createLocalConfig: () => MockLocalConfig({
-            'patapataFakeNow': tDateTimeNow,
-          }),
+          createLocalConfig: () =>
+              MockLocalConfig({'patapataFakeNow': tDateTimeNow}),
         ),
       ],
     );

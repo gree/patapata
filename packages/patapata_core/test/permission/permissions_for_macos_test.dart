@@ -20,10 +20,7 @@ void main() {
 
     app = createApp();
 
-    expect(
-      app.permissions.trackingRequested,
-      true,
-    );
+    expect(app.permissions.trackingRequested, true);
 
     app.dispose();
   });
@@ -34,19 +31,11 @@ void main() {
     app = createApp();
     app.permissions.testSetRequested(notificationsRequested: true);
 
-    expect(
-      app.permissions.notificationsRequested,
-      true,
-    );
+    expect(app.permissions.notificationsRequested, true);
 
-    app.permissions.testSetRequested(
-      notificationsRequested: false,
-    );
+    app.permissions.testSetRequested(notificationsRequested: false);
 
-    expect(
-      app.permissions.notificationsRequested,
-      false,
-    );
+    expect(app.permissions.notificationsRequested, false);
 
     app.dispose();
   });

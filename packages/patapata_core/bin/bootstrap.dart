@@ -15,9 +15,7 @@ void main(List<String> arguments) {
   late final ArgParser tParser;
 
   tParser = ArgParser()
-    ..addSeparator(
-      'Bootstrap your Patapata project.',
-    )
+    ..addSeparator('Bootstrap your Patapata project.')
     ..addFlag(
       'help',
       abbr: 'h',
@@ -32,11 +30,7 @@ void main(List<String> arguments) {
       negatable: false,
       defaultsTo: false,
     )
-    ..addFlag(
-      'i18n',
-      help: 'Enable I18n support.',
-      defaultsTo: true,
-    )
+    ..addFlag('i18n', help: 'Enable I18n support.', defaultsTo: true)
     ..addMultiOption(
       'locale',
       abbr: 'l',
@@ -172,8 +166,9 @@ void _checkEnvironmentFile(ArgResults results) {
     }
 
     tFile.writeAsStringSync(
-        DartFormatter(languageVersion: DartFormatter.latestLanguageVersion)
-            .format('''
+      DartFormatter(
+        languageVersion: DartFormatter.latestLanguageVersion,
+      ).format('''
 import 'package:flutter/foundation.dart';
 import 'package:patapata_core/patapata_core.dart';
 ${tMixins.contains('ScreenLayoutEnvironment') ? '''
@@ -191,10 +186,7 @@ class Environment${tMixins.isNotEmpty ? ' with\n${tMixins.join(',\n')}' : ''} {
   ${tMixins.contains('I18nEnvironment') ? '''
   @override
   final List<Locale> supportedL10ns = const [
-${[
-                    for (final tLocale in results['locale'] as List<String>)
-                      "Locale('$tLocale')",
-                  ].join(',\n')}
+${[for (final tLocale in results['locale'] as List<String>) "Locale('$tLocale')"].join(',\n')}
   ];
 
   @override
@@ -284,7 +276,8 @@ ${tMixins.contains('ScreenLayoutEnvironment') ? '''
 ''' : ''}
   });
 }
-'''));
+'''),
+    );
   }
 
   stdout.writeln('Done.');
@@ -304,8 +297,9 @@ void _checkMainFile(ArgResults results) {
     }
 
     tFile.writeAsStringSync(
-        DartFormatter(languageVersion: DartFormatter.latestLanguageVersion)
-            .format('''
+      DartFormatter(
+        languageVersion: DartFormatter.latestLanguageVersion,
+      ).format('''
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -432,7 +426,8 @@ void main() {
     await getApp().remoteConfig.setDefaults(const <String, Object>{});
   });
 }
-'''));
+'''),
+    );
   }
 
   stdout.writeln('Done.');
@@ -452,8 +447,9 @@ void _checkSplashPageFile(ArgResults results) {
     }
 
     tFile.writeAsStringSync(
-        DartFormatter(languageVersion: DartFormatter.latestLanguageVersion)
-            .format('''
+      DartFormatter(
+        languageVersion: DartFormatter.latestLanguageVersion,
+      ).format('''
 import 'package:flutter/material.dart';
 import 'package:patapata_core/patapata_widgets.dart';
 
@@ -467,7 +463,8 @@ class SplashPage extends StandardPage<void> {
     );
   }
 }
-'''));
+'''),
+    );
   }
 
   stdout.writeln('Done.');
@@ -487,8 +484,9 @@ void _checkAgreementPageFile(ArgResults results) {
     }
 
     tFile.writeAsStringSync(
-        DartFormatter(languageVersion: DartFormatter.latestLanguageVersion)
-            .format('''
+      DartFormatter(
+        languageVersion: DartFormatter.latestLanguageVersion,
+      ).format('''
 import 'package:flutter/material.dart';
 import 'package:patapata_core/patapata_core.dart';
 import 'package:patapata_core/patapata_widgets.dart';
@@ -524,7 +522,8 @@ class AgreementPage extends StandardPage<StartupPageCompleter> {
     );
   }
 }
-'''));
+'''),
+    );
   }
 
   stdout.writeln('Done.');
@@ -544,8 +543,9 @@ void _checkHomePageFile(ArgResults results) {
     }
 
     tFile.writeAsStringSync(
-        DartFormatter(languageVersion: DartFormatter.latestLanguageVersion)
-            .format('''
+      DartFormatter(
+        languageVersion: DartFormatter.latestLanguageVersion,
+      ).format('''
 import 'package:flutter/material.dart';
 import 'package:patapata_core/patapata_core.dart';
 import 'package:patapata_core/patapata_widgets.dart';
@@ -563,7 +563,8 @@ class HomePage extends StandardPage<void> {
     );
   }
 }
-'''));
+'''),
+    );
   }
 
   stdout.writeln('Done.');
@@ -583,8 +584,9 @@ void _checkStartupFile(ArgResults results) {
     }
 
     tFile.writeAsStringSync(
-        DartFormatter(languageVersion: DartFormatter.latestLanguageVersion)
-            .format('''
+      DartFormatter(
+        languageVersion: DartFormatter.latestLanguageVersion,
+      ).format('''
 import 'package:patapata_core/patapata_core.dart';
 
 import 'errors.dart';
@@ -633,7 +635,8 @@ class StartupStateAgreements extends StartupState {
     }
   }
 }
-'''));
+'''),
+    );
   }
 
   stdout.writeln('Done.');
@@ -653,8 +656,9 @@ void _checkErrorsFile(ArgResults results) {
     }
 
     tFile.writeAsStringSync(
-        DartFormatter(languageVersion: DartFormatter.latestLanguageVersion)
-            .format('''
+      DartFormatter(
+        languageVersion: DartFormatter.latestLanguageVersion,
+      ).format('''
 import 'package:patapata_core/patapata_core.dart';
 import 'package:patapata_core/patapata_core_libs.dart';
 import 'package:patapata_core/patapata_widgets.dart';
@@ -710,7 +714,8 @@ final class AppVersionException extends AppException {
     // Launch the app store.
   };
 }
-'''));
+'''),
+    );
   }
 
   // Also check and create the ErrorPage.
@@ -725,8 +730,9 @@ final class AppVersionException extends AppException {
     }
 
     tErrorPageFile.writeAsStringSync(
-        DartFormatter(languageVersion: DartFormatter.latestLanguageVersion)
-            .format('''
+      DartFormatter(
+        languageVersion: DartFormatter.latestLanguageVersion,
+      ).format('''
 import 'package:flutter/material.dart';
 import 'package:patapata_core/patapata_core.dart';
 import 'package:patapata_core/patapata_widgets.dart';
@@ -797,7 +803,8 @@ class UnknownExceptionPage extends StandardPage<ReportRecord> {
     );
   }
 }
-'''));
+'''),
+    );
   }
 
   stdout.writeln('Done.');
@@ -818,10 +825,12 @@ void _checkAndroidManifestFile(ArgResults results) {
   }
 
   final tDocument = XmlDocument.parse(tFile.readAsStringSync());
-  final tMainActivities =
-      tDocument.findAllElements('activity').where((element) {
-    final tIntentFilters =
-        element.findAllElements('intent-filter').where((element) {
+  final tMainActivities = tDocument.findAllElements('activity').where((
+    element,
+  ) {
+    final tIntentFilters = element.findAllElements('intent-filter').where((
+      element,
+    ) {
       final tActions = element.findAllElements('action').where((element) {
         return element.getAttribute('android:name') ==
             'android.intent.action.MAIN';
@@ -853,17 +862,20 @@ void _checkAndroidManifestFile(ArgResults results) {
 
   if (tMetaData.isEmpty) {
     stdout.writeln(
-        'No meta-data found. Adding the Flutter Deep Linking feature.');
+      'No meta-data found. Adding the Flutter Deep Linking feature.',
+    );
 
-    tMainActivity.children.add(XmlElement(
-      XmlName('meta-data'),
-      [
-        XmlAttribute(XmlName('android:name'), 'flutter_deeplinking_enabled'),
-        XmlAttribute(XmlName('android:value'), 'true'),
-      ],
-      [],
-      false,
-    ));
+    tMainActivity.children.add(
+      XmlElement(
+        XmlName('meta-data'),
+        [
+          XmlAttribute(XmlName('android:name'), 'flutter_deeplinking_enabled'),
+          XmlAttribute(XmlName('android:value'), 'true'),
+        ],
+        [],
+        false,
+      ),
+    );
 
     tFile.writeAsStringSync(tDocument.toXmlString(pretty: true));
   }
@@ -970,7 +982,8 @@ void _checkAndroidGradleFile(ArgResults results) {
     final tMatch = tCompileOptionsRegex.firstMatch(tDocument)!;
     final tBlockInside = tMatch.group(1)!.trimRight();
 
-    final tNewBlockInside = '''
+    final tNewBlockInside =
+        '''
 $tBlockInside
         $tDesugarEnableText
 ''';
@@ -991,7 +1004,8 @@ $tBlockInside
     if (tMatch != null) {
       final tBlockInside = tMatch.group(1)!.trimRight();
 
-      final tNewBlockInside = '''
+      final tNewBlockInside =
+          '''
 $tBlockInside
     $tDesugarLibraryText
 ''';
@@ -1002,7 +1016,8 @@ $tBlockInside
         'dependencies {$tNewBlockInside}',
       );
     } else {
-      tDocument = '''
+      tDocument =
+          '''
 $tDocument
 dependencies {
     $tDesugarLibraryText
@@ -1037,23 +1052,16 @@ void _checkInfoPlistFile(ArgResults results) {
 
   if (tKeys.isEmpty) {
     stdout.writeln(
-        'No FlutterDeepLinkingEnabled key found. Adding the Flutter Deep Linking feature.');
+      'No FlutterDeepLinkingEnabled key found. Adding the Flutter Deep Linking feature.',
+    );
 
-    tDictElement.children.add(XmlElement(
-      XmlName('key'),
-      [],
-      [
+    tDictElement.children.add(
+      XmlElement(XmlName('key'), [], [
         XmlText('FlutterDeepLinkingEnabled'),
-      ],
-      false,
-    ));
+      ], false),
+    );
 
-    tDictElement.children.add(XmlElement(
-      XmlName('true'),
-      [],
-      [],
-      true,
-    ));
+    tDictElement.children.add(XmlElement(XmlName('true'), [], [], true));
 
     tFile.writeAsStringSync(tDocument.toXmlString(pretty: true));
   }
@@ -1080,9 +1088,10 @@ void _checkPodFile(ArgResults results) {
   // So we remove that whole line and replace it.
   // As of writting this code, the default line is:
   // # platform :ios, '12.0'
-  final tDocument = tFile
-      .readAsStringSync()
-      .replaceAll('# platform :ios, \'12.0\'', 'platform :ios, \'13.0\'');
+  final tDocument = tFile.readAsStringSync().replaceAll(
+    '# platform :ios, \'12.0\'',
+    'platform :ios, \'13.0\'',
+  );
 
   tFile.writeAsStringSync(tDocument.toString());
 }
@@ -1199,14 +1208,16 @@ void _checkWidgetTestFile(ArgResults results) {
     }
 
     tFile.writeAsStringSync(
-        DartFormatter(languageVersion: DartFormatter.latestLanguageVersion)
-            .format('''
+      DartFormatter(
+        languageVersion: DartFormatter.latestLanguageVersion,
+      ).format('''
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   testWidgets('empty', (WidgetTester tester) async {});
 }
-'''));
+'''),
+    );
   }
 
   stdout.writeln('Done.');

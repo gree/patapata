@@ -44,10 +44,12 @@ class _TestAnalyticsEventFilterEnviroment extends Environment
   @override
   final analyticsEventFilter =
       <Type, AnalyticsEvent? Function(AnalyticsEvent event)>{
-    // A test filter for treating a specific event as a different RawEvent.
-    _TestAnalyticsEvent: (AnalyticsEvent event) =>
-        event is _TestAnalyticsEvent ? _TestRawEvent(name: event.name) : event,
-  };
+        // A test filter for treating a specific event as a different RawEvent.
+        _TestAnalyticsEvent: (AnalyticsEvent event) =>
+            event is _TestAnalyticsEvent
+            ? _TestRawEvent(name: event.name)
+            : event,
+      };
 }
 
 // RawEvent for Analytics Testing
@@ -66,9 +68,7 @@ class _TestAnalyticsPage extends StandardPage<void> {
   @override
   Widget buildPage(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(l(context, 'title')),
-      ),
+      appBar: AppBar(title: Text(l(context, 'title'))),
       body: ListView(
         children: [
           SizedBox(
@@ -77,16 +77,15 @@ class _TestAnalyticsPage extends StandardPage<void> {
               onPressed: () {
                 AnalyticsEvent tAnalyticsEvent = AnalyticsEvent(
                   name: 'testEvents',
-                  data: {
-                    'test': 'testData',
-                  },
+                  data: {'test': 'testData'},
                   context: getApp().analytics.globalContext,
                 );
                 getApp().analytics.rawEvent(tAnalyticsEvent);
 
                 setState(() {
-                  _interactionContextData =
-                      context.read<Analytics>().toString();
+                  _interactionContextData = context
+                      .read<Analytics>()
+                      .toString();
                 });
               },
               child: const Text('On Tap'),
@@ -105,27 +104,21 @@ class _TestAnalyticsContextProviderPage extends StandardPage<void> {
   @override
   Widget buildPage(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(l(context, 'title')),
-      ),
+      appBar: AppBar(title: Text(l(context, 'title'))),
       body: AnalyticsContextProvider(
         reset: false,
-        analyticsContext: AnalyticsContext(
-          {
-            'hogehogeName': 'AnalyticsContextParent',
-            'hogehogeData': null,
-            'hogehgoeLink': 'HogehogeLink',
-          },
-        ),
+        analyticsContext: AnalyticsContext({
+          'hogehogeName': 'AnalyticsContextParent',
+          'hogehogeData': null,
+          'hogehgoeLink': 'HogehogeLink',
+        }),
         child: AnalyticsContextProvider(
           reset: true,
-          analyticsContext: AnalyticsContext(
-            {
-              'pageName': 'AnalyticsContextPage',
-              'pageData': null,
-              'pageLink': 'AnalyticsContextPageLink',
-            },
-          ),
+          analyticsContext: AnalyticsContext({
+            'pageName': 'AnalyticsContextPage',
+            'pageData': null,
+            'pageLink': 'AnalyticsContextPageLink',
+          }),
           child: const AnalyticsEventWidget(
             key: ValueKey(kAnalyticsButton),
             name: 'context analytics event',
@@ -142,14 +135,10 @@ class _TestAnalyticsSingletonEventWidgetPage extends StandardPage<void> {
   @override
   Widget buildPage(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(l(context, 'title')),
-      ),
+      appBar: AppBar(title: Text(l(context, 'title'))),
       body: ListView(
         children: [
-          const Center(
-            child: Text('test'),
-          ),
+          const Center(child: Text('test')),
           Column(
             children: [
               if (_toggle)
@@ -188,9 +177,7 @@ class _TestAnalyticsImpressionWidgetPage extends StandardPage<void> {
   @override
   Widget buildPage(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(l(context, 'title')),
-      ),
+      appBar: AppBar(title: Text(l(context, 'title'))),
       body: ListView.builder(
         itemCount: _itemCount,
         itemBuilder: (context, index) {
@@ -205,9 +192,7 @@ class _TestAnalyticsImpressionWidgetPage extends StandardPage<void> {
                       durationThreshold: Duration.zero,
                       visibleThreshold: 0.5,
                       name: 'Analytics Impression',
-                      data: {
-                        'name': 'Analytics Page Item $index',
-                      },
+                      data: {'name': 'Analytics Page Item $index'},
                       child: Text("Impression index : $index"),
                       batchGenerator: (datas, contexts) {
                         return {
@@ -233,9 +218,7 @@ class _TestAnalyticsImpressionWidgetNoneBatchPage extends StandardPage<void> {
   @override
   Widget buildPage(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(l(context, 'title')),
-      ),
+      appBar: AppBar(title: Text(l(context, 'title'))),
       body: ListView.builder(
         itemCount: _itemCount,
         itemBuilder: (context, index) {
@@ -250,9 +233,7 @@ class _TestAnalyticsImpressionWidgetNoneBatchPage extends StandardPage<void> {
                       durationThreshold: Duration.zero,
                       visibleThreshold: 0.5,
                       name: 'Analytics Impression',
-                      data: {
-                        'name': 'Analytics Page Item $index',
-                      },
+                      data: {'name': 'Analytics Page Item $index'},
                       child: Text("Impression index : $index"),
                     ),
                   )
@@ -273,9 +254,7 @@ class _TestAnalyticsImpressionDidUpdateWidgetPage extends StandardPage<void> {
   void initState() {
     _analyticsEvent = AnalyticsEvent(
       name: 'Analytics Impression',
-      data: {
-        'name': 'Analytics Page Item',
-      },
+      data: {'name': 'Analytics Page Item'},
       context: getApp().analytics.globalContext,
     );
 
@@ -290,9 +269,7 @@ class _TestAnalyticsImpressionDidUpdateWidgetPage extends StandardPage<void> {
               setState(() {
                 _analyticsEvent = AnalyticsEvent(
                   name: 'Update Analytics Impression $index',
-                  data: {
-                    'name': 'Update Analytics Page Item $index',
-                  },
+                  data: {'name': 'Update Analytics Page Item $index'},
                   context: getApp().analytics.globalContext,
                 );
               });
@@ -305,9 +282,7 @@ class _TestAnalyticsImpressionDidUpdateWidgetPage extends StandardPage<void> {
   @override
   Widget buildPage(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(l(context, 'title')),
-      ),
+      appBar: AppBar(title: Text(l(context, 'title'))),
       body: ListView.builder(
         itemCount: _itemCount,
         itemBuilder: (context, index) {
@@ -335,16 +310,12 @@ class _TestAnalyticsImpressionDidUpdateWidgetPage extends StandardPage<void> {
 
 class _TestAnalyticsImpressionNotifyDataChangedPage extends StandardPage<void> {
   final int _itemCount = 35;
-  Map<String, Object?>? _data = {
-    'name': 'Analytics Page Item',
-  };
+  Map<String, Object?>? _data = {'name': 'Analytics Page Item'};
 
   @override
   Widget buildPage(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(l(context, 'title')),
-      ),
+      appBar: AppBar(title: Text(l(context, 'title'))),
       body: ListView.builder(
         itemCount: _itemCount,
         itemBuilder: (context, index) {
@@ -353,9 +324,7 @@ class _TestAnalyticsImpressionNotifyDataChangedPage extends StandardPage<void> {
               key: const ValueKey(kAnalyticsNotifyDataChangedButton),
               onPressed: () {
                 setState(() {
-                  _data = {
-                    'name': 'Analytics Page Item After Setstate $index',
-                  };
+                  _data = {'name': 'Analytics Page Item After Setstate $index'};
                 });
               },
               child: Text('On Tap Button $index'),
@@ -398,9 +367,7 @@ class _TestAnalyticsImpressionBatchToIgnorePage extends StandardPage<void> {
   @override
   Widget buildPage(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(l(context, 'title')),
-      ),
+      appBar: AppBar(title: Text(l(context, 'title'))),
       body: ListView.builder(
         itemCount: _itemCount,
         itemBuilder: (context, index) {
@@ -439,9 +406,7 @@ class _TestAnalyticsImpressionVisibilityPage extends StandardPage<void> {
   @override
   Widget buildPage(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(l(context, 'title')),
-      ),
+      appBar: AppBar(title: Text(l(context, 'title'))),
       body: ListView.builder(
         itemCount: _itemCount,
         itemBuilder: (context, index) {
@@ -456,9 +421,7 @@ class _TestAnalyticsImpressionVisibilityPage extends StandardPage<void> {
                       durationThreshold: Duration.zero,
                       visibleThreshold: 0.5,
                       name: 'Analytics Impression $index',
-                      data: {
-                        'name': 'Analytics Page Item $index',
-                      },
+                      data: {'name': 'Analytics Page Item $index'},
                       child: Text("Impression index : $index"),
                       batchGenerator: (datas, contexts) {
                         return {};
@@ -479,9 +442,7 @@ class _TestAnalyticsImpressionThresholdCallbackPage extends StandardPage<void> {
   @override
   Widget buildPage(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(l(context, 'title')),
-      ),
+      appBar: AppBar(title: Text(l(context, 'title'))),
       body: ListView.builder(
         itemCount: _itemCount,
         itemBuilder: (context, index) {
@@ -519,15 +480,16 @@ class _TestAnalyticsHomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Test Home Screen'),
-      ),
+      appBar: AppBar(title: const Text('Test Home Screen')),
       body: Center(
         child: ElevatedButton(
           key: const ValueKey(kAnalyticsHomeScreenButton),
           onPressed: () {
-            Navigator.pushNamed(context, '/second',
-                arguments: 'Hello from Test Home Screen');
+            Navigator.pushNamed(
+              context,
+              '/second',
+              arguments: 'Hello from Test Home Screen',
+            );
           },
           child: const Text('Go to Test Second Screen'),
         ),
@@ -541,9 +503,7 @@ class _TestAnalyticsSecondScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Test Second Screen'),
-      ),
+      appBar: AppBar(title: const Text('Test Second Screen')),
       body: Center(
         child: Column(
           children: [
@@ -572,9 +532,7 @@ class _TestFirstPage extends StandardPage<void> {
   @override
   Widget buildPage(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Test First Page'),
-      ),
+      appBar: AppBar(title: const Text('Test First Page')),
       body: Center(
         child: ElevatedButton(
           key: const ValueKey(kAnalyticsTestFirstPageButton),
@@ -592,12 +550,8 @@ class _TestSecondPage extends StandardPage<void> {
   @override
   Widget buildPage(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Test Second Page'),
-      ),
-      body: const Center(
-        child: Text('Test Second Page'),
-      ),
+      appBar: AppBar(title: const Text('Test Second Page')),
+      body: const Center(child: Text('Test Second Page')),
     );
   }
 }
@@ -611,11 +565,7 @@ void main() {
         appWidget: const MaterialApp(
           debugShowCheckedModeBanner: false,
           home: Scaffold(
-            body: SizedBox.expand(
-              child: Center(
-                child: SizedBox(),
-              ),
-            ),
+            body: SizedBox.expand(child: Center(child: SizedBox())),
           ),
         ),
       );
@@ -625,8 +575,8 @@ void main() {
       await tApp.runProcess(() async {
         final tAnalytics = tApp.analytics;
 
-        final Stream<AnalyticsEvent> tEventStream =
-            tAnalytics.eventsFor<_TestRawEvent>();
+        final Stream<AnalyticsEvent> tEventStream = tAnalytics
+            .eventsFor<_TestRawEvent>();
 
         var tFuture = expectLater(
           tEventStream,
@@ -642,18 +592,15 @@ void main() {
       tApp.dispose();
     });
 
-    testWidgets("AnalyticsEvent filter event test",
-        (WidgetTester tester) async {
+    testWidgets("AnalyticsEvent filter event test", (
+      WidgetTester tester,
+    ) async {
       final App tApp = createApp(
         environment: _TestAnalyticsEventFilterEnviroment(),
         appWidget: const MaterialApp(
           debugShowCheckedModeBanner: false,
           home: Scaffold(
-            body: SizedBox.expand(
-              child: Center(
-                child: SizedBox(),
-              ),
-            ),
+            body: SizedBox.expand(child: Center(child: SizedBox())),
           ),
         ),
       );
@@ -663,8 +610,8 @@ void main() {
       await tApp.runProcess(() async {
         final tAnalytics = tApp.analytics;
 
-        final Stream<AnalyticsEvent> tEventStream =
-            tAnalytics.eventsFor<_TestAnalyticsEvent>();
+        final Stream<AnalyticsEvent> tEventStream = tAnalytics
+            .eventsFor<_TestAnalyticsEvent>();
 
         var tFuture = expectLater(
           tEventStream,
@@ -686,11 +633,7 @@ void main() {
         appWidget: const MaterialApp(
           debugShowCheckedModeBanner: false,
           home: Scaffold(
-            body: SizedBox.expand(
-              child: Center(
-                child: SizedBox(),
-              ),
-            ),
+            body: SizedBox.expand(child: Center(child: SizedBox())),
           ),
         ),
       );
@@ -717,11 +660,7 @@ void main() {
         appWidget: const MaterialApp(
           debugShowCheckedModeBanner: false,
           home: Scaffold(
-            body: SizedBox.expand(
-              child: Center(
-                child: SizedBox(),
-              ),
-            ),
+            body: SizedBox.expand(child: Center(child: SizedBox())),
           ),
         ),
       );
@@ -742,8 +681,9 @@ void main() {
       tApp.dispose();
     });
 
-    testWidgets("GetRouteContext test navigate page",
-        (WidgetTester tester) async {
+    testWidgets("GetRouteContext test navigate page", (
+      WidgetTester tester,
+    ) async {
       final App tApp = createApp(
         environment: const _TestAnalyticsEnviroment(),
         appWidget: StandardMaterialApp(
@@ -751,16 +691,12 @@ void main() {
           pages: [
             StandardPageFactory<_TestFirstPage, void>(
               create: (data) => _TestFirstPage(),
-              links: {
-                r'': (match, uri) {},
-              },
+              links: {r'': (match, uri) {}},
               linkGenerator: (pageData) => '',
             ),
             StandardPageFactory<_TestSecondPage, void>(
               create: (data) => _TestSecondPage(),
-              links: {
-                r'': (match, uri) {},
-              },
+              links: {r'': (match, uri) {}},
               linkGenerator: (pageData) => '',
             ),
           ],
@@ -778,8 +714,9 @@ void main() {
 
         await tester.pumpAndSettle();
 
-        await tester
-            .tap(find.byKey(const ValueKey(kAnalyticsTestFirstPageButton)));
+        await tester.tap(
+          find.byKey(const ValueKey(kAnalyticsTestFirstPageButton)),
+        );
 
         await tester.pumpAndSettle();
 
@@ -789,31 +726,34 @@ void main() {
       tApp.dispose();
     });
 
-    testWidgets("Test sending analytics with null context",
-        (WidgetTester tester) async {
+    testWidgets("Test sending analytics with null context", (
+      WidgetTester tester,
+    ) async {
       final App tApp = createApp(
         environment: _TestAnalyticsEventFilterEnviroment(),
         appWidget: MaterialApp(
           debugShowCheckedModeBanner: false,
           home: Scaffold(
-            body: Builder(builder: (context) {
-              return SizedBox.expand(
-                child: Center(
-                  child: SizedBox(
-                    child: TextButton(
-                      key: const ValueKey(kAnalyticsButton),
-                      onPressed: () {
-                        getApp().analytics.event(
-                              name: 'testEvents',
-                              context: null,
-                            );
-                      },
-                      child: const Text('On Tap'),
+            body: Builder(
+              builder: (context) {
+                return SizedBox.expand(
+                  child: Center(
+                    child: SizedBox(
+                      child: TextButton(
+                        key: const ValueKey(kAnalyticsButton),
+                        onPressed: () {
+                          getApp().analytics.event(
+                            name: 'testEvents',
+                            context: null,
+                          );
+                        },
+                        child: const Text('On Tap'),
+                      ),
                     ),
                   ),
-                ),
-              );
-            }),
+                );
+              },
+            ),
           ),
         ),
       );
@@ -823,8 +763,8 @@ void main() {
       await tApp.runProcess(() async {
         final tAnalytics = tApp.analytics;
 
-        final Stream<AnalyticsEvent> tEventStream =
-            tAnalytics.eventsFor<_TestAnalyticsEvent>();
+        final Stream<AnalyticsEvent> tEventStream = tAnalytics
+            .eventsFor<_TestAnalyticsEvent>();
 
         var tFuture = expectLater(
           tEventStream,
@@ -843,7 +783,8 @@ void main() {
 
     testWidgets("Analytics revenueEvent test", (WidgetTester tester) async {
       AnalyticsRevenueEvent fConvertAnalyticsRevenueEvent(
-          AnalyticsEvent event) {
+        AnalyticsEvent event,
+      ) {
         return event as AnalyticsRevenueEvent;
       }
 
@@ -852,11 +793,7 @@ void main() {
         appWidget: const MaterialApp(
           debugShowCheckedModeBanner: false,
           home: Scaffold(
-            body: SizedBox.expand(
-              child: Center(
-                child: SizedBox(),
-              ),
-            ),
+            body: SizedBox.expand(child: Center(child: SizedBox())),
           ),
         ),
       );
@@ -866,8 +803,8 @@ void main() {
       await tApp.runProcess(() async {
         final tAnalytics = tApp.analytics;
 
-        final Stream<AnalyticsEvent> tEventStream =
-            tAnalytics.eventsFor<AnalyticsRevenueEvent>();
+        final Stream<AnalyticsEvent> tEventStream = tAnalytics
+            .eventsFor<AnalyticsRevenueEvent>();
 
         var tFuture = expectLater(
           tEventStream,
@@ -888,32 +825,38 @@ void main() {
         final List<Future> tFutureGetPropertyList = <Future>[
           expectLater(
             tAnalytics.events.asyncMap(
-                (event) => fConvertAnalyticsRevenueEvent(event).revenue),
+              (event) => fConvertAnalyticsRevenueEvent(event).revenue,
+            ),
             emitsInOrder([100.0]),
           ),
           expectLater(
             tAnalytics.events.asyncMap(
-                (event) => fConvertAnalyticsRevenueEvent(event).currency),
+              (event) => fConvertAnalyticsRevenueEvent(event).currency,
+            ),
             emitsInOrder(['USD']),
           ),
           expectLater(
             tAnalytics.events.asyncMap(
-                (event) => fConvertAnalyticsRevenueEvent(event).orderId),
+              (event) => fConvertAnalyticsRevenueEvent(event).orderId,
+            ),
             emitsInOrder(['123456']),
           ),
           expectLater(
             tAnalytics.events.asyncMap(
-                (event) => fConvertAnalyticsRevenueEvent(event).receipt),
+              (event) => fConvertAnalyticsRevenueEvent(event).receipt,
+            ),
             emitsInOrder(['receipt123']),
           ),
           expectLater(
             tAnalytics.events.asyncMap(
-                (event) => fConvertAnalyticsRevenueEvent(event).productId),
+              (event) => fConvertAnalyticsRevenueEvent(event).productId,
+            ),
             emitsInOrder(['product123']),
           ),
           expectLater(
             tAnalytics.events.asyncMap(
-                (event) => fConvertAnalyticsRevenueEvent(event).productName),
+              (event) => fConvertAnalyticsRevenueEvent(event).productName,
+            ),
             emitsInOrder(['Product 123']),
           ),
         ];
@@ -948,9 +891,7 @@ void main() {
                 key: ValueKey(kAnalyticsEventButton),
                 child: AnalyticsEventWidget(
                   name: 'testEvents',
-                  data: {
-                    'test': 'testData',
-                  },
+                  data: {'test': 'testData'},
                   child: Text('On Tap'),
                 ),
               ),
@@ -964,15 +905,13 @@ void main() {
       await tApp.runProcess(() async {
         final tAnalytics = tApp.analytics;
 
-        final Stream<AnalyticsEvent> tEventStream =
-            tAnalytics.eventsFor<AnalyticsRevenueEvent>();
+        final Stream<AnalyticsEvent> tEventStream = tAnalytics
+            .eventsFor<AnalyticsRevenueEvent>();
 
         var tFuture = expectLater(
-          tEventStream.asyncMap(
-            (event) => event.toString(),
-          ),
+          tEventStream.asyncMap((event) => event.toString()),
           emitsInOrder([
-            'AnalyticsEvent:testEvents: data={test: testData}, context={}, navigationInteractionContext=null'
+            'AnalyticsEvent:testEvents: data={test: testData}, context={}, navigationInteractionContext=null',
           ]),
         );
 
@@ -998,9 +937,7 @@ void main() {
                 child: AnalyticsEventWidget(
                   event: AnalyticsEvent(
                     name: 'eventRawName',
-                    data: {
-                      'testRaw': 'testRawData',
-                    },
+                    data: {'testRaw': 'testRawData'},
                   ),
                   child: const Text('On Tap'),
                 ),
@@ -1015,15 +952,13 @@ void main() {
       await tApp.runProcess(() async {
         final tAnalytics = tApp.analytics;
 
-        final Stream<AnalyticsEvent> tEventStream =
-            tAnalytics.eventsFor<AnalyticsRevenueEvent>();
+        final Stream<AnalyticsEvent> tEventStream = tAnalytics
+            .eventsFor<AnalyticsRevenueEvent>();
 
         var tFutureRawEvent = expectLater(
-          tEventStream.asyncMap(
-            (event) => event.toString(),
-          ),
+          tEventStream.asyncMap((event) => event.toString()),
           emitsInOrder([
-            'AnalyticsEvent:eventRawName: data={testRaw: testRawData}, context=null, navigationInteractionContext=null'
+            'AnalyticsEvent:eventRawName: data={testRaw: testRawData}, context=null, navigationInteractionContext=null',
           ]),
         );
 
@@ -1047,71 +982,67 @@ void main() {
             AnalyticsNavigatorObserver(analytics: tAnalytics),
           ],
           home: const _TestAnalyticsHomeScreen(),
-          routes: {
-            '/second': (context) => const _TestAnalyticsSecondScreen(),
-          },
+          routes: {'/second': (context) => const _TestAnalyticsSecondScreen()},
         ),
       );
 
       await tApp.run();
 
       await tApp.runProcess(() async {
-        final Stream<AnalyticsEvent> tEventStream =
-            tAnalytics.eventsFor<AnalyticsRouteViewEvent>();
+        final Stream<AnalyticsEvent> tEventStream = tAnalytics
+            .eventsFor<AnalyticsRouteViewEvent>();
 
         var tFuture = expectLater(
-          tEventStream.asyncMap(
-            (event) {
-              AnalyticsRouteViewEvent tEvent = event as AnalyticsRouteViewEvent;
-              return {
-                'isFirst': tEvent.isFirst,
-                'arguments': tEvent.arguments,
-                'routeName': tEvent.routeName,
-                'navigationType': tEvent.navigationType,
-              };
-            },
-          ),
+          tEventStream.asyncMap((event) {
+            AnalyticsRouteViewEvent tEvent = event as AnalyticsRouteViewEvent;
+            return {
+              'isFirst': tEvent.isFirst,
+              'arguments': tEvent.arguments,
+              'routeName': tEvent.routeName,
+              'navigationType': tEvent.navigationType,
+            };
+          }),
           emitsInOrder([
             {
               'isFirst': false,
               'arguments': 'Hello from Test Home Screen',
               'routeName': '/second',
               'navigationType': 'push',
-            }
+            },
           ]),
         );
 
-        await tester
-            .tap(find.byKey(const ValueKey(kAnalyticsHomeScreenButton)));
+        await tester.tap(
+          find.byKey(const ValueKey(kAnalyticsHomeScreenButton)),
+        );
 
         await tester.pumpAndSettle();
 
         await tFuture;
 
         tFuture = expectLater(
-          tEventStream.asyncMap(
-            (event) {
-              AnalyticsRouteViewEvent tEvent = event as AnalyticsRouteViewEvent;
-              return {
-                'isFirst': tEvent.isFirst,
-                'arguments': tEvent.arguments,
-                'routeName': tEvent.routeName,
-                'navigationType': tEvent.navigationType,
-              };
-            },
-          ),
+          tEventStream.asyncMap((event) {
+            AnalyticsRouteViewEvent tEvent = event as AnalyticsRouteViewEvent;
+            return {
+              'isFirst': tEvent.isFirst,
+              'arguments': tEvent.arguments,
+              'routeName': tEvent.routeName,
+              'navigationType': tEvent.navigationType,
+            };
+          }),
           emitsInOrder([
             {
               'isFirst': true,
               'arguments': null,
               'routeName': '/',
               'navigationType': 'pop',
-            }
+            },
           ]),
         );
 
-        await tester
-            .tap(find.byKey(const ValueKey(kAnalyticsSecondScreenButton)));
+        await tester.tap(
+          find.byKey(const ValueKey(kAnalyticsSecondScreenButton)),
+        );
 
         await tester.pumpAndSettle();
 
@@ -1121,8 +1052,9 @@ void main() {
       tApp.dispose();
     });
 
-    testWidgets("AnalyticsNavigatorObserver remove route test",
-        (WidgetTester tester) async {
+    testWidgets("AnalyticsNavigatorObserver remove route test", (
+      WidgetTester tester,
+    ) async {
       final Analytics tAnalytics = Analytics();
 
       final App tApp = createApp(
@@ -1132,17 +1064,15 @@ void main() {
             AnalyticsNavigatorObserver(analytics: tAnalytics),
           ],
           home: const _TestAnalyticsHomeScreen(),
-          routes: {
-            '/second': (context) => const _TestAnalyticsSecondScreen(),
-          },
+          routes: {'/second': (context) => const _TestAnalyticsSecondScreen()},
         ),
       );
 
       await tApp.run();
 
       await tApp.runProcess(() async {
-        final Stream<AnalyticsEvent> tEventStream =
-            tAnalytics.eventsFor<AnalyticsRouteViewEvent>();
+        final Stream<AnalyticsEvent> tEventStream = tAnalytics
+            .eventsFor<AnalyticsRouteViewEvent>();
 
         var tFuture = expectLater(
           tEventStream.asyncMap(
@@ -1157,12 +1087,13 @@ void main() {
               'isFirst': false,
               'routeName': '/second',
               'navigationType': 'push',
-            }
+            },
           ]),
         );
 
-        await tester
-            .tap(find.byKey(const ValueKey(kAnalyticsHomeScreenButton)));
+        await tester.tap(
+          find.byKey(const ValueKey(kAnalyticsHomeScreenButton)),
+        );
 
         await tester.pumpAndSettle();
 
@@ -1177,16 +1108,13 @@ void main() {
             },
           ),
           emitsInOrder([
-            {
-              'isFirst': true,
-              'routeName': '/',
-              'navigationType': 'remove',
-            }
+            {'isFirst': true, 'routeName': '/', 'navigationType': 'remove'},
           ]),
         );
 
         await tester.tap(
-            find.byKey(const ValueKey(kAnalyticsSecondRemoveScreenButton)));
+          find.byKey(const ValueKey(kAnalyticsSecondRemoveScreenButton)),
+        );
 
         await tester.pumpAndSettle();
 
@@ -1207,9 +1135,7 @@ void main() {
           pages: [
             StandardPageFactory<_TestAnalyticsPage, void>(
               create: (data) => _TestAnalyticsPage(),
-              links: {
-                r'': (match, uri) {},
-              },
+              links: {r'': (match, uri) {}},
               linkGenerator: (pageData) => '',
               groupRoot: true,
             ),
@@ -1222,8 +1148,8 @@ void main() {
       await tApp.runProcess(() async {
         await tester.pumpAndSettle();
         final tAnalytics = tApp.analytics;
-        final Stream<AnalyticsEvent> tEventStream =
-            tAnalytics.eventsFor<AnalyticsRevenueEvent>();
+        final Stream<AnalyticsEvent> tEventStream = tAnalytics
+            .eventsFor<AnalyticsRevenueEvent>();
 
         var tFuture = expectLater(
           tEventStream.asyncMap(
@@ -1238,12 +1164,13 @@ void main() {
               'pageName': '_TestAnalyticsPage',
               'pageLink': '',
               'test': 'testData',
-            }
+            },
           ]),
         );
 
-        await tester
-            .tap(find.byKey(const ValueKey(kAnalyticsStandardPageButton)));
+        await tester.tap(
+          find.byKey(const ValueKey(kAnalyticsStandardPageButton)),
+        );
 
         await tester.pumpAndSettle();
 
@@ -1260,8 +1187,9 @@ void main() {
       tApp.dispose();
     });
 
-    testWidgets("Analytics context provider reset test",
-        (WidgetTester tester) async {
+    testWidgets("Analytics context provider reset test", (
+      WidgetTester tester,
+    ) async {
       final App tApp = createApp(
         environment: const Environment(),
         appWidget: StandardMaterialApp(
@@ -1269,9 +1197,7 @@ void main() {
           pages: [
             StandardPageFactory<_TestAnalyticsContextProviderPage, void>(
               create: (data) => _TestAnalyticsContextProviderPage(),
-              links: {
-                r'': (match, uri) {},
-              },
+              links: {r'': (match, uri) {}},
               linkGenerator: (pageData) => '',
               groupRoot: true,
             ),
@@ -1285,8 +1211,8 @@ void main() {
         await tester.pumpAndSettle();
 
         final tAnalytics = tApp.analytics;
-        final Stream<AnalyticsEvent> tEventStream =
-            tAnalytics.eventsFor<AnalyticsRevenueEvent>();
+        final Stream<AnalyticsEvent> tEventStream = tAnalytics
+            .eventsFor<AnalyticsRevenueEvent>();
 
         var tFuture = expectLater(
           tEventStream.asyncMap(
@@ -1301,7 +1227,7 @@ void main() {
               'pageName': 'AnalyticsContextPage',
               'pageData': null,
               'pageLink': 'AnalyticsContextPageLink',
-            }
+            },
           ]),
         );
 
@@ -1315,8 +1241,9 @@ void main() {
       tApp.dispose();
     });
 
-    testWidgets("Analytics singleton event widget test",
-        (WidgetTester tester) async {
+    testWidgets("Analytics singleton event widget test", (
+      WidgetTester tester,
+    ) async {
       final App tApp = createApp(
         environment: const Environment(),
         appWidget: StandardMaterialApp(
@@ -1324,9 +1251,7 @@ void main() {
           pages: [
             StandardPageFactory<_TestAnalyticsSingletonEventWidgetPage, void>(
               create: (data) => _TestAnalyticsSingletonEventWidgetPage(),
-              links: {
-                r'': (match, uri) {},
-              },
+              links: {r'': (match, uri) {}},
               linkGenerator: (pageData) => '',
               groupRoot: true,
             ),
@@ -1340,21 +1265,18 @@ void main() {
         await tester.pumpAndSettle();
 
         final tAnalytics = tApp.analytics;
-        final Stream<AnalyticsEvent> tEventStream =
-            tAnalytics.eventsFor<Analytics>();
+        final Stream<AnalyticsEvent> tEventStream = tAnalytics
+            .eventsFor<Analytics>();
 
         var tFuture = expectLater(
           tEventStream.asyncMap(
-            (event) => {
-              'pageName': event.name,
-              'eventData': event.data,
-            },
+            (event) => {'pageName': event.name, 'eventData': event.data},
           ),
           emitsInOrder([
             {
               'pageName': 'Event1',
               'eventData': {'test': 'testData1'},
-            }
+            },
           ]),
         );
 
@@ -1366,16 +1288,13 @@ void main() {
 
         tFuture = expectLater(
           tEventStream.asyncMap(
-            (event) => {
-              'pageName': event.name,
-              'eventData': event.data,
-            },
+            (event) => {'pageName': event.name, 'eventData': event.data},
           ),
           emitsInOrder([
             {
               'pageName': 'Event2',
               'eventData': {'test': 'testData2'},
-            }
+            },
           ]),
         );
 
@@ -1399,9 +1318,7 @@ void main() {
           pages: [
             StandardPageFactory<_TestAnalyticsImpressionWidgetPage, void>(
               create: (data) => _TestAnalyticsImpressionWidgetPage(),
-              links: {
-                r'': (match, uri) {},
-              },
+              links: {r'': (match, uri) {}},
               linkGenerator: (pageData) => '',
               groupRoot: true,
             ),
@@ -1416,24 +1333,21 @@ void main() {
 
         await tester.pumpAndSettle();
 
-        final Stream<AnalyticsEvent> tEventStream =
-            tAnalytics.eventsFor<Analytics>();
+        final Stream<AnalyticsEvent> tEventStream = tAnalytics
+            .eventsFor<Analytics>();
 
         var tFuture = expectLater(
           tEventStream.asyncMap(
-            (event) => {
-              'pageName': event.name,
-              'eventData': event.data,
-            },
+            (event) => {'pageName': event.name, 'eventData': event.data},
           ),
           emitsInOrder([
             {
               'pageName': 'Analytics Impression',
               'eventData': {
                 'name': 'Analytics Page Item 5',
-                'section': 'Section 5'
-              }
-            }
+                'section': 'Section 5',
+              },
+            },
           ]),
         );
 
@@ -1447,8 +1361,9 @@ void main() {
       tApp.dispose();
     });
 
-    testWidgets("Analytics impression did update widget test",
-        (WidgetTester tester) async {
+    testWidgets("Analytics impression did update widget test", (
+      WidgetTester tester,
+    ) async {
       VisibilityDetectorController.instance.updateInterval = Duration.zero;
 
       final App tApp = createApp(
@@ -1456,12 +1371,12 @@ void main() {
         appWidget: StandardMaterialApp(
           onGenerateTitle: (context) => 'title',
           pages: [
-            StandardPageFactory<_TestAnalyticsImpressionDidUpdateWidgetPage,
-                void>(
+            StandardPageFactory<
+              _TestAnalyticsImpressionDidUpdateWidgetPage,
+              void
+            >(
               create: (data) => _TestAnalyticsImpressionDidUpdateWidgetPage(),
-              links: {
-                r'': (match, uri) {},
-              },
+              links: {r'': (match, uri) {}},
               linkGenerator: (pageData) => '',
               groupRoot: true,
             ),
@@ -1476,28 +1391,26 @@ void main() {
 
         await tester.pumpAndSettle();
 
-        final Stream<AnalyticsEvent> tEventStream =
-            tAnalytics.eventsFor<Analytics>();
+        final Stream<AnalyticsEvent> tEventStream = tAnalytics
+            .eventsFor<Analytics>();
 
         await tester.drag(find.byType(ListView), const Offset(0, -100));
 
         await tester.pumpAndSettle();
 
-        await tester
-            .tap(find.byKey(const ValueKey(kAnalyticsUpdateWidgetButton)));
+        await tester.tap(
+          find.byKey(const ValueKey(kAnalyticsUpdateWidgetButton)),
+        );
 
         var tFuture = expectLater(
           tEventStream.asyncMap(
-            (event) => {
-              'pageName': event.name,
-              'eventData': event.data,
-            },
+            (event) => {'pageName': event.name, 'eventData': event.data},
           ),
           emitsInOrder([
             {
               'pageName': 'Update Analytics Impression 5',
-              'eventData': {'name': 'Update Analytics Page Item 5'}
-            }
+              'eventData': {'name': 'Update Analytics Page Item 5'},
+            },
           ]),
         );
 
@@ -1509,8 +1422,9 @@ void main() {
       tApp.dispose();
     });
 
-    testWidgets("Analytics impression None batch test",
-        (WidgetTester tester) async {
+    testWidgets("Analytics impression None batch test", (
+      WidgetTester tester,
+    ) async {
       VisibilityDetectorController.instance.updateInterval = Duration.zero;
 
       final App tApp = createApp(
@@ -1518,12 +1432,12 @@ void main() {
         appWidget: StandardMaterialApp(
           onGenerateTitle: (context) => 'title',
           pages: [
-            StandardPageFactory<_TestAnalyticsImpressionWidgetNoneBatchPage,
-                void>(
+            StandardPageFactory<
+              _TestAnalyticsImpressionWidgetNoneBatchPage,
+              void
+            >(
               create: (data) => _TestAnalyticsImpressionWidgetNoneBatchPage(),
-              links: {
-                r'': (match, uri) {},
-              },
+              links: {r'': (match, uri) {}},
               linkGenerator: (pageData) => '',
               groupRoot: true,
             ),
@@ -1538,21 +1452,18 @@ void main() {
 
         await tester.pumpAndSettle();
 
-        final Stream<AnalyticsEvent> tEventStream =
-            tAnalytics.eventsFor<Analytics>();
+        final Stream<AnalyticsEvent> tEventStream = tAnalytics
+            .eventsFor<Analytics>();
 
         var tFuture = expectLater(
           tEventStream.asyncMap(
-            (event) => {
-              'pageName': event.name,
-              'eventData': event.data,
-            },
+            (event) => {'pageName': event.name, 'eventData': event.data},
           ),
           emitsInOrder([
             {
               'pageName': 'Analytics Impression',
-              'eventData': {'name': 'Analytics Page Item 30'}
-            }
+              'eventData': {'name': 'Analytics Page Item 30'},
+            },
           ]),
         );
 
@@ -1566,8 +1477,9 @@ void main() {
       tApp.dispose();
     });
 
-    testWidgets("Analytics impression notify data changed test",
-        (WidgetTester tester) async {
+    testWidgets("Analytics impression notify data changed test", (
+      WidgetTester tester,
+    ) async {
       VisibilityDetectorController.instance.updateInterval = Duration.zero;
 
       final App tApp = createApp(
@@ -1575,12 +1487,12 @@ void main() {
         appWidget: StandardMaterialApp(
           onGenerateTitle: (context) => 'title',
           pages: [
-            StandardPageFactory<_TestAnalyticsImpressionNotifyDataChangedPage,
-                void>(
+            StandardPageFactory<
+              _TestAnalyticsImpressionNotifyDataChangedPage,
+              void
+            >(
               create: (data) => _TestAnalyticsImpressionNotifyDataChangedPage(),
-              links: {
-                r'': (match, uri) {},
-              },
+              links: {r'': (match, uri) {}},
               linkGenerator: (pageData) => '',
               groupRoot: true,
             ),
@@ -1595,8 +1507,8 @@ void main() {
 
         await tester.pumpAndSettle();
 
-        final Stream<AnalyticsEvent> tEventStream =
-            tAnalytics.eventsFor<Analytics>();
+        final Stream<AnalyticsEvent> tEventStream = tAnalytics
+            .eventsFor<Analytics>();
 
         await tester.drag(find.byType(ListView), const Offset(0, -500));
 
@@ -1604,24 +1516,22 @@ void main() {
 
         var tFuture = expectLater(
           tEventStream.asyncMap(
-            (event) => {
-              'pageName': event.name,
-              'eventData': event.data,
-            },
+            (event) => {'pageName': event.name, 'eventData': event.data},
           ),
           emitsInOrder([
             {
               'pageName': 'Analytics Impression',
               'eventData': {
                 'name': 'Analytics Page Item After Setstate 7',
-                'section': 'Section 10'
-              }
-            }
+                'section': 'Section 10',
+              },
+            },
           ]),
         );
 
-        await tester
-            .tap(find.byKey(const ValueKey(kAnalyticsNotifyDataChangedButton)));
+        await tester.tap(
+          find.byKey(const ValueKey(kAnalyticsNotifyDataChangedButton)),
+        );
 
         await tester.pumpAndSettle();
 
@@ -1631,8 +1541,9 @@ void main() {
       tApp.dispose();
     });
 
-    testWidgets("Analytics impression batch to ignore data test",
-        (WidgetTester tester) async {
+    testWidgets("Analytics impression batch to ignore data test", (
+      WidgetTester tester,
+    ) async {
       VisibilityDetectorController.instance.updateInterval = Duration.zero;
 
       final App tApp = createApp(
@@ -1640,12 +1551,12 @@ void main() {
         appWidget: StandardMaterialApp(
           onGenerateTitle: (context) => 'title',
           pages: [
-            StandardPageFactory<_TestAnalyticsImpressionBatchToIgnorePage,
-                void>(
+            StandardPageFactory<
+              _TestAnalyticsImpressionBatchToIgnorePage,
+              void
+            >(
               create: (data) => _TestAnalyticsImpressionBatchToIgnorePage(),
-              links: {
-                r'': (match, uri) {},
-              },
+              links: {r'': (match, uri) {}},
               linkGenerator: (pageData) => '',
               groupRoot: true,
             ),
@@ -1660,8 +1571,8 @@ void main() {
 
         await tester.pumpAndSettle();
 
-        final Stream<AnalyticsEvent> tEventStream =
-            tAnalytics.eventsFor<Analytics>();
+        final Stream<AnalyticsEvent> tEventStream = tAnalytics
+            .eventsFor<Analytics>();
 
         var tFuture = expectLater(
           tEventStream.asyncMap(
@@ -1676,7 +1587,7 @@ void main() {
               'pageName': '_TestAnalyticsImpressionBatchToIgnorePage',
               'index': '30',
               'section': null,
-            }
+            },
           ]),
         );
 
@@ -1690,8 +1601,9 @@ void main() {
       tApp.dispose();
     });
 
-    testWidgets("Analytics impression visibility test",
-        (WidgetTester tester) async {
+    testWidgets("Analytics impression visibility test", (
+      WidgetTester tester,
+    ) async {
       VisibilityDetectorController.instance.updateInterval = Duration.zero;
 
       final App tApp = createApp(
@@ -1701,9 +1613,7 @@ void main() {
           pages: [
             StandardPageFactory<_TestAnalyticsImpressionVisibilityPage, void>(
               create: (data) => _TestAnalyticsImpressionVisibilityPage(),
-              links: {
-                r'': (match, uri) {},
-              },
+              links: {r'': (match, uri) {}},
               linkGenerator: (pageData) => '',
               groupRoot: true,
             ),
@@ -1718,25 +1628,22 @@ void main() {
 
         await tester.pumpAndSettle();
 
-        final Stream<AnalyticsEvent> tEventStream =
-            tAnalytics.eventsFor<Analytics>();
+        final Stream<AnalyticsEvent> tEventStream = tAnalytics
+            .eventsFor<Analytics>();
 
         var tFuture = expectLater(
-          tEventStream.asyncMap(
-            (event) => {
-              'pageName': event.name,
-            },
-          ),
+          tEventStream.asyncMap((event) => {'pageName': event.name}),
           emitsInOrder([
-            {
-              'pageName': 'Analytics Impression 10',
-            }
+            {'pageName': 'Analytics Impression 10'},
           ]),
         );
 
         // If you scroll too quickly, the VisibilityChanged won't be triggered, so scroll slowly.
-        await tester.timedDrag(find.byType(ListView), const Offset(0, -500),
-            const Duration(seconds: 1));
+        await tester.timedDrag(
+          find.byType(ListView),
+          const Offset(0, -500),
+          const Duration(seconds: 1),
+        );
 
         await tester.pumpAndSettle();
 
@@ -1746,8 +1653,11 @@ void main() {
         await tFuture;
 
         // If you scroll too quickly, the VisibilityChanged won't be triggered, so scroll slowly.
-        await tester.timedDrag(find.byType(ListView), const Offset(0, -500),
-            const Duration(seconds: 1));
+        await tester.timedDrag(
+          find.byType(ListView),
+          const Offset(0, -500),
+          const Duration(seconds: 1),
+        );
 
         await tester.pumpAndSettle();
 
@@ -1758,8 +1668,9 @@ void main() {
       tApp.dispose();
     });
 
-    testWidgets("Analytics impression threshold callback test",
-        (WidgetTester tester) async {
+    testWidgets("Analytics impression threshold callback test", (
+      WidgetTester tester,
+    ) async {
       VisibilityDetectorController.instance.updateInterval = Duration.zero;
 
       final App tApp = createApp(
@@ -1767,12 +1678,12 @@ void main() {
         appWidget: StandardMaterialApp(
           onGenerateTitle: (context) => 'title',
           pages: [
-            StandardPageFactory<_TestAnalyticsImpressionThresholdCallbackPage,
-                void>(
+            StandardPageFactory<
+              _TestAnalyticsImpressionThresholdCallbackPage,
+              void
+            >(
               create: (data) => _TestAnalyticsImpressionThresholdCallbackPage(),
-              links: {
-                r'': (match, uri) {},
-              },
+              links: {r'': (match, uri) {}},
               linkGenerator: (pageData) => '',
               groupRoot: true,
             ),
@@ -1787,25 +1698,22 @@ void main() {
 
         await tester.pumpAndSettle();
 
-        final Stream<AnalyticsEvent> tEventStream =
-            tAnalytics.eventsFor<Analytics>();
+        final Stream<AnalyticsEvent> tEventStream = tAnalytics
+            .eventsFor<Analytics>();
 
         var tFuture = expectLater(
-          tEventStream.asyncMap(
-            (event) => {
-              'pageName': event.name,
-            },
-          ),
+          tEventStream.asyncMap((event) => {'pageName': event.name}),
           emitsInOrder([
-            {
-              'pageName': 'Analytics Impression 10',
-            }
+            {'pageName': 'Analytics Impression 10'},
           ]),
         );
 
         // If you scroll too quickly, the VisibilityChanged won't be triggered, so scroll slowly.
-        await tester.timedDrag(find.byType(ListView), const Offset(0, -500),
-            const Duration(seconds: 2));
+        await tester.timedDrag(
+          find.byType(ListView),
+          const Offset(0, -500),
+          const Duration(seconds: 2),
+        );
 
         await tester.pumpAndSettle();
 
@@ -1813,8 +1721,11 @@ void main() {
         expect(find.text('Impression index : 10'), findsOneWidget);
 
         // If you scroll too quickly, the VisibilityChanged won't be triggered, so scroll slowly.
-        await tester.timedDrag(find.byType(ListView), const Offset(0, -800),
-            const Duration(seconds: 2));
+        await tester.timedDrag(
+          find.byType(ListView),
+          const Offset(0, -800),
+          const Duration(seconds: 2),
+        );
 
         await tester.pumpAndSettle();
 
@@ -1865,7 +1776,9 @@ void main() {
       final object = {'key': 'value'};
       final result = Analytics.defaultMakeLoggableToNative(object);
       expect(
-          result, equals(jsonEncode(object).characters.take(100).toString()));
+        result,
+        equals(jsonEncode(object).characters.take(100).toString()),
+      );
     });
 
     test('defaultMakeLoggableToNative test with non-json encodable object', () {
@@ -1898,20 +1811,23 @@ void main() {
       expect(result, equals({'1': object.toString()}));
     });
 
-    test('tryConvertToLoggableJsonParameters test with json encodable object',
-        () {
-      final object = {'key': 'value'};
-      final result = Analytics.tryConvertToLoggableJsonParameters('', object);
-      expect(result, equals({'1': jsonEncode(object)}));
-    });
+    test(
+      'tryConvertToLoggableJsonParameters test with json encodable object',
+      () {
+        final object = {'key': 'value'};
+        final result = Analytics.tryConvertToLoggableJsonParameters('', object);
+        expect(result, equals({'1': jsonEncode(object)}));
+      },
+    );
 
     test(
-        'tryConvertToLoggableJsonParameters test with non-json encodable object',
-        () {
-      final object = Object();
-      final result = Analytics.tryConvertToLoggableJsonParameters('', object);
-      expect(result, equals({}));
-    });
+      'tryConvertToLoggableJsonParameters test with non-json encodable object',
+      () {
+        final object = Object();
+        final result = Analytics.tryConvertToLoggableJsonParameters('', object);
+        expect(result, equals({}));
+      },
+    );
 
     // hashcode tests
     test('AnalyticsContext hashCode test', () {
@@ -1922,8 +1838,10 @@ void main() {
 
       final analyticsContext3 = AnalyticsContext({'key': 'otherValue'});
 
-      expect(analyticsContext1.hashCode,
-          isNot(equals(analyticsContext3.hashCode)));
+      expect(
+        analyticsContext1.hashCode,
+        isNot(equals(analyticsContext3.hashCode)),
+      );
     });
   });
 }

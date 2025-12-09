@@ -161,8 +161,11 @@ class InfiniteScrollListView<T> extends StatefulWidget {
 
   /// Builder for the refresh indicator widget.
   final Widget Function(
-          BuildContext context, Widget child, Future<void> Function() refresh)?
-      refreshIndicatorBuilder;
+    BuildContext context,
+    Widget child,
+    Future<void> Function() refresh,
+  )?
+  refreshIndicatorBuilder;
 
   /// The delegate that controls the layout of the grid tiles.
   final SliverGridDelegate? gridDelegate;
@@ -186,9 +189,11 @@ class InfiniteScrollListView<T> extends StatefulWidget {
   final bool? primary;
 
   final Widget Function(
-      BuildContext context,
-      Widget? Function(BuildContext context, int index) itemBuilder,
-      int count) _listBuilder;
+    BuildContext context,
+    Widget? Function(BuildContext context, int index) itemBuilder,
+    int count,
+  )
+  _listBuilder;
 
   /// Creates an infinite scrolling list view.
   InfiniteScrollListView.list({
@@ -219,13 +224,10 @@ class InfiniteScrollListView<T> extends StatefulWidget {
     this.onRefresh,
     this.canFetchNext,
     this.canFetchPrev,
-  })  : gridDelegate = null,
-        _listBuilder = ((context, itemBuilder, count) => SliverList(
-              delegate: SliverChildBuilderDelegate(
-                childCount: count,
-                itemBuilder,
-              ),
-            ));
+  }) : gridDelegate = null,
+       _listBuilder = ((context, itemBuilder, count) => SliverList(
+         delegate: SliverChildBuilderDelegate(childCount: count, itemBuilder),
+       ));
 
   /// Creates an infinite scrolling grid view.
   InfiniteScrollListView.grid({
@@ -258,12 +260,9 @@ class InfiniteScrollListView<T> extends StatefulWidget {
     this.canFetchNext,
     this.canFetchPrev,
   }) : _listBuilder = ((context, itemBuilder, count) => SliverGrid(
-              delegate: SliverChildBuilderDelegate(
-                childCount: count,
-                itemBuilder,
-              ),
-              gridDelegate: gridDelegate!,
-            ));
+         delegate: SliverChildBuilderDelegate(childCount: count, itemBuilder),
+         gridDelegate: gridDelegate!,
+       ));
 
   @override
   State<InfiniteScrollListView<T>> createState() =>
@@ -346,11 +345,7 @@ class _InfiniteScrollListViewState<T> extends State<InfiniteScrollListView<T>> {
 
       if (_canFetchNext(_initialIndex)) {
         bool tResult = false;
-        tResult = await _fetch(
-          _initialIndex,
-          backward: false,
-          doSetter: false,
-        );
+        tResult = await _fetch(_initialIndex, backward: false, doSetter: false);
         if (!tResult || !mounted) {
           return;
         }
@@ -359,8 +354,10 @@ class _InfiniteScrollListViewState<T> extends State<InfiniteScrollListView<T>> {
       if (widget.initialIndex != null) {
         if (!_data.containsKey(_initialIndex)) {
           final tCanRetry = (retryCount < 10);
-          if (widget.initialIndexNotFoundCallback
-                      ?.call(_initialIndex, !tCanRetry) ==
+          if (widget.initialIndexNotFoundCallback?.call(
+                    _initialIndex,
+                    !tCanRetry,
+                  ) ==
                   true &&
               tCanRetry) {
             final tCrossAxisCount = _crossAxisCount;
@@ -521,10 +518,7 @@ class _InfiniteScrollListViewState<T> extends State<InfiniteScrollListView<T>> {
     }
   }
 
-  bool _onShortage(
-    bool backward,
-    VoidCallback onProgressive,
-  ) {
+  bool _onShortage(bool backward, VoidCallback onProgressive) {
     Future<bool>? tFuture;
 
     if (backward) {
@@ -556,10 +550,8 @@ class _InfiniteScrollListViewState<T> extends State<InfiniteScrollListView<T>> {
   Widget build(BuildContext context) {
     late Widget tWidget;
 
-    final tLoading = widget.loading ??
-        const Center(
-          child: CircularProgressIndicator(),
-        );
+    final tLoading =
+        widget.loading ?? const Center(child: CircularProgressIndicator());
 
     tWidget = _CustomScrollView(
       key: ObjectKey(_key),
@@ -604,15 +596,11 @@ class _InfiniteScrollListViewState<T> extends State<InfiniteScrollListView<T>> {
           if (widget.prefix != null)
             _PrefixSliverProxy(
               key: const ValueKey<String>('Prefix'),
-              child: SliverToBoxAdapter(
-                child: widget.prefix!,
-              ),
+              child: SliverToBoxAdapter(child: widget.prefix!),
             ),
           ..._buildList(),
           if (widget.suffix != null && _readyViewed)
-            SliverToBoxAdapter(
-              child: widget.suffix!,
-            ),
+            SliverToBoxAdapter(child: widget.suffix!),
         ] else if (widget.gridDelegate != null && _crossAxisCount < 1) ...[
           _SliverListIndexListener(
             onNotification: (index, crossAxisCount) {
@@ -633,7 +621,7 @@ class _InfiniteScrollListViewState<T> extends State<InfiniteScrollListView<T>> {
                 (context, index) => const SizedBox.shrink(),
               ),
             ),
-          )
+          ),
         ],
       ],
     );
@@ -642,14 +630,12 @@ class _InfiniteScrollListViewState<T> extends State<InfiniteScrollListView<T>> {
       fit: StackFit.expand,
       children: [
         Visibility.maintain(
-          visible: _readyViewed ||
+          visible:
+              _readyViewed ||
               (widget.gridDelegate != null && _crossAxisCount < 1),
           child: tWidget,
         ),
-        if (!_readyViewed)
-          SizedBox.expand(
-            child: tLoading,
-          ),
+        if (!_readyViewed) SizedBox.expand(child: tLoading),
       ],
     );
 
@@ -657,10 +643,7 @@ class _InfiniteScrollListViewState<T> extends State<InfiniteScrollListView<T>> {
       if (widget.refreshIndicatorBuilder != null) {
         tWidget = widget.refreshIndicatorBuilder!(context, tWidget, _onRefresh);
       } else {
-        tWidget = RefreshIndicator(
-          onRefresh: _onRefresh,
-          child: tWidget,
-        );
+        tWidget = RefreshIndicator(onRefresh: _onRefresh, child: tWidget);
       }
     }
 
@@ -679,16 +662,15 @@ class _InfiniteScrollListViewState<T> extends State<InfiniteScrollListView<T>> {
     if (_error != null) {
       return [
         SliverFillRemaining(
-          child: widget.errorBuilder?.call(context, _error!) ??
+          child:
+              widget.errorBuilder?.call(context, _error!) ??
               const SizedBox.shrink(),
         ),
       ];
     }
     if (_data.isEmpty) {
       return [
-        SliverFillRemaining(
-          child: widget.empty ?? const SizedBox.shrink(),
-        ),
+        SliverFillRemaining(child: widget.empty ?? const SizedBox.shrink()),
       ];
     }
 
@@ -754,9 +736,11 @@ class _InfiniteScrollListViewState<T> extends State<InfiniteScrollListView<T>> {
               layoutInProgress: true,
             );
           },
-          child: Builder(builder: (_) {
-            return _buildLoading();
-          }),
+          child: Builder(
+            builder: (_) {
+              return _buildLoading();
+            },
+          ),
         );
       } else {
         tWidget = _LoadTrigger(
@@ -771,9 +755,11 @@ class _InfiniteScrollListViewState<T> extends State<InfiniteScrollListView<T>> {
               layoutInProgress: true,
             );
           },
-          child: Builder(builder: (_) {
-            return _buildLoading();
-          }),
+          child: Builder(
+            builder: (_) {
+              return _buildLoading();
+            },
+          ),
         );
       }
 
@@ -786,12 +772,16 @@ class _InfiniteScrollListViewState<T> extends State<InfiniteScrollListView<T>> {
       int tListFirstIndex = _shouldLoadDataIndex.first + 1;
       for (int i = _backedItemSizeList.length - 1; i >= 0; i--) {
         final tLength = _backedItemSizeList[i];
-        tBackwardWidgetList.add(fBuildSliverList(
-          tListFirstIndex,
-          tLength,
-          true,
-          (i == _backedItemSizeList.length - 1 ? _backedLoadTriggerSize : 0.0),
-        ));
+        tBackwardWidgetList.add(
+          fBuildSliverList(
+            tListFirstIndex,
+            tLength,
+            true,
+            (i == _backedItemSizeList.length - 1
+                ? _backedLoadTriggerSize
+                : 0.0),
+          ),
+        );
 
         tListFirstIndex += tLength;
       }
@@ -815,11 +805,7 @@ class _InfiniteScrollListViewState<T> extends State<InfiniteScrollListView<T>> {
     ];
     if (widget.padding != null) {
       Widget fWrapPadding(Widget widget, EdgeInsets padding) {
-        return SliverPadding(
-          key: widget.key,
-          padding: padding,
-          sliver: widget,
-        );
+        return SliverPadding(key: widget.key, padding: padding, sliver: widget);
       }
 
       if (tWidgetList.length == 1) {
@@ -829,8 +815,8 @@ class _InfiniteScrollListViewState<T> extends State<InfiniteScrollListView<T>> {
           final tPadding = (tWidgetList[i] == tWidgetList.first)
               ? widget.padding!.copyWith(bottom: 0)
               : (tWidgetList[i] == tWidgetList.last)
-                  ? widget.padding!.copyWith(top: 0)
-                  : widget.padding!.copyWith(top: 0, bottom: 0);
+              ? widget.padding!.copyWith(top: 0)
+              : widget.padding!.copyWith(top: 0, bottom: 0);
 
           tWidgetList[i] = fWrapPadding(tWidgetList[i], tPadding);
         }
@@ -848,10 +834,7 @@ class _InfiniteScrollListViewState<T> extends State<InfiniteScrollListView<T>> {
     });
   }
 
-  VoidCallback _startListening(
-    InheritedContext<T?> e,
-    T value,
-  ) {
+  VoidCallback _startListening(InheritedContext<T?> e, T value) {
     (value as Listenable).addListener(e.markNeedsNotifyDependents);
     return () => value.removeListener(e.markNeedsNotifyDependents);
   }
@@ -860,9 +843,7 @@ class _InfiniteScrollListViewState<T> extends State<InfiniteScrollListView<T>> {
     return widget.loadingMore ??
         const SizedBox(
           height: 104,
-          child: Center(
-            child: CircularProgressIndicator(),
-          ),
+          child: Center(child: CircularProgressIndicator()),
         );
   }
 
@@ -881,10 +862,8 @@ class _InfiniteScrollListViewState<T> extends State<InfiniteScrollListView<T>> {
               startListening: _startListening,
             ),
           ] else ...[
-            Provider<T>.value(
-              value: tItem,
-            ),
-          ]
+            Provider<T>.value(value: tItem),
+          ],
         ],
         builder: (context, _) => widget.itemBuilder(context, tItem, index),
       );
@@ -906,16 +885,11 @@ class InfiniteScrollItemInformation {
   final int index;
 
   /// Creates an [InfiniteScrollItemInformation] with the given index.
-  const InfiniteScrollItemInformation(
-    this.index,
-  );
+  const InfiniteScrollItemInformation(this.index);
 }
 
 class _PrefixSliverProxy extends SingleChildRenderObjectWidget {
-  const _PrefixSliverProxy({
-    super.key,
-    required super.child,
-  });
+  const _PrefixSliverProxy({super.key, required super.child});
 
   @override
   _RenderPrefixSliverProxy createRenderObject(BuildContext context) {
@@ -925,10 +899,7 @@ class _PrefixSliverProxy extends SingleChildRenderObjectWidget {
 
 class _RenderPrefixSliverProxy extends RenderProxySliver {}
 
-typedef _OnShortage = bool Function(
-  bool backward,
-  VoidCallback onProgressive,
-);
+typedef _OnShortage = bool Function(bool backward, VoidCallback onProgressive);
 typedef _OnReady = void Function();
 typedef _OnUpdatePrefixExtent = void Function(double prefixScrollExtent);
 
@@ -1000,7 +971,8 @@ class _Viewport extends Viewport {
   _RenderViewport createRenderObject(BuildContext context) {
     return _RenderViewport(
       axisDirection: axisDirection,
-      crossAxisDirection: crossAxisDirection ??
+      crossAxisDirection:
+          crossAxisDirection ??
           Viewport.getDefaultCrossAxisDirection(context, axisDirection),
       anchor: anchor,
       offset: offset,
@@ -1055,9 +1027,11 @@ class _RenderViewport extends RenderViewport {
     }
 
     double tPrefixScrollExtent = 0.0;
-    for (RenderSliver? tChild = firstChild;
-        tChild != null;
-        (tChild = childAfter(tChild))) {
+    for (
+      RenderSliver? tChild = firstChild;
+      tChild != null;
+      (tChild = childAfter(tChild))
+    ) {
       if (tChild is! _RenderPrefixSliverProxy) {
         break;
       }
@@ -1075,9 +1049,11 @@ class _RenderViewport extends RenderViewport {
 
     double tForwardListScrollExtent = lastChild!.geometry!.scrollExtent;
     double tBackwardListScrollExtent = 0.0;
-    for (RenderSliver? tChild = childBefore(lastChild!);
-        tChild != null;
-        (tChild = childBefore(tChild))) {
+    for (
+      RenderSliver? tChild = childBefore(lastChild!);
+      tChild != null;
+      (tChild = childBefore(tChild))
+    ) {
       if (tChild is _RenderPrefixSliverProxy) {
         break;
       }
@@ -1269,8 +1245,8 @@ class _LoadingAnchorRender extends RenderSliverToBoxAdapter
   }
 }
 
-typedef _SliverListIndexNotifyCallback = void Function(
-    int index, int crossAxisCount);
+typedef _SliverListIndexNotifyCallback =
+    void Function(int index, int crossAxisCount);
 typedef _NotificationOffset = double Function();
 
 class _SliverListIndexListener extends SingleChildRenderObjectWidget {
@@ -1355,13 +1331,15 @@ class _RenderSliverListIndexListener extends RenderProxySliver
       final tLayout = _sliverGrid!.gridDelegate.getLayout(constraints);
       // Any value for scrollOffset is fine, but specifying 0.0 will result in an
       // internal mainAxisCount of 0, so 0.1 is specified.
-      _corssAxisCount = (tLayout.getMaxChildIndexForScrollOffset(0.1) -
+      _corssAxisCount =
+          (tLayout.getMaxChildIndexForScrollOffset(0.1) -
               tLayout.getMinChildIndexForScrollOffset(0.1)) +
           1;
 
       if (backward || getViewportNextSibling(this) is _LoadingAnchorRender) {
-        final tCrossGeometry =
-            tLayout.getGeometryForChildIndex(_corssAxisCount);
+        final tCrossGeometry = tLayout.getGeometryForChildIndex(
+          _corssAxisCount,
+        );
         final tSpacing =
             tCrossGeometry.scrollOffset % tCrossGeometry.mainAxisExtent;
 
@@ -1393,12 +1371,8 @@ class _RenderSliverListIndexListener extends RenderProxySliver
           geometry!.cacheExtent,
           constraints.remainingCacheExtent,
         );
-        final tMaxPaintExtent = fExtentWithSpacing(
-          geometry!.maxPaintExtent,
-        );
-        final tScrollExtent = fExtentWithSpacing(
-          geometry!.scrollExtent,
-        );
+        final tMaxPaintExtent = fExtentWithSpacing(geometry!.maxPaintExtent);
+        final tScrollExtent = fExtentWithSpacing(geometry!.scrollExtent);
 
         geometry = geometry!.copyWith(
           paintExtent: tPaintExtent,

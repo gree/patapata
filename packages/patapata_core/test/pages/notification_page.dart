@@ -10,11 +10,7 @@ class NotificationPage extends StandardPage<void> {
   @override
   Widget buildPage(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          l(context, "notification.title"),
-        ),
-      ),
+      appBar: AppBar(title: Text(l(context, "notification.title"))),
       body: const SizedBox.shrink(),
     );
   }

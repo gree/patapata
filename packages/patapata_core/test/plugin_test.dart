@@ -33,8 +33,10 @@ void main() {
 
       test('remoteConfigEnabledKey should return the correct value', () {
         final tPlugin = createPlugin();
-        expect(tPlugin.remoteConfigEnabledKey,
-            equals('patapata_plugin_${name}_enabled'));
+        expect(
+          tPlugin.remoteConfigEnabledKey,
+          equals('patapata_plugin_${name}_enabled'),
+        );
       });
 
       test('app should return the initialized App instance', () async {
@@ -59,13 +61,15 @@ void main() {
         expect(tPlugin.disposed, isTrue);
       });
 
-      test('createAppWidgetWrapper should return the child widget by default',
-          () {
-        final tPlugin = createPlugin();
-        final tChild = Container();
-        final wrapper = tPlugin.createAppWidgetWrapper(tChild);
-        expect(wrapper, equals(tChild));
-      });
+      test(
+        'createAppWidgetWrapper should return the child widget by default',
+        () {
+          final tPlugin = createPlugin();
+          final tChild = Container();
+          final wrapper = tPlugin.createAppWidgetWrapper(tChild);
+          expect(wrapper, equals(tChild));
+        },
+      );
 
       test('createRemoteConfig should return null by default', () {
         final tPlugin = createPlugin();
@@ -92,11 +96,15 @@ void main() {
       });
     }
 
-    group('Extended defaults',
-        () => doDefaultTests(() => _BasePlugin(), '_BasePlugin'));
+    group(
+      'Extended defaults',
+      () => doDefaultTests(() => _BasePlugin(), '_BasePlugin'),
+    );
 
-    group('Inline defaults',
-        () => doDefaultTests(() => Plugin.inline(), 'inline'));
+    group(
+      'Inline defaults',
+      () => doDefaultTests(() => Plugin.inline(), 'inline'),
+    );
 
     group('Extended others', () {
       test('init can not be executed multiple times', () async {
@@ -105,7 +113,9 @@ void main() {
         await tPlugin.init(tApp);
 
         expect(
-            () async => await tPlugin.init(tApp), throwsA(isA<StateError>()));
+          () async => await tPlugin.init(tApp),
+          throwsA(isA<StateError>()),
+        );
       });
 
       test('dispose can not be executed multiple times', () async {
@@ -117,12 +127,11 @@ void main() {
         expect(() async => await tPlugin.dispose(), throwsA(isA<StateError>()));
       });
 
-      testWidgets('native mock enable/disable calls should be called',
-          (tester) async {
+      testWidgets('native mock enable/disable calls should be called', (
+        tester,
+      ) async {
         final tPlugin = _BasePlugin(shouldCall: expectAsync0(() {}, count: 2));
-        final tApp = createApp(
-          plugins: [tPlugin],
-        );
+        final tApp = createApp(plugins: [tPlugin]);
 
         await tApp.run();
 
@@ -135,19 +144,24 @@ void main() {
         tApp.dispose();
       });
 
-      test('An error should be thrown if dependencies are not satisfied',
-          () async {
-        final tPlugin = _DependencyPlugin();
-        final tApp = createApp();
+      test(
+        'An error should be thrown if dependencies are not satisfied',
+        () async {
+          final tPlugin = _DependencyPlugin();
+          final tApp = createApp();
 
-        expect(
-            () async => await tPlugin.init(tApp), throwsA(isA<StateError>()));
-      });
+          expect(
+            () async => await tPlugin.init(tApp),
+            throwsA(isA<StateError>()),
+          );
+        },
+      );
     });
 
     group('Inline others', () {
-      testWidgets('You can make a complete custom inline plugin',
-          (tester) async {
+      testWidgets('You can make a complete custom inline plugin', (
+        tester,
+      ) async {
         final tWidgetKey = GlobalKey();
         final tPlugin = Plugin.inline(
           name: 'test',
@@ -155,28 +169,16 @@ void main() {
           requireRemoteConfig: true,
           init: expectAsync1((App app) async => true, count: 1),
           dispose: expectAsync0(() {}, count: 1),
-          createAppWidgetWrapper: (child) => KeyedSubtree(
-            key: tWidgetKey,
-            child: child,
-          ),
-          createRemoteConfig: () => MockRemoteConfig({
-            'r': 'r',
-          }),
-          createLocalConfig: () => MockLocalConfig({
-            'l': 'l',
-          }),
-          createRemoteMessaging: () => MockRemoteMessaging(
-            getToken: () => Future.value('token'),
-          ),
+          createAppWidgetWrapper: (child) =>
+              KeyedSubtree(key: tWidgetKey, child: child),
+          createRemoteConfig: () => MockRemoteConfig({'r': 'r'}),
+          createLocalConfig: () => MockLocalConfig({'l': 'l'}),
+          createRemoteMessaging: () =>
+              MockRemoteMessaging(getToken: () => Future.value('token')),
           navigatorObservers: () => [NavigatorObserver()],
         );
 
-        final tApp = createApp(
-          plugins: [
-            _BasePlugin(),
-            tPlugin,
-          ],
-        );
+        final tApp = createApp(plugins: [_BasePlugin(), tPlugin]);
 
         await tApp.run();
 
@@ -186,8 +188,10 @@ void main() {
           expect(tPlugin.name, equals('test'));
           expect(tPlugin.dependencies, equals([_BasePlugin]));
           expect(tPlugin.requireRemoteConfig, isTrue);
-          expect(tPlugin.remoteConfigEnabledKey,
-              equals('patapata_plugin_test_enabled'));
+          expect(
+            tPlugin.remoteConfigEnabledKey,
+            equals('patapata_plugin_test_enabled'),
+          );
           expect(tPlugin.app, equals(tApp));
           expect(tPlugin.initialized, isTrue);
           expect(tPlugin.disposed, isFalse);
@@ -208,9 +212,7 @@ void main() {
 class _BasePlugin extends Plugin {
   final void Function()? shouldCall;
 
-  _BasePlugin({
-    this.shouldCall,
-  });
+  _BasePlugin({this.shouldCall});
 
   @override
   void mockPatapataEnable() {

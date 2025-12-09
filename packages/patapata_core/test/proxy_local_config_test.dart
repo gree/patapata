@@ -11,7 +11,9 @@ void main() async {
   TestWidgetsFlutterBinding.ensureInitialized();
 
   testSetMockMethodCallHandler = TestDefaultBinaryMessengerBinding
-      .instance.defaultBinaryMessenger.setMockMethodCallHandler;
+      .instance
+      .defaultBinaryMessenger
+      .setMockMethodCallHandler;
 
   const kBoolValueKey = 'kBoolValueKey';
   const kDoubleValueKey = 'kDoubleValueKey';
@@ -70,7 +72,9 @@ void main() async {
     ProxyLocalConfig tProxyLocalConfig = ProxyLocalConfig();
 
     expect(
-        tProxyLocalConfig.getBool(kBoolValueKey), Config.defaultValueForBool);
+      tProxyLocalConfig.getBool(kBoolValueKey),
+      Config.defaultValueForBool,
+    );
 
     await tProxyLocalConfig.setDefaults({kBoolValueKey: true});
     expect(tProxyLocalConfig.getBool(kBoolValueKey), true);
@@ -85,8 +89,10 @@ void main() async {
   test('check double value', () async {
     ProxyLocalConfig tProxyLocalConfig = ProxyLocalConfig();
 
-    expect(tProxyLocalConfig.getDouble(kDoubleValueKey),
-        Config.defaultValueForDouble);
+    expect(
+      tProxyLocalConfig.getDouble(kDoubleValueKey),
+      Config.defaultValueForDouble,
+    );
 
     await tProxyLocalConfig.setDefaults({kDoubleValueKey: 1.0});
     expect(tProxyLocalConfig.getDouble(kDoubleValueKey), 1.0);
@@ -116,8 +122,10 @@ void main() async {
   test('check String value', () async {
     ProxyLocalConfig tProxyLocalConfig = ProxyLocalConfig();
 
-    expect(tProxyLocalConfig.getString(kStringValueKey),
-        Config.defaultValueForString);
+    expect(
+      tProxyLocalConfig.getString(kStringValueKey),
+      Config.defaultValueForString,
+    );
 
     await tProxyLocalConfig.setDefaults({kStringValueKey: '1'});
     expect(tProxyLocalConfig.getString(kStringValueKey), '1');
@@ -145,12 +153,18 @@ void main() async {
     await tProxyLocalConfig.resetAll();
 
     expect(
-        tProxyLocalConfig.getBool(kBoolValueKey), Config.defaultValueForBool);
-    expect(tProxyLocalConfig.getDouble(kDoubleValueKey),
-        Config.defaultValueForDouble);
+      tProxyLocalConfig.getBool(kBoolValueKey),
+      Config.defaultValueForBool,
+    );
+    expect(
+      tProxyLocalConfig.getDouble(kDoubleValueKey),
+      Config.defaultValueForDouble,
+    );
     expect(tProxyLocalConfig.getInt(kIntValueKey), Config.defaultValueForInt);
-    expect(tProxyLocalConfig.getString(kStringValueKey),
-        Config.defaultValueForString);
+    expect(
+      tProxyLocalConfig.getString(kStringValueKey),
+      Config.defaultValueForString,
+    );
   });
 
   test('resetMany', () async {
@@ -161,10 +175,7 @@ void main() async {
     const kIsNotSetKey1 = 'isNotSet1';
     const kIsNotSetKey2 = 'isNotSet2';
 
-    await tProxyLocalConfig.setDefaults({
-      kIsSetKey1: 1,
-      kIsSetKey2: 1,
-    });
+    await tProxyLocalConfig.setDefaults({kIsSetKey1: 1, kIsSetKey2: 1});
 
     await tProxyLocalConfig.setInt(kIsSetKey1, 2);
     await tProxyLocalConfig.setInt(kIsNotSetKey1, 2);
@@ -185,9 +196,7 @@ void main() async {
   test('setMany', () async {
     ProxyLocalConfig tProxyLocalConfig = ProxyLocalConfig();
 
-    final Map<String, Object> tObjects = {
-      'name': 'GREE, Inc.',
-    };
+    final Map<String, Object> tObjects = {'name': 'GREE, Inc.'};
 
     await tProxyLocalConfig.setMany(tObjects);
 

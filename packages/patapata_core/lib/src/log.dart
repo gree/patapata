@@ -95,12 +95,13 @@ class Log {
       LogEnvironment() => tEnvironment.printLog,
       // debugPrint's implementation is actually quite heavy even in release mode.
       // So we disable it in release mode.
-      _ => kDebugMode
+      _ => kDebugMode,
     };
     setLevelByValue(-kPataInHex);
 
-    _rootLogDelegateSubscription =
-        Logger.root.onRecord.listen(_onRootLogRecordDelegate);
+    _rootLogDelegateSubscription = Logger.root.onRecord.listen(
+      _onRootLogRecordDelegate,
+    );
 
     if (!kIsWeb) {
       _originalOnUnhandledError = PlatformDispatcher.instance.onError;
@@ -110,22 +111,26 @@ class Log {
     FlutterError.onError = _onFlutterError;
 
     App.appStageChangeStream
-        .firstWhere((e) =>
-            e == app && e.stage == AppStage.initializingPluginsWithRemoteConfig)
+        .firstWhere(
+          (e) =>
+              e == app &&
+              e.stage == AppStage.initializingPluginsWithRemoteConfig,
+        )
         .then((_) {
-      // When RemoteConfig is ready in our app, start listening
-      // for RemoteConfig changes and grab and parse our configuration.
-      _onRemoteConfigChange();
-      app.remoteConfig.addListener(_onRemoteConfigChange);
-    });
+          // When RemoteConfig is ready in our app, start listening
+          // for RemoteConfig changes and grab and parse our configuration.
+          _onRemoteConfigChange();
+          app.remoteConfig.addListener(_onRemoteConfigChange);
+        });
   }
 
   Map<RegExp, Level?>? _levelFilters;
   String? _remoteConfigLevelFiltersString;
 
   void _onRemoteConfigChange() {
-    final tLevelFiltersString =
-        app.remoteConfig.getString(Log.kRemoteConfigLevelFilters);
+    final tLevelFiltersString = app.remoteConfig.getString(
+      Log.kRemoteConfigLevelFilters,
+    );
 
     if (_remoteConfigLevelFiltersString == tLevelFiltersString) {
       return;
@@ -137,14 +142,16 @@ class Log {
       _levelFilters = null;
     } else {
       try {
-        final tDecodedLevelFilters =
-            (jsonDecode(tLevelFiltersString) as Map).cast<String, int?>();
+        final tDecodedLevelFilters = (jsonDecode(tLevelFiltersString) as Map)
+            .cast<String, int?>();
         _levelFilters = {
           for (var e in tDecodedLevelFilters.entries)
             RegExp(e.key): e.value == null
                 ? null
-                : Level.LEVELS.firstWhere((v) => v.value == e.value!,
-                    orElse: () => Level('REMOTE', e.value!)),
+                : Level.LEVELS.firstWhere(
+                    (v) => v.value == e.value!,
+                    orElse: () => Level('REMOTE', e.value!),
+                  ),
         };
       } catch (e) {
         // Print directly, if this was a bad error that happens
@@ -152,7 +159,8 @@ class Log {
         // filter out this message and cause account limit over issues
         // all over the place.
         _print(
-            'Log: RemoteConfig ${Log.kRemoteConfigLevelFilters} parsing failed: $e');
+          'Log: RemoteConfig ${Log.kRemoteConfigLevelFilters} parsing failed: $e',
+        );
       }
     }
   }
@@ -214,8 +222,10 @@ class Log {
       value = tDefaultLogLevel;
     }
 
-    level = Level.LEVELS.firstWhere((v) => v.value == value,
-        orElse: () => Level('REMOTE', value));
+    level = Level.LEVELS.firstWhere(
+      (v) => v.value == value,
+      orElse: () => Level('REMOTE', value),
+    );
   }
 
   bool _seenBefore(Object error) {
@@ -244,8 +254,9 @@ class Log {
   bool get logPrinting => _rootLogPrintSubscription != null;
   set logPrinting(bool value) {
     if (value) {
-      _rootLogPrintSubscription ??=
-          Logger.root.onRecord.listen(_onRootLogRecordPrint);
+      _rootLogPrintSubscription ??= Logger.root.onRecord.listen(
+        _onRootLogRecordPrint,
+      );
 
       if (debugPrint == _debugLogMuter) {
         debugPrint = _originalDebugPrint!;
@@ -298,8 +309,9 @@ class Log {
 
             tByteLength++;
           } else {
-            final tRuneBytesLength =
-                utf8.encode(String.fromCharCode(tRune)).length;
+            final tRuneBytesLength = utf8
+                .encode(String.fromCharCode(tRune))
+                .length;
 
             if (tByteLength + tRuneBytesLength > _kLineLimit) {
               yield message.substring(tStart, i);
@@ -399,16 +411,17 @@ class Log {
             getApp().removeNativeSplashScreen();
             final tLevel = (error is PatapataException)
                 ? (error.logLevel != null && error.logLevel! > Level.SEVERE)
-                    ? error.logLevel!
-                    : Level.SEVERE
+                      ? error.logLevel!
+                      : Level.SEVERE
                 : Level.SEVERE;
             report(
               ReportRecord(
                 level: tLevel,
                 error: error,
                 stackTrace: stackTrace,
-                fingerprint:
-                    (error is PatapataException) ? error.fingerprint : null,
+                fingerprint: (error is PatapataException)
+                    ? error.fingerprint
+                    : null,
                 mechanism: Log.kUnhandledErrorMechanism,
               ),
             );
@@ -464,8 +477,8 @@ class Log {
 
   ReportRecord? _shouldIgnoreByType(ReportRecord record) =>
       record.error != null && _typeFilters.contains(record.error.runtimeType)
-          ? null
-          : record;
+      ? null
+      : record;
 
   /// Adds a filter.
   ///
@@ -634,37 +647,38 @@ class ReportRecord implements LogRecord {
     this.mechanism = Log.kReportMechanism,
     this.extra,
     this.fingerprint,
-  })  : assert(message != null || object != null || error != null),
-        time = time ?? DateTime.now(),
-        sequenceNumber =
-            sequenceNumber ?? LogRecord(Level.INFO, '', '').sequenceNumber,
-        message =
-            message ?? object?.toString() ?? error?.toString() ?? '<NoMessage>',
-        stackTrace = (stackTrace != null && stackTrace != StackTrace.empty
-                ? stackTrace
-                : null) ??
-            (error is Error &&
-                    error.stackTrace != null &&
-                    error.stackTrace != StackTrace.empty
-                ? error.stackTrace
-                : null);
+  }) : assert(message != null || object != null || error != null),
+       time = time ?? DateTime.now(),
+       sequenceNumber =
+           sequenceNumber ?? LogRecord(Level.INFO, '', '').sequenceNumber,
+       message =
+           message ?? object?.toString() ?? error?.toString() ?? '<NoMessage>',
+       stackTrace =
+           (stackTrace != null && stackTrace != StackTrace.empty
+               ? stackTrace
+               : null) ??
+           (error is Error &&
+                   error.stackTrace != null &&
+                   error.stackTrace != StackTrace.empty
+               ? error.stackTrace
+               : null);
 
   /// Creates a new instance of [ReportRecord] from [LogRecord].
   factory ReportRecord.fromLogRecord(LogRecord record) => ReportRecord(
-        level: record.level,
-        message: record.message,
-        object: record.object,
-        loggerName: record.loggerName,
-        time: record.time,
-        sequenceNumber: record.sequenceNumber,
-        error: record.error,
-        fingerprint: (record.error is PatapataException)
-            ? (record.error as PatapataException).fingerprint
-            : null,
-        stackTrace: record.stackTrace,
-        zone: record.zone,
-        mechanism: Log.kRootLogMechanism,
-      );
+    level: record.level,
+    message: record.message,
+    object: record.object,
+    loggerName: record.loggerName,
+    time: record.time,
+    sequenceNumber: record.sequenceNumber,
+    error: record.error,
+    fingerprint: (record.error is PatapataException)
+        ? (record.error as PatapataException).fingerprint
+        : null,
+    stackTrace: record.stackTrace,
+    zone: record.zone,
+    mechanism: Log.kRootLogMechanism,
+  );
 
   @override
   String toString() => '[${level.name}] $loggerName: $message';
@@ -770,7 +784,8 @@ Future<dynamic> _nativeLoggingMethodHandler(MethodCall call) async {
 
   if (tLoggingPackage['throwable'] is Map) {
     tThrowable = NativeThrowable.fromMap(
-        (tLoggingPackage['throwable'] as Map).cast<String, dynamic>());
+      (tLoggingPackage['throwable'] as Map).cast<String, dynamic>(),
+    );
   }
 
   _nativeLogger.log(
@@ -798,7 +813,8 @@ Future<dynamic> _nativeLoggingMethodHandler(MethodCall call) async {
 /// `(?:\((.+?)(?::([\d]+?))?\))?` Capture the filename if present, followed by the line number if available.
 ///
 final RegExp _nativeAndroidFrameParser = RegExp(
-    r'^(.+?[\.].+?(?=\.))?\.?([^\.]+?\.[^\.(]+?)(?:\((.+?)(?::([\d]+?))?\))?$');
+  r'^(.+?[\.].+?(?=\.))?\.?([^\.]+?\.[^\.(]+?)(?:\((.+?)(?::([\d]+?))?\))?$',
+);
 
 ///
 /// This is a regular expression to parse and separate a single frame (line) of an
@@ -810,8 +826,9 @@ final RegExp _nativeAndroidFrameParser = RegExp(
 /// `(.+?)` Capture the function name.
 /// `(?:\s+\+\s+(\d+)?)?` If present, capture the line number.
 ///
-final RegExp _nativeIosFrameParser =
-    RegExp(r'^.+?\s+(.+?)\s+.+?\s+(.+?)(?:\s+\+\s+(\d+)?)?$');
+final RegExp _nativeIosFrameParser = RegExp(
+  r'^.+?\s+(.+?)\s+.+?\s+(.+?)(?:\s+\+\s+(\d+)?)?$',
+);
 
 /// Class for exceptions that occurred natively.
 ///
@@ -867,12 +884,7 @@ class NativeThrowable {
   /// Cause of the exception.
   final NativeThrowable? cause;
 
-  const NativeThrowable({
-    this.type,
-    this.message,
-    this.chain,
-    this.cause,
-  });
+  const NativeThrowable({this.type, this.message, this.chain, this.cause});
 
   /// Registers the MethodChannel with the [name].
   ///
@@ -968,31 +980,29 @@ class NativeThrowable {
     final tChain = Chain([
       if (tStackTrace != null)
         Trace(
-          tStackTrace.map(
-            (v) {
-              try {
-                final tMatch = tMatcher.firstMatch(v);
+          tStackTrace.map((v) {
+            try {
+              final tMatch = tMatcher.firstMatch(v);
 
-                if (tMatch != null) {
-                  final tLine = tMatch.group(tLineGroup);
-                  return Frame(
-                    Uri.file(
-                      '${tMatch.group(tPackageGroup) ?? '<NoPackage>'}${(tFileGroup != null ? '/${tMatch.group(tFileGroup)}' : null) ?? '/<NoFileName>'}'
-                          .replaceAll(' ', '<space>'),
-                      windows: false,
-                    ),
-                    tLine != null ? int.tryParse(tLine) : null,
-                    null,
-                    tMatch.group(tMethodGroup),
-                  );
-                } else {
-                  return Frame.parseFriendly(v);
-                }
-              } catch (e) {
+              if (tMatch != null) {
+                final tLine = tMatch.group(tLineGroup);
+                return Frame(
+                  Uri.file(
+                    '${tMatch.group(tPackageGroup) ?? '<NoPackage>'}${(tFileGroup != null ? '/${tMatch.group(tFileGroup)}' : null) ?? '/<NoFileName>'}'
+                        .replaceAll(' ', '<space>'),
+                    windows: false,
+                  ),
+                  tLine != null ? int.tryParse(tLine) : null,
+                  null,
+                  tMatch.group(tMethodGroup),
+                );
+              } else {
                 return Frame.parseFriendly(v);
               }
-            },
-          ),
+            } catch (e) {
+              return Frame.parseFriendly(v);
+            }
+          }),
           original: tStackTrace.join('\n'),
         ),
       ...((NativeThrowable? cause) sync* {
@@ -1021,8 +1031,9 @@ class NativeThrowable {
   /// Converts this class to a Map.
   Map<String, dynamic> toMap() {
     final tCause = cause?.toMap();
-    final tFrames =
-        chain?.traces.isNotEmpty == true ? chain?.traces.first.frames : null;
+    final tFrames = chain?.traces.isNotEmpty == true
+        ? chain?.traces.first.frames
+        : null;
 
     final tPratformStackTrace = List.generate(tFrames?.length ?? 0, (index) {
       final tFrame = tFrames![index];
@@ -1050,7 +1061,8 @@ class NativeThrowable {
           default:
             // ignore: avoid_print
             print(
-                '$defaultTargetPlatform not supported for NativeThrowable yet.');
+              '$defaultTargetPlatform not supported for NativeThrowable yet.',
+            );
             return tFrame.toString();
         }
       } catch (e) {

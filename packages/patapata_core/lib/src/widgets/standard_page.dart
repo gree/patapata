@@ -291,8 +291,8 @@ base class StandardPageWithResultFactory<
 
     assert(
       pageData is R,
-      'pageData must be of type $R, but got ${pageData.runtimeType}',
-    ); // coverage:ignore-line
+      'pageData must be of type $R, but got ${pageData.runtimeType}', // coverage:ignore-line
+    );
 
     return _buildFullLinkPath(pageData as R);
   }
@@ -1892,8 +1892,8 @@ class StandardRouterDelegate extends RouterDelegate<StandardRouteData>
     ) {
       assert(
         _factoryTypeMap.containsKey(factory.pageType) == false,
-        'Duplicate pageType found: ${factory.pageType}. Each pageType must be unique.',
-      ); // coverage:ignore-line
+        'Duplicate pageType found: ${factory.pageType}. Each pageType must be unique.', // coverage:ignore-line
+      );
 
       StandardPageWithResultFactory._extendedDataMap[factory] =
           _StandardPageFactoryExtendedData(
@@ -2123,7 +2123,7 @@ class StandardRouterDelegate extends RouterDelegate<StandardRouteData>
         // Ensure that the first nested page is the default one.
         final tFirstPage = tPageInstances.first;
         final tDefaultFirstPageData = tDefaultFirstPageFactory.pageDataWhenNull
-            ?.call();
+            ?.call(); // coverage:ignore-line
         if (_pageInstanceToPageType[tFirstPage] !=
                 tDefaultFirstPageFactory.pageType &&
             tFirstPage.key !=
@@ -2252,7 +2252,7 @@ class StandardRouterDelegate extends RouterDelegate<StandardRouteData>
             }
 
             final tGroupRootPageData = tGroupRootFactory.pageDataWhenNull
-                ?.call();
+                ?.call(); // coverage:ignore-line
             final tGroupRootRouteData = StandardRouteData(
               factory: tGroupRootFactory,
               pageData: tGroupRootPageData,

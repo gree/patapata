@@ -116,95 +116,73 @@ class NativeLocalConfig extends LocalConfig with MemoryLocalConfig {
   @visibleForTesting
   void setMockMethodCallHandler() {
     // ignore: invalid_use_of_visible_for_testing_member
-    testSetMockMethodCallHandler(
-      _methodChannel,
-      (methodCall) async {
-        methodCallLogs.add(methodCall);
-        switch (methodCall.method) {
-          case 'reset':
-            final tKey = methodCall.arguments as String;
+    testSetMockMethodCallHandler(_methodChannel, (methodCall) async {
+      methodCallLogs.add(methodCall);
+      switch (methodCall.method) {
+        case 'reset':
+          final tKey = methodCall.arguments as String;
+          mockNativeLocalConfigMap.remove(tKey);
+          _onMethodCall(MethodCall('syncAll', mockNativeLocalConfigMap));
+          break;
+        case 'resetAll':
+          mockNativeLocalConfigMap.clear();
+          _onMethodCall(MethodCall('syncAll', mockNativeLocalConfigMap));
+          break;
+        case 'resetMany':
+          final tKeys = List<String>.from(methodCall.arguments);
+
+          for (final tKey in tKeys) {
             mockNativeLocalConfigMap.remove(tKey);
-            _onMethodCall(
-              MethodCall('syncAll', mockNativeLocalConfigMap),
-            );
-            break;
-          case 'resetAll':
-            mockNativeLocalConfigMap.clear();
-            _onMethodCall(
-              MethodCall('syncAll', mockNativeLocalConfigMap),
-            );
-            break;
-          case 'resetMany':
-            final tKeys = List<String>.from(methodCall.arguments);
+          }
+          _onMethodCall(MethodCall('syncAll', mockNativeLocalConfigMap));
+          break;
 
-            for (final tKey in tKeys) {
-              mockNativeLocalConfigMap.remove(tKey);
-            }
-            _onMethodCall(
-              MethodCall('syncAll', mockNativeLocalConfigMap),
-            );
-            break;
+        case 'setBool':
+          final tArguments = methodCall.arguments as List<dynamic>;
+          mockNativeLocalConfigMap[tArguments[0] as String] =
+              tArguments[1] as bool;
+          _onMethodCall(MethodCall('syncAll', mockNativeLocalConfigMap));
+          break;
+        case 'setDouble':
+          final tArguments = methodCall.arguments as List<dynamic>;
+          mockNativeLocalConfigMap[tArguments[0] as String] =
+              tArguments[1] as double;
+          _onMethodCall(MethodCall('syncAll', mockNativeLocalConfigMap));
+          break;
+        case 'setInt':
+          final tArguments = methodCall.arguments as List<dynamic>;
+          mockNativeLocalConfigMap[tArguments[0] as String] =
+              tArguments[1] as int;
+          _onMethodCall(MethodCall('syncAll', mockNativeLocalConfigMap));
+          break;
+        case 'setString':
+          final tArguments = methodCall.arguments as List<dynamic>;
+          mockNativeLocalConfigMap[tArguments[0] as String] =
+              tArguments[1] as String;
+          _onMethodCall(MethodCall('syncAll', mockNativeLocalConfigMap));
+          break;
+        case 'setMany':
+          final tArguments = Map<String, Object>.from(methodCall.arguments);
 
-          case 'setBool':
-            final tArguments = methodCall.arguments as List<dynamic>;
-            mockNativeLocalConfigMap[tArguments[0] as String] =
-                tArguments[1] as bool;
-            _onMethodCall(
-              MethodCall('syncAll', mockNativeLocalConfigMap),
-            );
-            break;
-          case 'setDouble':
-            final tArguments = methodCall.arguments as List<dynamic>;
-            mockNativeLocalConfigMap[tArguments[0] as String] =
-                tArguments[1] as double;
-            _onMethodCall(
-              MethodCall('syncAll', mockNativeLocalConfigMap),
-            );
-            break;
-          case 'setInt':
-            final tArguments = methodCall.arguments as List<dynamic>;
-            mockNativeLocalConfigMap[tArguments[0] as String] =
-                tArguments[1] as int;
-            _onMethodCall(
-              MethodCall('syncAll', mockNativeLocalConfigMap),
-            );
-            break;
-          case 'setString':
-            final tArguments = methodCall.arguments as List<dynamic>;
-            mockNativeLocalConfigMap[tArguments[0] as String] =
-                tArguments[1] as String;
-            _onMethodCall(
-              MethodCall('syncAll', mockNativeLocalConfigMap),
-            );
-            break;
-          case 'setMany':
-            final tArguments = Map<String, Object>.from(methodCall.arguments);
-
-            for (final tKey in tArguments.keys) {
-              mockNativeLocalConfigMap[tKey] = tArguments[tKey] as Object;
-            }
-            _onMethodCall(
-              MethodCall('syncAll', mockNativeLocalConfigMap),
-            );
-            break;
-        }
-        return null;
-      },
-    );
+          for (final tKey in tArguments.keys) {
+            mockNativeLocalConfigMap[tKey] = tArguments[tKey] as Object;
+          }
+          _onMethodCall(MethodCall('syncAll', mockNativeLocalConfigMap));
+          break;
+      }
+      return null;
+    });
   }
 
   @visibleForTesting
   void sendError() {
     _onMethodCall(
-      MethodCall(
-        'error',
-        {
-          "type": runtimeType.toString(),
-          "message": "",
-          "stackTrace": const [],
-          "cause": const {},
-        },
-      ),
+      MethodCall('error', {
+        "type": runtimeType.toString(),
+        "message": "",
+        "stackTrace": const [],
+        "cause": const {},
+      }),
     );
   }
 }

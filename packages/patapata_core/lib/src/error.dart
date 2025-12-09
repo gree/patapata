@@ -28,7 +28,7 @@ mixin ErrorEnvironment {
 
   /// Defines the default behavior of [PatapataException.showDialog].
   Future<void> Function(BuildContext, PatapataException)?
-      get errorDefaultShowDialog;
+  get errorDefaultShowDialog;
 }
 
 /// Defines exceptions that occur in applications using patapata.
@@ -121,17 +121,17 @@ abstract class PatapataException {
     this.logLevel,
     bool overridableLocalization = true,
     Level? userLogLevel,
-  })  : _app = app ?? (Zone.current[#patapataApp] as App?),
-        _userLogLevel = userLogLevel {
+  }) : _app = app ?? (Zone.current[#patapataApp] as App?),
+       _userLogLevel = userLogLevel {
     final tPageLocalizationKey = (overridableLocalization)
         ? _app
-            ?.getPlugin<StandardAppPlugin>()
-            ?.delegate
-            ?.pageInstances
-            .lastOrNull
-            ?.standardPageKey
-            .currentState
-            ?.localizationKey
+              ?.getPlugin<StandardAppPlugin>()
+              ?.delegate
+              ?.pageInstances
+              .lastOrNull
+              ?.standardPageKey
+              .currentState
+              ?.localizationKey
         : null;
 
     _overrideLocalizeKeyBase = tPageLocalizationKey?.isNotEmpty == true
@@ -339,12 +339,7 @@ abstract class PatapataException {
         context: context,
         title: localizedTitle,
         message: localizedMessage,
-        actions: [
-          PlatformDialogAction(
-            result: () => true,
-            text: 'OK',
-          ),
-        ],
+        actions: [PlatformDialogAction(result: () => true, text: 'OK')],
       );
 
   /// Called when this exception is reported by the [Log] system.
@@ -387,10 +382,7 @@ abstract class PatapataException {
   String _localize(String key, Map<String, String>? namedParameters) {
     return _l10n!.lookup(
       key,
-      namedParameters: {
-        'prefix': prefix,
-        ...(namedParameters ?? {}),
-      },
+      namedParameters: {'prefix': prefix, ...(namedParameters ?? {})},
     );
   }
 

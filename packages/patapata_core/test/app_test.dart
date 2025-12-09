@@ -78,18 +78,15 @@ void main() {
       tApp = App(
         environment: _Environment(),
         createAppWidget: (context, app) {
-          return MaterialApp(
-            home: SizedBox.shrink(
-              key: tWidgetKey,
-            ),
-          );
+          return MaterialApp(home: SizedBox.shrink(key: tWidgetKey));
         },
       );
     });
 
     testWidgets('App run test.', (tester) async {
-      final tAppStageChangeStream =
-          App.appStageChangeStream.asyncMap((event) => event.stage);
+      final tAppStageChangeStream = App.appStageChangeStream.asyncMap(
+        (event) => event.stage,
+      );
       expectLater(
         tAppStageChangeStream,
         emitsInOrder([
@@ -148,8 +145,9 @@ void main() {
       tApp.dispose();
     });
 
-    testWidgets('Each required plugins and models is correctly initialized.',
-        (tester) async {
+    testWidgets('Each required plugins and models is correctly initialized.', (
+      tester,
+    ) async {
       await tApp.run();
 
       // plugins
@@ -157,8 +155,10 @@ void main() {
       expect(tApp.package, isA<PackageInfoPlugin>());
       expect(tApp.device, isA<DeviceInfoPlugin>());
       expect(tApp.getPlugin<I18nPlugin>(), isA<I18nPlugin>());
-      expect(tApp.getPlugin<NativeLocalConfigPlugin>(),
-          isA<NativeLocalConfigPlugin>());
+      expect(
+        tApp.getPlugin<NativeLocalConfigPlugin>(),
+        isA<NativeLocalConfigPlugin>(),
+      );
       expect(tApp.getPlugin<NotificationsPlugin>(), isA<NotificationsPlugin>());
       expect(tApp.getPlugin<StandardAppPlugin>(), isA<StandardAppPlugin>());
 
@@ -177,8 +177,9 @@ void main() {
       tApp.dispose();
     });
 
-    testWidgets('Each Provider can be obtained with getProvider.',
-        (tester) async {
+    testWidgets('Each Provider can be obtained with getProvider.', (
+      tester,
+    ) async {
       await tApp.run();
 
       await tApp.runProcess(() async {
@@ -194,7 +195,9 @@ void main() {
         expect(tApp.getProvider<Analytics>(), isA<Analytics>());
         expect(tApp.getProvider<AnalyticsContext>(), isA<AnalyticsContext>());
         expect(
-            tApp.getProvider<NetworkInformation>(), isA<NetworkInformation>());
+          tApp.getProvider<NetworkInformation>(),
+          isA<NetworkInformation>(),
+        );
         expect(tApp.getProvider<PackageInfoPlugin>(), isA<PackageInfoPlugin>());
         expect(tApp.getProvider<DeviceInfoPlugin>(), isA<DeviceInfoPlugin>());
 
@@ -291,23 +294,90 @@ void main() {
     });
 
     testWidgets(
-        'An Exception raised by runProcess is handled as an unknown error in the App zone and rethrown to the caller.',
-        (tester) async {
-      if (kIsWeb) {
-        // PlatformDispatcher is not supported on the Web.
-        return;
-      }
+      'An Exception raised by runProcess is handled as an unknown error in the App zone and rethrown to the caller.',
+      (tester) async {
+        if (kIsWeb) {
+          // PlatformDispatcher is not supported on the Web.
+          return;
+        }
 
-      // Unknown errors are handled by PlatformDispatcher, but they are not invoked during tests.
-      // Perform testing within an errorZone.
-      // Since the PlatformDispatcher's handling is implemented in the Log system, testing is performed there.
-      final List<Object?> tThrownException = [];
-      final List<Object?> tUnhandledException = [];
-      await runZonedGuarded(() async {
+        // Unknown errors are handled by PlatformDispatcher, but they are not invoked during tests.
+        // Perform testing within an errorZone.
+        // Since the PlatformDispatcher's handling is implemented in the Log system, testing is performed there.
+        final List<Object?> tThrownException = [];
+        final List<Object?> tUnhandledException = [];
+        await runZonedGuarded(
+          () async {
+            await tApp.run();
+            await tApp.runProcess(() async {
+              await tester.pumpAndSettle();
+            });
+
+            Object? tException;
+            try {
+              await tApp.runProcess(() async {
+                throw _TestException(Level.SHOUT);
+              });
+            } catch (e) {
+              tException = e;
+            }
+            expect(
+              (tException as _TestException).logLevel,
+              equals(Level.SHOUT),
+            );
+            tThrownException.add(tException);
+
+            tException = null;
+            try {
+              await tApp.runProcess(() async {
+                throw _TestException(Level.INFO);
+              });
+            } catch (e) {
+              tException = e;
+            }
+            expect((tException as _TestException).logLevel, equals(Level.INFO));
+            tThrownException.add(tException);
+
+            tException = null;
+            try {
+              await tApp.runProcess(() async {
+                throw _TestException(null);
+              });
+            } catch (e) {
+              tException = e;
+            }
+            expect((tException as _TestException).logLevel, isNull);
+            tThrownException.add(tException);
+
+            tApp.dispose();
+          },
+          (error, stackTrace) {
+            if (error is! _TestException) {
+              throw error;
+            }
+            tUnhandledException.add(error);
+          },
+        );
+
+        expect(tUnhandledException, tThrownException);
+      },
+    );
+
+    testWidgets(
+      '[Flutter web] UnhandledError is handled by App errorZone. The LogLevel for UnhandledError is SEVERE or higher.',
+      (tester) async {
+        App.debugIsWeb = true;
         await tApp.run();
         await tApp.runProcess(() async {
           await tester.pumpAndSettle();
         });
+
+        // Check log levels processed within the App zone.
+        final tStream = tApp.log.reports.asyncMap((event) => event.level);
+        expectLater(
+          tStream,
+          emitsInOrder([Level.SHOUT, Level.SEVERE, Level.SEVERE, Level.SEVERE]),
+        );
 
         Object? tException;
         try {
@@ -318,7 +388,6 @@ void main() {
           tException = e;
         }
         expect((tException as _TestException).logLevel, equals(Level.SHOUT));
-        tThrownException.add(tException);
 
         tException = null;
         try {
@@ -328,9 +397,10 @@ void main() {
         } catch (e) {
           tException = e;
         }
+        expect(tException, isA<_TestException>());
         expect((tException as _TestException).logLevel, equals(Level.INFO));
-        tThrownException.add(tException);
 
+        // If logLevel is null, it is processed as Level.SEVERE in App zone.
         tException = null;
         try {
           await tApp.runProcess(() async {
@@ -340,86 +410,22 @@ void main() {
           tException = e;
         }
         expect((tException as _TestException).logLevel, isNull);
-        tThrownException.add(tException);
+
+        // If it is not a PatapataException, it is handled as Level.SEVERE in the App zone.
+        tException = null;
+        try {
+          await tApp.runProcess(() async {
+            throw 'not PatapataException';
+          });
+        } catch (e) {
+          tException = e;
+        }
+        expect(tException, equals('not PatapataException'));
 
         tApp.dispose();
-      }, (error, stackTrace) {
-        if (error is! _TestException) {
-          throw error;
-        }
-        tUnhandledException.add(error);
-      });
-
-      expect(tUnhandledException, tThrownException);
-    });
-
-    testWidgets(
-        '[Flutter web] UnhandledError is handled by App errorZone. The LogLevel for UnhandledError is SEVERE or higher.',
-        (tester) async {
-      App.debugIsWeb = true;
-      await tApp.run();
-      await tApp.runProcess(() async {
-        await tester.pumpAndSettle();
-      });
-
-      // Check log levels processed within the App zone.
-      final tStream = tApp.log.reports.asyncMap((event) => event.level);
-      expectLater(
-        tStream,
-        emitsInOrder([
-          Level.SHOUT,
-          Level.SEVERE,
-          Level.SEVERE,
-          Level.SEVERE,
-        ]),
-      );
-
-      Object? tException;
-      try {
-        await tApp.runProcess(() async {
-          throw _TestException(Level.SHOUT);
-        });
-      } catch (e) {
-        tException = e;
-      }
-      expect((tException as _TestException).logLevel, equals(Level.SHOUT));
-
-      tException = null;
-      try {
-        await tApp.runProcess(() async {
-          throw _TestException(Level.INFO);
-        });
-      } catch (e) {
-        tException = e;
-      }
-      expect(tException, isA<_TestException>());
-      expect((tException as _TestException).logLevel, equals(Level.INFO));
-
-      // If logLevel is null, it is processed as Level.SEVERE in App zone.
-      tException = null;
-      try {
-        await tApp.runProcess(() async {
-          throw _TestException(null);
-        });
-      } catch (e) {
-        tException = e;
-      }
-      expect((tException as _TestException).logLevel, isNull);
-
-      // If it is not a PatapataException, it is handled as Level.SEVERE in the App zone.
-      tException = null;
-      try {
-        await tApp.runProcess(() async {
-          throw 'not PatapataException';
-        });
-      } catch (e) {
-        tException = e;
-      }
-      expect(tException, equals('not PatapataException'));
-
-      tApp.dispose();
-      App.debugIsWeb = false;
-    });
+        App.debugIsWeb = false;
+      },
+    );
   });
 
   group('App initialization test. options', () {
@@ -432,18 +438,10 @@ void main() {
         providerKey: tProviderKey,
         createAppWidget: (context, app) {
           return MultiProvider(
-            providers: [
-              Provider<ClassA>(
-                create: (context) => ClassA(),
-              ),
-            ],
+            providers: [Provider<ClassA>(create: (context) => ClassA())],
             child: KeyedSubtree(
               key: tProviderKey,
-              child: MaterialApp(
-                home: SizedBox.shrink(
-                  key: tWidgetKey,
-                ),
-              ),
+              child: MaterialApp(home: SizedBox.shrink(key: tWidgetKey)),
             ),
           );
         },
@@ -468,7 +466,9 @@ void main() {
         expect(tApp.getProvider<Analytics>(), isA<Analytics>());
         expect(tApp.getProvider<AnalyticsContext>(), isA<AnalyticsContext>());
         expect(
-            tApp.getProvider<NetworkInformation>(), isA<NetworkInformation>());
+          tApp.getProvider<NetworkInformation>(),
+          isA<NetworkInformation>(),
+        );
         expect(tApp.getProvider<PackageInfoPlugin>(), isA<PackageInfoPlugin>());
         expect(tApp.getProvider<DeviceInfoPlugin>(), isA<DeviceInfoPlugin>());
       });
@@ -483,11 +483,7 @@ void main() {
         environment: _Environment(),
         userFactory: ((app) => MyCustomUser(app)),
         createAppWidget: (context, app) {
-          return MaterialApp(
-            home: SizedBox.shrink(
-              key: tWidgetKey,
-            ),
-          );
+          return MaterialApp(home: SizedBox.shrink(key: tWidgetKey));
         },
       );
 
@@ -525,15 +521,9 @@ void main() {
       tApp = App(
         environment: _Environment(),
         createAppWidget: (context, app) {
-          return MaterialApp(
-            home: SizedBox.shrink(
-              key: tWidgetKey,
-            ),
-          );
+          return MaterialApp(home: SizedBox.shrink(key: tWidgetKey));
         },
-        plugins: [
-          tPluginA,
-        ],
+        plugins: [tPluginA],
       );
 
       await tApp.run();
@@ -561,8 +551,9 @@ void main() {
       tApp.dispose();
     });
 
-    testWidgets('Initialization of App using plugins. RemoteConfig required.',
-        (tester) async {
+    testWidgets('Initialization of App using plugins. RemoteConfig required.', (
+      tester,
+    ) async {
       testInitialize();
 
       late final AppStage tInitPluginAAppStage;
@@ -586,192 +577,171 @@ void main() {
       tApp = App(
         environment: _Environment(),
         createAppWidget: (context, app) {
-          return MaterialApp(
-            home: SizedBox.shrink(
-              key: tWidgetKey,
-            ),
-          );
+          return MaterialApp(home: SizedBox.shrink(key: tWidgetKey));
         },
-        plugins: [
-          tPluginA,
-          tPluginB,
-        ],
+        plugins: [tPluginA, tPluginB],
       );
 
       await tApp.run();
       expect(tApp.stage, equals(AppStage.running));
       expect(tInitPluginAAppStage, equals(AppStage.initializingPlugins));
-      expect(tInitPluginBAppStage,
-          equals(AppStage.initializingPluginsWithRemoteConfig));
+      expect(
+        tInitPluginBAppStage,
+        equals(AppStage.initializingPluginsWithRemoteConfig),
+      );
 
       tApp.dispose();
     });
 
     testWidgets(
-        'If the plugin init returns false during initialization, the plugin is removed.',
-        (tester) async {
-      testInitialize();
-
-      fCreateApp(List<Plugin> plugins) {
-        return App(
-          environment: _Environment(),
-          createAppWidget: (context, app) {
-            return MaterialApp(
-              home: SizedBox.shrink(
-                key: tWidgetKey,
-              ),
-            );
-          },
-          plugins: plugins,
-        );
-      }
-
-      final tPluginA = Plugin.inline(
-        name: 'testPluginA',
-        init: (app) async {
-          return true;
-        },
-      );
-      final tPluginFA = Plugin.inline(
-        name: 'testPluginFA',
-        init: (app) async {
-          return false;
-        },
-      );
-      final tPluginB = Plugin.inline(
-        name: 'testPluginB',
-        requireRemoteConfig: true,
-        init: (app) async {
-          return true;
-        },
-      );
-      final tPluginFB = Plugin.inline(
-        name: 'testPluginFB',
-        requireRemoteConfig: true,
-        init: (app) async {
-          return false;
-        },
-      );
-
-      tApp = fCreateApp([
-        tPluginA,
-        tPluginFA,
-      ]);
-      await tApp.run();
-      await tApp.runProcess(() async {
-        await tester.pumpAndSettle();
-
-        expect(tApp.getPlugin<InlinePlugin>(), equals(tPluginA));
-        expect(tApp.getPluginsOfType<InlinePlugin>(), equals([tPluginA]));
-      });
-      tApp.dispose();
-
-      tApp = fCreateApp([
-        tPluginB,
-        tPluginFB,
-      ]);
-      await tApp.run();
-      await tApp.runProcess(() async {
-        await tester.pumpAndSettle();
-
-        expect(tApp.getPlugin<InlinePlugin>(), equals(tPluginB));
-        expect(tApp.getPluginsOfType<InlinePlugin>(), equals([tPluginB]));
-      });
-      tApp.dispose();
-    });
-
-    testWidgets(
-        'If plugin init throws an exception during initialization, the application will fail to start.',
-        (tester) async {
-      await runZonedGuarded(() async {
+      'If the plugin init returns false during initialization, the plugin is removed.',
+      (tester) async {
         testInitialize();
 
         fCreateApp(List<Plugin> plugins) {
           return App(
             environment: _Environment(),
             createAppWidget: (context, app) {
-              return MaterialApp(
-                home: SizedBox.shrink(
-                  key: tWidgetKey,
-                ),
-              );
+              return MaterialApp(home: SizedBox.shrink(key: tWidgetKey));
             },
             plugins: plugins,
           );
         }
 
+        final tPluginA = Plugin.inline(
+          name: 'testPluginA',
+          init: (app) async {
+            return true;
+          },
+        );
         final tPluginFA = Plugin.inline(
           name: 'testPluginFA',
           init: (app) async {
-            throw _TestException(Level.INFO);
+            return false;
+          },
+        );
+        final tPluginB = Plugin.inline(
+          name: 'testPluginB',
+          requireRemoteConfig: true,
+          init: (app) async {
+            return true;
           },
         );
         final tPluginFB = Plugin.inline(
           name: 'testPluginFB',
           requireRemoteConfig: true,
           init: (app) async {
-            throw _TestException(Level.INFO);
+            return false;
           },
         );
 
-        tApp = fCreateApp([
-          tPluginFA,
-        ]);
-        expect(await tApp.run(), isFalse);
-        expect(tApp.stage, AppStage.initializingPlugins);
+        tApp = fCreateApp([tPluginA, tPluginFA]);
+        await tApp.run();
+        await tApp.runProcess(() async {
+          await tester.pumpAndSettle();
+
+          expect(tApp.getPlugin<InlinePlugin>(), equals(tPluginA));
+          expect(tApp.getPluginsOfType<InlinePlugin>(), equals([tPluginA]));
+        });
         tApp.dispose();
 
-        tApp = fCreateApp([
-          tPluginFB,
-        ]);
-        expect(await tApp.run(), isFalse);
-        expect(tApp.stage, AppStage.initializingPluginsWithRemoteConfig);
+        tApp = fCreateApp([tPluginB, tPluginFB]);
+        await tApp.run();
+        await tApp.runProcess(() async {
+          await tester.pumpAndSettle();
+
+          expect(tApp.getPlugin<InlinePlugin>(), equals(tPluginB));
+          expect(tApp.getPluginsOfType<InlinePlugin>(), equals([tPluginB]));
+        });
         tApp.dispose();
-      }, (error, stackTrace) {
-        if (error is! _TestException) {
-          throw error;
-        }
-      });
-    });
+      },
+    );
+
+    testWidgets(
+      'If plugin init throws an exception during initialization, the application will fail to start.',
+      (tester) async {
+        await runZonedGuarded(
+          () async {
+            testInitialize();
+
+            fCreateApp(List<Plugin> plugins) {
+              return App(
+                environment: _Environment(),
+                createAppWidget: (context, app) {
+                  return MaterialApp(home: SizedBox.shrink(key: tWidgetKey));
+                },
+                plugins: plugins,
+              );
+            }
+
+            final tPluginFA = Plugin.inline(
+              name: 'testPluginFA',
+              init: (app) async {
+                throw _TestException(Level.INFO);
+              },
+            );
+            final tPluginFB = Plugin.inline(
+              name: 'testPluginFB',
+              requireRemoteConfig: true,
+              init: (app) async {
+                throw _TestException(Level.INFO);
+              },
+            );
+
+            tApp = fCreateApp([tPluginFA]);
+            expect(await tApp.run(), isFalse);
+            expect(tApp.stage, AppStage.initializingPlugins);
+            tApp.dispose();
+
+            tApp = fCreateApp([tPluginFB]);
+            expect(await tApp.run(), isFalse);
+            expect(tApp.stage, AppStage.initializingPluginsWithRemoteConfig);
+            tApp.dispose();
+          },
+          (error, stackTrace) {
+            if (error is! _TestException) {
+              throw error;
+            }
+          },
+        );
+      },
+    );
 
     testWidgets('If App.run fails, onInitFailure is called.', (tester) async {
-      await runZonedGuarded(() async {
-        testInitialize();
+      await runZonedGuarded(
+        () async {
+          testInitialize();
 
-        final tPluginA = Plugin.inline(
-          name: 'testPluginA',
-          init: (app) async {
-            throw _TestException(Level.SEVERE);
-          },
-        );
+          final tPluginA = Plugin.inline(
+            name: 'testPluginA',
+            init: (app) async {
+              throw _TestException(Level.SEVERE);
+            },
+          );
 
-        Object? tException;
-        tApp = App(
-          environment: _Environment(),
-          createAppWidget: (context, app) {
-            return MaterialApp(
-              home: SizedBox.shrink(
-                key: tWidgetKey,
-              ),
-            );
-          },
-          plugins: [
-            tPluginA,
-          ],
-          onInitFailure: (env, e, stackTrace) {
-            tException = e;
-          },
-        );
+          Object? tException;
+          tApp = App(
+            environment: _Environment(),
+            createAppWidget: (context, app) {
+              return MaterialApp(home: SizedBox.shrink(key: tWidgetKey));
+            },
+            plugins: [tPluginA],
+            onInitFailure: (env, e, stackTrace) {
+              tException = e;
+            },
+          );
 
-        expect(await tApp.run(), isFalse);
-        expect(tException, isA<_TestException>());
+          expect(await tApp.run(), isFalse);
+          expect(tException, isA<_TestException>());
 
-        tApp.dispose();
-      }, (error, stackTrace) {
-        if (error is! _TestException) {
-          throw error;
-        }
-      });
+          tApp.dispose();
+        },
+        (error, stackTrace) {
+          if (error is! _TestException) {
+            throw error;
+          }
+        },
+      );
     });
 
     testWidgets('Use RemoteMessages.', (tester) async {
@@ -789,15 +759,9 @@ void main() {
       tApp = App(
         environment: _Environment(),
         createAppWidget: (context, app) {
-          return MaterialApp(
-            home: SizedBox.shrink(
-              key: tWidgetKey,
-            ),
-          );
+          return MaterialApp(home: SizedBox.shrink(key: tWidgetKey));
         },
-        plugins: [
-          tPluginA,
-        ],
+        plugins: [tPluginA],
       );
 
       await tApp.run();
@@ -813,66 +777,55 @@ void main() {
     });
 
     testWidgets(
-        'Use RemoteConfig. If fetch fails during initialization, the application will still start.',
-        (tester) async {
-      testInitialize();
+      'Use RemoteConfig. If fetch fails during initialization, the application will still start.',
+      (tester) async {
+        testInitialize();
 
-      final tStoreA = {
-        'a': 1,
-        'patapata_log_level': Level.INFO.value,
-      };
-      final tStoreB = {
-        'b': 2,
-      };
-      final tRemoteConfigA = MockRemoteConfig({})
-        ..testSetMockFetchValues(tStoreA);
-      final tRemoteConfigB = FetchFailsRemoteConfig({})
-        ..testSetMockFetchValues(tStoreB);
+        final tStoreA = {'a': 1, 'patapata_log_level': Level.INFO.value};
+        final tStoreB = {'b': 2};
+        final tRemoteConfigA = MockRemoteConfig({})
+          ..testSetMockFetchValues(tStoreA);
+        final tRemoteConfigB = FetchFailsRemoteConfig({})
+          ..testSetMockFetchValues(tStoreB);
 
-      final tPluginA = Plugin.inline(
-        name: 'testPluginA',
-        createRemoteConfig: () => tRemoteConfigA,
-      );
-      final tPluginB = Plugin.inline(
-        name: 'testPluginB',
-        createRemoteConfig: () => tRemoteConfigB,
-      );
+        final tPluginA = Plugin.inline(
+          name: 'testPluginA',
+          createRemoteConfig: () => tRemoteConfigA,
+        );
+        final tPluginB = Plugin.inline(
+          name: 'testPluginB',
+          createRemoteConfig: () => tRemoteConfigB,
+        );
 
-      tApp = App(
-        environment: _Environment(),
-        createAppWidget: (context, app) {
-          return MaterialApp(
-            home: SizedBox.shrink(
-              key: tWidgetKey,
-            ),
-          );
-        },
-        plugins: [
-          tPluginA,
-          tPluginB,
-        ],
-      );
+        tApp = App(
+          environment: _Environment(),
+          createAppWidget: (context, app) {
+            return MaterialApp(home: SizedBox.shrink(key: tWidgetKey));
+          },
+          plugins: [tPluginA, tPluginB],
+        );
 
-      expect(await tApp.run(), isTrue);
+        expect(await tApp.run(), isTrue);
 
-      await tApp.runProcess(() async {
-        await tester.pumpAndSettle();
+        await tApp.runProcess(() async {
+          await tester.pumpAndSettle();
 
-        expect(tApp.remoteConfig.getInt('a'), equals(1));
-        expect(tApp.remoteConfig.getInt('b'), equals(0));
-        expect(tApp.log.level, equals(Level.INFO));
+          expect(tApp.remoteConfig.getInt('a'), equals(1));
+          expect(tApp.remoteConfig.getInt('b'), equals(0));
+          expect(tApp.log.level, equals(Level.INFO));
 
-        tStoreA['a'] = 10;
-        tStoreA['patapata_log_level'] = Level.SEVERE.value;
-        tRemoteConfigA.testSetMockFetchValues(tStoreA);
-        await tApp.remoteConfig.fetch(force: true);
-        expect(tApp.log.level, equals(Level.SEVERE));
-        expect(tApp.remoteConfig.getInt('a'), equals(10));
-        expect(tApp.remoteConfig.getInt('b'), equals(0));
-      });
+          tStoreA['a'] = 10;
+          tStoreA['patapata_log_level'] = Level.SEVERE.value;
+          tRemoteConfigA.testSetMockFetchValues(tStoreA);
+          await tApp.remoteConfig.fetch(force: true);
+          expect(tApp.log.level, equals(Level.SEVERE));
+          expect(tApp.remoteConfig.getInt('a'), equals(10));
+          expect(tApp.remoteConfig.getInt('b'), equals(0));
+        });
 
-      tApp.dispose();
-    });
+        tApp.dispose();
+      },
+    );
 
     testWidgets('Plugin can be disabled in RemoteConfig.', (tester) async {
       testInitialize();
@@ -896,18 +849,9 @@ void main() {
       tApp = App(
         environment: _Environment(),
         createAppWidget: (context, app) {
-          return MaterialApp(
-            home: SizedBox.shrink(
-              key: tWidgetKey,
-            ),
-          );
+          return MaterialApp(home: SizedBox.shrink(key: tWidgetKey));
         },
-        plugins: [
-          tPluginA,
-          tPluginB,
-          tPluginC,
-          tRemoteConfigPlugin,
-        ],
+        plugins: [tPluginA, tPluginB, tPluginC, tRemoteConfigPlugin],
       );
 
       await tApp.run();

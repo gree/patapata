@@ -38,19 +38,18 @@ abstract class Plugin with MethodChannelTestMixin {
     LocalConfig? Function()? createLocalConfig,
     RemoteMessaging? Function()? createRemoteMessaging,
     List<NavigatorObserver> Function()? navigatorObservers,
-  }) =>
-      InlinePlugin(
-        name: name,
-        dependencies: dependencies,
-        requireRemoteConfig: requireRemoteConfig,
-        init: init,
-        dispose: dispose,
-        createAppWidgetWrapper: createAppWidgetWrapper,
-        createRemoteConfig: createRemoteConfig,
-        createLocalConfig: createLocalConfig,
-        createRemoteMessaging: createRemoteMessaging,
-        navigatorObservers: navigatorObservers,
-      );
+  }) => InlinePlugin(
+    name: name,
+    dependencies: dependencies,
+    requireRemoteConfig: requireRemoteConfig,
+    init: init,
+    dispose: dispose,
+    createAppWidgetWrapper: createAppWidgetWrapper,
+    createRemoteConfig: createRemoteConfig,
+    createLocalConfig: createLocalConfig,
+    createRemoteMessaging: createRemoteMessaging,
+    navigatorObservers: navigatorObservers,
+  );
 
   /// The unique name of this [Plugin].
   /// This property is referenced in various situations, such as when enabling or disabling the plugin,
@@ -182,13 +181,13 @@ class InlinePlugin extends Plugin {
     LocalConfig? Function()? createLocalConfig,
     RemoteMessaging? Function()? createRemoteMessaging,
     List<NavigatorObserver> Function()? navigatorObservers,
-  })  : _init = init,
-        _dispose = dispose,
-        _createAppWidgetWrapper = createAppWidgetWrapper,
-        _createRemoteConfig = createRemoteConfig,
-        _createLocalConfig = createLocalConfig,
-        _createRemoteMessaging = createRemoteMessaging,
-        _navigatorObservers = navigatorObservers;
+  }) : _init = init,
+       _dispose = dispose,
+       _createAppWidgetWrapper = createAppWidgetWrapper,
+       _createRemoteConfig = createRemoteConfig,
+       _createLocalConfig = createLocalConfig,
+       _createRemoteMessaging = createRemoteMessaging,
+       _navigatorObservers = navigatorObservers;
 
   @override
   FutureOr<bool> init(App app) async {

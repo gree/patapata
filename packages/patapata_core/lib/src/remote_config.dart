@@ -80,10 +80,7 @@ class ProxyRemoteConfig extends RemoteConfig {
   }) async {
     await Future.wait([
       for (var tConfig in _remoteConfigs)
-        tConfig.fetch(
-          expiration: expiration,
-          force: force,
-        ),
+        tConfig.fetch(expiration: expiration, force: force),
     ]).catchError((e) => const <void>[]);
   }
 
@@ -121,8 +118,10 @@ class ProxyRemoteConfig extends RemoteConfig {
   /// If the [key] does not exist in any RemoteConfig's, it returns the value in [_defaults].
   /// If that also doesn't exist, it returns the [defaultValue].
   @override
-  double getDouble(String key,
-      {double defaultValue = Config.defaultValueForDouble}) {
+  double getDouble(
+    String key, {
+    double defaultValue = Config.defaultValueForDouble,
+  }) {
     for (var tConfig in _remoteConfigs) {
       if (tConfig.hasKey(key)) {
         return tConfig.getDouble(key, defaultValue: defaultValue);
@@ -166,8 +165,10 @@ class ProxyRemoteConfig extends RemoteConfig {
   /// If the [key] does not exist in any RemoteConfig's, it returns the value in [_defaults].
   /// If that also doesn't exist, it returns the [defaultValue].
   @override
-  String getString(String key,
-      {String defaultValue = Config.defaultValueForString}) {
+  String getString(
+    String key, {
+    String defaultValue = Config.defaultValueForString,
+  }) {
     for (var tConfig in _remoteConfigs) {
       if (tConfig.hasKey(key)) {
         return tConfig.getString(key, defaultValue: defaultValue);
@@ -232,18 +233,20 @@ class MockRemoteConfig extends RemoteConfig implements WritableConfig {
     return _store.containsKey(key) && _store[key] is bool
         ? _store[key] as bool
         : _defaults.containsKey(key) && _defaults[key] is bool
-            ? _defaults[key] as bool
-            : defaultValue;
+        ? _defaults[key] as bool
+        : defaultValue;
   }
 
   @override
-  double getDouble(String key,
-      {double defaultValue = Config.defaultValueForDouble}) {
+  double getDouble(
+    String key, {
+    double defaultValue = Config.defaultValueForDouble,
+  }) {
     return _store.containsKey(key) && _store[key] is double
         ? _store[key] as double
         : _defaults.containsKey(key) && _defaults[key] is double
-            ? _defaults[key] as double
-            : defaultValue;
+        ? _defaults[key] as double
+        : defaultValue;
   }
 
   @override
@@ -251,18 +254,20 @@ class MockRemoteConfig extends RemoteConfig implements WritableConfig {
     return _store.containsKey(key) && _store[key] is int
         ? _store[key] as int
         : _defaults.containsKey(key) && _defaults[key] is int
-            ? _defaults[key] as int
-            : defaultValue;
+        ? _defaults[key] as int
+        : defaultValue;
   }
 
   @override
-  String getString(String key,
-      {String defaultValue = Config.defaultValueForString}) {
+  String getString(
+    String key, {
+    String defaultValue = Config.defaultValueForString,
+  }) {
     return _store.containsKey(key) && _store[key] is String
         ? _store[key] as String
         : _defaults.containsKey(key) && _defaults[key] is String
-            ? _defaults[key] as String
-            : defaultValue;
+        ? _defaults[key] as String
+        : defaultValue;
   }
 
   @override

@@ -113,18 +113,20 @@ void main() {
       expect(tCacheMap[1], 'A');
     });
 
-    test('putIfAbsent should remove the oldest element when exceeding max size',
-        () {
-      tCacheMap.putIfAbsent(1, () => 'A');
-      tCacheMap.putIfAbsent(2, () => 'B');
-      tCacheMap.putIfAbsent(3, () => 'C');
-      tCacheMap.putIfAbsent(4, () => 'D');
+    test(
+      'putIfAbsent should remove the oldest element when exceeding max size',
+      () {
+        tCacheMap.putIfAbsent(1, () => 'A');
+        tCacheMap.putIfAbsent(2, () => 'B');
+        tCacheMap.putIfAbsent(3, () => 'C');
+        tCacheMap.putIfAbsent(4, () => 'D');
 
-      expect(tCacheMap.containsKey(1), isFalse);
-      expect(tCacheMap.containsKey(2), isTrue);
-      expect(tCacheMap.containsKey(3), isTrue);
-      expect(tCacheMap.containsKey(4), isTrue);
-    });
+        expect(tCacheMap.containsKey(1), isFalse);
+        expect(tCacheMap.containsKey(2), isTrue);
+        expect(tCacheMap.containsKey(3), isTrue);
+        expect(tCacheMap.containsKey(4), isTrue);
+      },
+    );
 
     test('update should modify an existing value', () {
       tCacheMap[1] = 'A';
@@ -143,24 +145,27 @@ void main() {
       expect(tCacheMap[1], 'A');
     });
 
-    test('update should throw error if key is missing and ifAbsent is null',
-        () {
-      expect(() => tCacheMap.update(1, (value) => 'B'), throwsArgumentError);
-    });
+    test(
+      'update should throw error if key is missing and ifAbsent is null',
+      () {
+        expect(() => tCacheMap.update(1, (value) => 'B'), throwsArgumentError);
+      },
+    );
 
     test(
-        'update with ifAbsent should remove the oldest when exceeding max size',
-        () {
-      tCacheMap.update(1, (value) => 'A', ifAbsent: () => 'A');
-      tCacheMap.update(2, (value) => 'B', ifAbsent: () => 'B');
-      tCacheMap.update(3, (value) => 'C', ifAbsent: () => 'C');
-      tCacheMap.update(4, (value) => 'D', ifAbsent: () => 'D');
+      'update with ifAbsent should remove the oldest when exceeding max size',
+      () {
+        tCacheMap.update(1, (value) => 'A', ifAbsent: () => 'A');
+        tCacheMap.update(2, (value) => 'B', ifAbsent: () => 'B');
+        tCacheMap.update(3, (value) => 'C', ifAbsent: () => 'C');
+        tCacheMap.update(4, (value) => 'D', ifAbsent: () => 'D');
 
-      expect(tCacheMap.containsKey(1), isFalse);
-      expect(tCacheMap.containsKey(2), isTrue);
-      expect(tCacheMap.containsKey(3), isTrue);
-      expect(tCacheMap.containsKey(4), isTrue);
-    });
+        expect(tCacheMap.containsKey(1), isFalse);
+        expect(tCacheMap.containsKey(2), isTrue);
+        expect(tCacheMap.containsKey(3), isTrue);
+        expect(tCacheMap.containsKey(4), isTrue);
+      },
+    );
 
     test('update without ifAbsent should not remove oldest', () {
       tCacheMap[1] = 'A';
@@ -190,8 +195,9 @@ void main() {
       tCacheMap[1] = 'A';
       tCacheMap[2] = 'B';
 
-      final tNewMap =
-          tCacheMap.map<String, int>((key, value) => MapEntry(value, key));
+      final tNewMap = tCacheMap.map<String, int>(
+        (key, value) => MapEntry(value, key),
+      );
 
       expect(tNewMap, {'A': 1, 'B': 2});
     });

@@ -46,10 +46,7 @@ bool onLink(Uri link) {
 
 // Test Data
 class TestChangeNotifierData extends ChangeNotifier {
-  TestChangeNotifierData({
-    required this.title,
-    required this.pages,
-  });
+  TestChangeNotifierData({required this.title, required this.pages});
 
   String title = '';
   List<StandardPageFactory> pages = [];
@@ -73,9 +70,7 @@ class TestChangeNotifierData extends ChangeNotifier {
     notifyListeners();
   }
 
-  void changeOnDidRemovePage(
-    void Function(Page page)? onDidRemovePage,
-  ) {
+  void changeOnDidRemovePage(void Function(Page page)? onDidRemovePage) {
     this.onDidRemovePage = onDidRemovePage;
     notifyListeners();
   }
@@ -86,11 +81,7 @@ class TestSplash extends StandardPage<void> {
   @override
   Widget buildPage(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          l(context, 'Test Splash'),
-        ),
-      ),
+      appBar: AppBar(title: Text(l(context, 'Test Splash'))),
       body: SingleChildScrollView(
         child: Column(
           children: [
@@ -124,11 +115,7 @@ class TestPageA extends StandardPage<void> {
   @override
   Widget buildPage(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          l(context, 'Test Title'),
-        ),
-      ),
+      appBar: AppBar(title: Text(l(context, 'Test Title'))),
       body: SingleChildScrollView(
         child: Column(
           children: [
@@ -150,8 +137,9 @@ class TestPageA extends StandardPage<void> {
               key: const ValueKey(kGoToRouterDelegateButton),
               onPressed: () {
                 // Go To Test Page B for Router Delegate
-                var routerDelegate = (Router.of(context).routerDelegate
-                    as StandardRouterDelegate);
+                var routerDelegate =
+                    (Router.of(context).routerDelegate
+                        as StandardRouterDelegate);
                 routerDelegate.go<TestPageB, void>(null);
               },
               child: const Text('Go to Test Page B'),
@@ -196,10 +184,11 @@ class TestPageA extends StandardPage<void> {
             TextButton(
               key: const ValueKey(kGetPageFactoryButton),
               onPressed: () {
-                var routerDelegate = (Router.of(context).routerDelegate
-                    as StandardRouterDelegate);
-                pageFactory =
-                    routerDelegate.getPageFactory<TestPageA, void, void>();
+                var routerDelegate =
+                    (Router.of(context).routerDelegate
+                        as StandardRouterDelegate);
+                pageFactory = routerDelegate
+                    .getPageFactory<TestPageA, void, void>();
               },
               child: const Text('Get Page Factory'),
             ),
@@ -221,7 +210,8 @@ class TestPageA extends StandardPage<void> {
               TextButton(
                 key: const ValueKey(kGetStandardAppPluginGenerateLink),
                 onPressed: () {
-                  testText = context
+                  testText =
+                      context
                           .read<App>()
                           .standardAppPlugin
                           .generateLink<TestPageC, TestPageData>(
@@ -232,14 +222,13 @@ class TestPageA extends StandardPage<void> {
                 },
                 child: const Text('Get Standard GenerateLink App'),
               ),
-              Center(
-                child: Text('generateLink testText $testText'),
-              ),
+              Center(child: Text('generateLink testText $testText')),
             ],
             if (analyticsSingletonEvent != null)
               Center(
                 child: Text(
-                    "Analytics Event Data : ${analyticsSingletonEvent!.data}"),
+                  "Analytics Event Data : ${analyticsSingletonEvent!.data}",
+                ),
               ),
           ],
         ),
@@ -252,11 +241,7 @@ class TestPageB extends StandardPage<void> {
   @override
   Widget buildPage(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text(
-          'Test Title B',
-        ),
-      ),
+      appBar: AppBar(title: const Text('Test Title B')),
       body: SingleChildScrollView(
         child: Column(
           children: [
@@ -286,9 +271,7 @@ class TestPageB extends StandardPage<void> {
             TextButton(
               key: const ValueKey(kTestButtonSecond),
               onPressed: () {
-                context.go<TestPageD, void>(
-                  null,
-                );
+                context.go<TestPageD, void>(null);
               },
               child: const Text('Go to Test TestPage D'),
             ),
@@ -302,15 +285,18 @@ class TestPageB extends StandardPage<void> {
             TextButton(
               key: const ValueKey(kCheckNavigatorButton),
               onPressed: () {
-                navigatorState = (Router.of(context).routerDelegate
-                        as StandardRouterDelegate)
-                    .navigator;
-                navigatorContext = (Router.of(context).routerDelegate
-                        as StandardRouterDelegate)
-                    .navigatorContext;
-                navigatorKey = (Router.of(context).routerDelegate
-                        as StandardRouterDelegate)
-                    .navigatorKey;
+                navigatorState =
+                    (Router.of(context).routerDelegate
+                            as StandardRouterDelegate)
+                        .navigator;
+                navigatorContext =
+                    (Router.of(context).routerDelegate
+                            as StandardRouterDelegate)
+                        .navigatorContext;
+                navigatorKey =
+                    (Router.of(context).routerDelegate
+                            as StandardRouterDelegate)
+                        .navigatorKey;
               },
               child: const Text('Set Navigator Key'),
             ),
@@ -332,9 +318,7 @@ class TestPageC extends StandardPage<TestPageData> {
     }
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Test Title C'),
-      ),
+      appBar: AppBar(title: const Text('Test Title C')),
       body: SingleChildScrollView(
         child: Column(
           children: [
@@ -367,7 +351,9 @@ class TestPageC extends StandardPage<TestPageData> {
               key: const ValueKey(kTestChangePageDataButton),
               onPressed: () {
                 pageData = TestPageData(
-                    id: 30, data: 'changed test page data by button');
+                  id: 30,
+                  data: 'changed test page data by button',
+                );
                 setState(() {});
               },
               child: const Text('On Change PageData'),
@@ -402,11 +388,7 @@ class TestPageD extends StandardPage<void> {
     var tTestPageData = tInterfacePage.arguments as TestPageData;
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          l(context, 'Test Title D'),
-        ),
-      ),
+      appBar: AppBar(title: Text(l(context, 'Test Title D'))),
       body: SingleChildScrollView(
         child: Column(
           children: [
@@ -414,7 +396,8 @@ class TestPageD extends StandardPage<void> {
             Text("Test Page Data : ${tTestPageData.data}"),
             Text("Test Interface Name : ${tInterfacePage.name}"),
             Text(
-                "Test Interface RestorationId : ${tInterfacePage.restorationId}"),
+              "Test Interface RestorationId : ${tInterfacePage.restorationId}",
+            ),
           ],
         ),
       ),
@@ -426,11 +409,7 @@ class TestPageE extends StandardPage<BaseListenable> {
   @override
   Widget buildPage(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          l(context, 'Test Title'),
-        ),
-      ),
+      appBar: AppBar(title: Text(l(context, 'Test Title'))),
       body: SingleChildScrollView(
         child: Column(
           children: [
@@ -449,12 +428,14 @@ class TestPageE extends StandardPage<BaseListenable> {
             if (pageData is ChangeListenableBool)
               Center(
                 child: Text(
-                    "Test Data Bool : ${context.watch<ChangeListenableBool>().data}"),
+                  "Test Data Bool : ${context.watch<ChangeListenableBool>().data}",
+                ),
               ),
             if (pageData is ChangeListenableNumber)
               Center(
                 child: Text(
-                    "Test Data Number : ${context.watch<ChangeListenableNumber>().data}"),
+                  "Test Data Number : ${context.watch<ChangeListenableNumber>().data}",
+                ),
               ),
           ],
         ),
@@ -468,9 +449,7 @@ class TestPageF extends StandardPage<void> {
   @override
   Widget buildPage(BuildContext context) {
     return CupertinoPageScaffold(
-      navigationBar: const CupertinoNavigationBar(
-        middle: Text('Test title F'),
-      ),
+      navigationBar: const CupertinoNavigationBar(middle: Text('Test title F')),
       child: SingleChildScrollView(
         child: Column(
           children: [
@@ -499,9 +478,7 @@ class TestPageG extends StandardPage<TestPageData> {
   @override
   Widget buildPage(BuildContext context) {
     return CupertinoPageScaffold(
-      navigationBar: const CupertinoNavigationBar(
-        middle: Text('Test title G'),
-      ),
+      navigationBar: const CupertinoNavigationBar(middle: Text('Test title G')),
       child: SingleChildScrollView(
         child: Column(
           children: [
@@ -523,9 +500,7 @@ class TestPageH extends StandardPage<TestPageData> {
   @override
   Widget buildPage(BuildContext context) {
     return CupertinoPageScaffold(
-      navigationBar: const CupertinoNavigationBar(
-        middle: Text('Test title H'),
-      ),
+      navigationBar: const CupertinoNavigationBar(middle: Text('Test title H')),
       child: SingleChildScrollView(
         child: Column(
           children: [
@@ -581,21 +556,17 @@ class TestPageLocalizationKey extends StandardPage<void> {
   @override
   Widget buildPage(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(context.pl('title')),
-      ),
+      appBar: AppBar(title: Text(context.pl('title'))),
       body: SingleChildScrollView(
         child: Column(
           children: [
-            Center(
-              child: Text(testMessage),
+            Center(child: Text(testMessage)),
+            Center(child: Text(context.pl('message', {'param': 'b'}))),
+            Builder(
+              builder: (context) {
+                return Text(context.pl('message', {'param': 'c'}));
+              },
             ),
-            Center(
-              child: Text(context.pl('message', {'param': 'b'})),
-            ),
-            Builder(builder: (context) {
-              return Text(context.pl('message', {'param': 'c'}));
-            })
           ],
         ),
       ),
@@ -607,9 +578,7 @@ class TestPageRemoveRoute extends StandardPage<void> {
   @override
   Widget buildPage(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('TestPageRemoveRoute'),
-      ),
+      appBar: AppBar(title: const Text('TestPageRemoveRoute')),
       body: SingleChildScrollView(
         child: Column(
           children: [
@@ -633,11 +602,7 @@ class TestPageContextGoWithResult extends StandardPage<void> {
   @override
   Widget buildPage(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          l(context, 'TestPageContextGoWithResult'),
-        ),
-      ),
+      appBar: AppBar(title: Text(l(context, 'TestPageContextGoWithResult'))),
       body: SingleChildScrollView(
         child: Column(
           children: [
@@ -664,11 +629,7 @@ class TestPageWithResult extends StandardPageWithResult<void, String> {
   @override
   Widget buildPage(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          l(context, 'TestPageWithResult'),
-        ),
-      ),
+      appBar: AppBar(title: Text(l(context, 'TestPageWithResult'))),
       body: SingleChildScrollView(
         child: Column(
           children: [
@@ -699,10 +660,7 @@ class TestPageData {
   final int id;
   final String? data;
 
-  TestPageData({
-    required this.id,
-    required this.data,
-  });
+  TestPageData({required this.id, required this.data});
 }
 
 class BaseListenable extends ChangeNotifier {}
@@ -716,10 +674,7 @@ class ChangeListenableNumber extends BaseListenable {
 }
 
 class TestAnalyticsEvent extends AnalyticsEvent {
-  TestAnalyticsEvent({
-    required super.name,
-    super.data,
-  });
+  TestAnalyticsEvent({required super.name, super.data});
 }
 
 class TestNoLinkPlugin extends Plugin with StandardAppRoutePluginMixin {
@@ -759,12 +714,15 @@ class TestDataParseRouteInformationPlugin extends Plugin
     with StandardAppRoutePluginMixin {
   @override
   Future<StandardRouteData?> parseRouteInformation(
-      RouteInformation routeInformation) async {
-    return SynchronousFuture(StandardRouteData(
-      factory: app.standardAppPlugin.delegate!
-          .getPageFactory<TestPageH, TestPageData, void>(),
-      pageData: TestPageData(id: 70, data: 'parsed route'),
-    ));
+    RouteInformation routeInformation,
+  ) async {
+    return SynchronousFuture(
+      StandardRouteData(
+        factory: app.standardAppPlugin.delegate!
+            .getPageFactory<TestPageH, TestPageData, void>(),
+        pageData: TestPageData(id: 70, data: 'parsed route'),
+      ),
+    );
   }
 }
 

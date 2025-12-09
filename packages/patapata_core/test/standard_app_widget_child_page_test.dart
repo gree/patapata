@@ -19,8 +19,9 @@ class NoAutoProcessInitialRouteEnvironment extends Environment
 void main() {
   testInitialize();
 
-  testWidgets('Standard Nested Page hasNestedPages Test',
-      (WidgetTester tester) async {
+  testWidgets('Standard Nested Page hasNestedPages Test', (
+    WidgetTester tester,
+  ) async {
     final tStandardFactory = StandardPageFactory<TestPageA, void>(
       create: (data) => TestPageA(),
     );
@@ -42,12 +43,14 @@ void main() {
     expect(tParentFactory.hasNestedPages, isFalse);
   });
 
-  testWidgets('Standard Child Page Context Go Test',
-      (WidgetTester tester) async {
+  testWidgets('Standard Child Page Context Go Test', (
+    WidgetTester tester,
+  ) async {
     await _setTestDeviceSize(tester);
 
-    final tNavigatorMode =
-        TestNavigatorMode(StandardPageNavigationMode.moveToTop);
+    final tNavigatorMode = TestNavigatorMode(
+      StandardPageNavigationMode.moveToTop,
+    );
 
     final App tApp = createApp(
       appWidget: Provider<TestNavigatorMode>.value(
@@ -65,30 +68,25 @@ void main() {
                     StandardChildPageFactory<TestPageC, TestPageData, void>(
                       create: (data) => TestPageC(),
                       createParentPageData: (pageData) {},
-                      pageDataWhenNull: () => TestPageData(
-                        id: 1,
-                        data: 'Default Test Data C',
-                      ),
+                      pageDataWhenNull: () =>
+                          TestPageData(id: 1, data: 'Default Test Data C'),
                     ),
                     StandardChildPageFactory<TestPageD, TestPageData, void>(
                       create: (data) => TestPageD(),
                       createParentPageData: (pageData) {},
-                      pageDataWhenNull: () => TestPageData(
-                        id: 2,
-                        data: 'Default Test Data D',
-                      ),
+                      pageDataWhenNull: () =>
+                          TestPageData(id: 2, data: 'Default Test Data D'),
                       childPageFactories: [
-                        StandardChildPageFactory<TestPageE, TestPageData,
-                            TestPageData>(
+                        StandardChildPageFactory<
+                          TestPageE,
+                          TestPageData,
+                          TestPageData
+                        >(
                           create: (data) => TestPageE(),
-                          pageDataWhenNull: () => TestPageData(
-                            id: 3,
-                            data: 'Default Test Data E',
-                          ),
-                          createParentPageData: (pageData) => TestPageData(
-                            id: 2,
-                            data: 'Test Data D',
-                          ),
+                          pageDataWhenNull: () =>
+                              TestPageData(id: 3, data: 'Default Test Data E'),
+                          createParentPageData: (pageData) =>
+                              TestPageData(id: 2, data: 'Test Data D'),
                         ),
                       ],
                     ),
@@ -117,16 +115,8 @@ void main() {
 
       _checkPageInstances(
         tApp,
-        expectedPageInstanceNames: [
-          'TestPageA',
-          'TestPageE',
-          'TestPageB',
-        ],
-        expectedActiveStates: [
-          false,
-          false,
-          true,
-        ],
+        expectedPageInstanceNames: ['TestPageA', 'TestPageE', 'TestPageB'],
+        expectedActiveStates: [false, false, true],
       );
 
       await tester.tap(find.byKey(const ValueKey(kTestBackButton)));
@@ -135,14 +125,8 @@ void main() {
       expect(find.text('Test Title E'), findsOneWidget);
       _checkPageInstances(
         tApp,
-        expectedPageInstanceNames: [
-          'TestPageA',
-          'TestPageE',
-        ],
-        expectedActiveStates: [
-          false,
-          true,
-        ],
+        expectedPageInstanceNames: ['TestPageA', 'TestPageE'],
+        expectedActiveStates: [false, true],
       );
 
       await tester.tap(find.byKey(const ValueKey(kTestButtonGoEwithParent)));
@@ -157,12 +141,7 @@ void main() {
           'TestPageD',
           'TestPageE',
         ],
-        expectedActiveStates: [
-          false,
-          false,
-          false,
-          true,
-        ],
+        expectedActiveStates: [false, false, false, true],
       );
 
       await tester.tap(find.byKey(const ValueKey(kTestButtonGoC)));
@@ -178,13 +157,7 @@ void main() {
           'TestPageE',
           'TestPageC',
         ],
-        expectedActiveStates: [
-          false,
-          false,
-          false,
-          false,
-          true,
-        ],
+        expectedActiveStates: [false, false, false, false, true],
       );
 
       await tester.tap(find.byKey(const ValueKey(kTestButtonGoD)));
@@ -200,13 +173,7 @@ void main() {
           'TestPageC',
           'TestPageD',
         ],
-        expectedActiveStates: [
-          false,
-          false,
-          false,
-          false,
-          true,
-        ],
+        expectedActiveStates: [false, false, false, false, true],
       );
 
       await tester.tap(find.byKey(const ValueKey(kTestBackButton)));
@@ -221,12 +188,7 @@ void main() {
           'TestPageE',
           'TestPageC',
         ],
-        expectedActiveStates: [
-          false,
-          false,
-          false,
-          true,
-        ],
+        expectedActiveStates: [false, false, false, true],
       );
 
       await tester.tap(find.byKey(const ValueKey(kTestBackButton)));
@@ -241,12 +203,7 @@ void main() {
           'TestPageD',
           'TestPageE',
         ],
-        expectedActiveStates: [
-          false,
-          false,
-          false,
-          true,
-        ],
+        expectedActiveStates: [false, false, false, true],
       );
 
       await tester.tap(find.byKey(const ValueKey(kTestBackButton)));
@@ -255,16 +212,8 @@ void main() {
 
       _checkPageInstances(
         tApp,
-        expectedPageInstanceNames: [
-          'TestPageA',
-          'TestPageB',
-          'TestPageD',
-        ],
-        expectedActiveStates: [
-          false,
-          false,
-          true,
-        ],
+        expectedPageInstanceNames: ['TestPageA', 'TestPageB', 'TestPageD'],
+        expectedActiveStates: [false, false, true],
       );
 
       await tester.tap(find.byKey(const ValueKey(kTestBackButton)));
@@ -273,14 +222,8 @@ void main() {
 
       _checkPageInstances(
         tApp,
-        expectedPageInstanceNames: [
-          'TestPageA',
-          'TestPageB',
-        ],
-        expectedActiveStates: [
-          false,
-          true,
-        ],
+        expectedPageInstanceNames: ['TestPageA', 'TestPageB'],
+        expectedActiveStates: [false, true],
       );
 
       await tester.tap(find.byKey(const ValueKey(kTestBackButton)));
@@ -289,24 +232,22 @@ void main() {
 
       _checkPageInstances(
         tApp,
-        expectedPageInstanceNames: [
-          'TestPageA',
-        ],
-        expectedActiveStates: [
-          true,
-        ],
+        expectedPageInstanceNames: ['TestPageA'],
+        expectedActiveStates: [true],
       );
     });
 
     tApp.dispose();
   });
 
-  testWidgets('Standard Child Page in Nested Navigator Context Go Test',
-      (WidgetTester tester) async {
+  testWidgets('Standard Child Page in Nested Navigator Context Go Test', (
+    WidgetTester tester,
+  ) async {
     await _setTestDeviceSize(tester);
 
-    final tNavigatorMode =
-        TestNavigatorMode(StandardPageNavigationMode.moveToTop);
+    final tNavigatorMode = TestNavigatorMode(
+      StandardPageNavigationMode.moveToTop,
+    );
 
     final App tApp = createApp(
       appWidget: Provider<TestNavigatorMode>.value(
@@ -327,10 +268,8 @@ void main() {
                         StandardChildPageFactory<TestPageC, TestPageData, void>(
                           create: (data) => TestPageC(),
                           createParentPageData: (pageData) {},
-                          pageDataWhenNull: () => TestPageData(
-                            id: 1,
-                            data: 'Default Test Data C',
-                          ),
+                          pageDataWhenNull: () =>
+                              TestPageData(id: 1, data: 'Default Test Data C'),
                         ),
                       ],
                     ),
@@ -344,22 +283,19 @@ void main() {
                 StandardChildPageFactory<TestPageD, TestPageData, void>(
                   create: (data) => TestPageD(),
                   createParentPageData: (pageData) {},
-                  pageDataWhenNull: () => TestPageData(
-                    id: 2,
-                    data: 'Default Test Data D',
-                  ),
+                  pageDataWhenNull: () =>
+                      TestPageData(id: 2, data: 'Default Test Data D'),
                   childPageFactories: [
-                    StandardChildPageFactory<TestPageE, TestPageData,
-                        TestPageData>(
+                    StandardChildPageFactory<
+                      TestPageE,
+                      TestPageData,
+                      TestPageData
+                    >(
                       create: (data) => TestPageE(),
-                      pageDataWhenNull: () => TestPageData(
-                        id: 3,
-                        data: 'Default Test Data E',
-                      ),
-                      createParentPageData: (pageData) => TestPageData(
-                        id: 2,
-                        data: 'Test Data D',
-                      ),
+                      pageDataWhenNull: () =>
+                          TestPageData(id: 3, data: 'Default Test Data E'),
+                      createParentPageData: (pageData) =>
+                          TestPageData(id: 2, data: 'Test Data D'),
                     ),
                   ],
                 ),
@@ -400,15 +336,8 @@ void main() {
           'TestPageB',
           'TestPageC',
         ],
-        expectedRootPageInstanceNames: [
-          'TestNestedA',
-        ],
-        expectedActiveStates: [
-          true,
-          false,
-          false,
-          true,
-        ],
+        expectedRootPageInstanceNames: ['TestNestedA'],
+        expectedActiveStates: [true, false, false, true],
       );
 
       await tester.tap(find.byKey(const ValueKey(kTestButtonGoEwithParent)));
@@ -426,19 +355,8 @@ void main() {
           'TestPageD',
           'TestPageE',
         ],
-        expectedRootPageInstanceNames: [
-          'TestNestedA',
-          'TestNestedB',
-        ],
-        expectedActiveStates: [
-          false,
-          false,
-          false,
-          false,
-          true,
-          false,
-          true,
-        ],
+        expectedRootPageInstanceNames: ['TestNestedA', 'TestNestedB'],
+        expectedActiveStates: [false, false, false, false, true, false, true],
       );
     });
 
@@ -473,16 +391,18 @@ void _checkPageInstances(
 
   if (expectedNestedPageInstanceNames != null) {
     expect(
-      app.standardAppPlugin.delegate?.nestedPageInstances
-          .map((k, v) => MapEntry(k.name, v.map((e) => e.name).toList())),
+      app.standardAppPlugin.delegate?.nestedPageInstances.map(
+        (k, v) => MapEntry(k.name, v.map((e) => e.name).toList()),
+      ),
       expectedNestedPageInstanceNames,
     );
   }
 
   if (expectedActiveStates != null) {
     expect(
-      app.standardAppPlugin.delegate?.pageInstances
-          .map((e) => e.standardPageKey.currentState!.active),
+      app.standardAppPlugin.delegate?.pageInstances.map(
+        (e) => e.standardPageKey.currentState!.active,
+      ),
       expectedActiveStates,
     );
   }
@@ -508,10 +428,7 @@ class TestPageData {
   final int id;
   final String? data;
 
-  TestPageData({
-    required this.id,
-    required this.data,
-  });
+  TestPageData({required this.id, required this.data});
 }
 
 List<Widget> _buildNavigateButtons(BuildContext context) {
@@ -520,7 +437,9 @@ List<Widget> _buildNavigateButtons(BuildContext context) {
       key: const ValueKey(kTestButtonGoA),
       onPressed: () {
         context.go<TestPageA, void>(
-            null, context.read<TestNavigatorMode>().mode);
+          null,
+          context.read<TestNavigatorMode>().mode,
+        );
       },
       child: const Text('Go to Test Page A'),
     ),
@@ -528,7 +447,9 @@ List<Widget> _buildNavigateButtons(BuildContext context) {
       key: const ValueKey(kTestButtonGoB),
       onPressed: () {
         context.go<TestPageB, void>(
-            null, context.read<TestNavigatorMode>().mode);
+          null,
+          context.read<TestNavigatorMode>().mode,
+        );
       },
       child: const Text('Go to Test Page B'),
     ),
@@ -536,11 +457,9 @@ List<Widget> _buildNavigateButtons(BuildContext context) {
       key: const ValueKey(kTestButtonGoC),
       onPressed: () {
         context.go<TestPageC, TestPageData>(
-            TestPageData(
-              id: 1,
-              data: 'Test Data C',
-            ),
-            context.read<TestNavigatorMode>().mode);
+          TestPageData(id: 1, data: 'Test Data C'),
+          context.read<TestNavigatorMode>().mode,
+        );
       },
       child: const Text('Go to Test Page C'),
     ),
@@ -548,11 +467,9 @@ List<Widget> _buildNavigateButtons(BuildContext context) {
       key: const ValueKey(kTestButtonGoD),
       onPressed: () {
         context.go<TestPageD, TestPageData>(
-            TestPageData(
-              id: 2,
-              data: 'Test Data D',
-            ),
-            context.read<TestNavigatorMode>().mode);
+          TestPageData(id: 2, data: 'Test Data D'),
+          context.read<TestNavigatorMode>().mode,
+        );
       },
       child: const Text('Go to Test Page D'),
     ),
@@ -560,11 +477,9 @@ List<Widget> _buildNavigateButtons(BuildContext context) {
       key: const ValueKey(kTestButtonGoE),
       onPressed: () {
         context.go<TestPageE, TestPageData>(
-            TestPageData(
-              id: 3,
-              data: 'Test Data E',
-            ),
-            context.read<TestNavigatorMode>().mode);
+          TestPageData(id: 3, data: 'Test Data E'),
+          context.read<TestNavigatorMode>().mode,
+        );
       },
       child: const Text('Go to Test Page E'),
     ),
@@ -572,10 +487,7 @@ List<Widget> _buildNavigateButtons(BuildContext context) {
       key: const ValueKey(kTestButtonGoCwithParent),
       onPressed: () {
         context.go<TestPageC, TestPageData>(
-          TestPageData(
-            id: 1,
-            data: 'Test Data C',
-          ),
+          TestPageData(id: 1, data: 'Test Data C'),
           context.read<TestNavigatorMode>().mode,
           true,
         );
@@ -586,10 +498,7 @@ List<Widget> _buildNavigateButtons(BuildContext context) {
       key: const ValueKey(kTestButtonGoDwithParent),
       onPressed: () {
         context.go<TestPageD, TestPageData>(
-          TestPageData(
-            id: 2,
-            data: 'Test Data D',
-          ),
+          TestPageData(id: 2, data: 'Test Data D'),
           context.read<TestNavigatorMode>().mode,
           true,
         );
@@ -600,10 +509,7 @@ List<Widget> _buildNavigateButtons(BuildContext context) {
       key: const ValueKey(kTestButtonGoEwithParent),
       onPressed: () {
         context.go<TestPageE, TestPageData>(
-          TestPageData(
-            id: 3,
-            data: 'Test Data E',
-          ),
+          TestPageData(id: 3, data: 'Test Data E'),
           context.read<TestNavigatorMode>().mode,
           true,
         );
@@ -639,9 +545,7 @@ class TestPageA extends StandardPage<void> {
   @override
   Widget buildPage(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Test Title'),
-      ),
+      appBar: AppBar(title: const Text('Test Title')),
       body: SingleChildScrollView(
         child: Column(
           children: [
@@ -664,9 +568,7 @@ class TestPageB extends StandardPage<void> {
   @override
   Widget buildPage(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Test Title B'),
-      ),
+      appBar: AppBar(title: const Text('Test Title B')),
       body: SingleChildScrollView(
         child: Column(
           children: [
@@ -689,9 +591,7 @@ class TestPageC extends StandardPage<TestPageData> {
   @override
   Widget buildPage(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Test Title C'),
-      ),
+      appBar: AppBar(title: const Text('Test Title C')),
       body: SingleChildScrollView(
         child: Column(
           children: [
@@ -714,9 +614,7 @@ class TestPageD extends StandardPage<TestPageData> {
   @override
   Widget buildPage(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Test Title D'),
-      ),
+      appBar: AppBar(title: const Text('Test Title D')),
       body: SingleChildScrollView(
         child: Column(
           children: [
@@ -739,9 +637,7 @@ class TestPageE extends StandardPage<TestPageData> {
   @override
   Widget buildPage(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Test Title E'),
-      ),
+      appBar: AppBar(title: const Text('Test Title E')),
       body: SingleChildScrollView(
         child: Column(
           children: [
