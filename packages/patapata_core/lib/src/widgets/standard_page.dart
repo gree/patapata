@@ -1493,7 +1493,7 @@ abstract class StandardPageWithResult<T extends Object?, E extends Object?>
     }
 
     if (_active != tIsCurrentlyActive) {
-      fUpdateNestedPageActiveStatus() {
+      void fUpdateNestedPageActiveStatus() {
         // If nested Navigators exist, the status of their subordinate pages will also be updated.
         final tPage = ModalRoute.of(context)?.settings;
         final tNestedPage = tPage != null
@@ -2312,7 +2312,7 @@ class StandardRouterDelegate extends RouterDelegate<StandardRouteData>
   List<StandardPageInterface> get pageInstances {
     final tInstances = <StandardPageInterface>[];
 
-    fPushNestedPages(StandardPageInterface page) {
+    void fPushNestedPages(StandardPageInterface page) {
       tInstances.add(page);
 
       final tNestedPages = _nestedPageInstances[page];
