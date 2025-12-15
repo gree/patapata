@@ -135,6 +135,7 @@ class StandardAppPlugin extends Plugin with StartupNavigatorMixin {
   /// {@template patapata_widgets.StandardAppPlugin.route}
   /// Navigate to a page with the specified [link].
   /// [link] is a string set in [StandardPageFactory] under `links`.
+  /// [pushParentPage] indicates whether to push the parent page when navigating to a child page. default is `true`.
   /// {@endtemplate}
   void route(String link, [bool pushParentPage = true]) async {
     final tRouteInformation = await parser?.parseRouteInformation(
@@ -441,6 +442,7 @@ extension StandardAppRouter on Router {
   /// {@template patapata_widgets.StandardAppRouter.route}
   /// Navigate to a page with the specified [location].
   /// [navigationMode] represents the mode of [StandardPageNavigationMode] to use during navigation (optional).
+  /// [pushParentPage] indicates whether to push the parent page when navigating to a child page. default is `true`.
   /// {@endtemplate}
   void route(
     String location, [
@@ -591,7 +593,7 @@ extension StandardAppApp on App {
     return standardAppPlugin.route(link);
   }
 
-  /// maybePop the Navigator of [StandardAppApp.navigator].
+  /// Pops the Navigator of [StandardAppApp.navigator].
   /// This is used when context is not accessible.
   void removeRoute([Object? result]) {
     navigator.maybePop(result);

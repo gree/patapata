@@ -2307,7 +2307,7 @@ class StandardRouterDelegate extends RouterDelegate<StandardRouteData>
   /// The current [Page] history.
   ///
   /// Returns a flattened list of all [Page] instances, including both root pages
-  /// and nested pages within nested navigators, collected recursively in depth-first order.
+  /// and nested pages within nested navigators, collected recursively in order of addition.
   /// {@endtemplate}
   List<StandardPageInterface> get pageInstances {
     final tInstances = <StandardPageInterface>[];
