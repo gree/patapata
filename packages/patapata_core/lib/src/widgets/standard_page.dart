@@ -935,19 +935,17 @@ abstract class _BaseStandardPageRoute<R extends Object?, E extends Object?>
   void onPopInvokedWithResult(bool didPop, E? result) {
     super.onPopInvokedWithResult(didPop, result);
 
-    getApp().standardAppPlugin.delegate?._onPopInvokedWithResult(
-      this,
-      didPop,
-      result,
-    );
+    final tDelegate =
+        (settings as StandardPageInterface<R, E>).factoryObject._delegate;
+    tDelegate._onPopInvokedWithResult(this, didPop, result);
   }
 
   @override
   bool get popGestureEnabled {
-    final tDelegate = getApp().standardAppPlugin.delegate;
+    final tDelegate =
+        (settings as StandardPageInterface<R, E>).factoryObject._delegate;
 
-    return (tDelegate?._checkPopGestureEnabled(this) ?? true) &&
-        super.popGestureEnabled;
+    return tDelegate._checkPopGestureEnabled(this) && super.popGestureEnabled;
   }
 }
 
@@ -1155,19 +1153,17 @@ class _StandardCustomPageRoute<R, E> extends ModalRoute<E> {
   void onPopInvokedWithResult(bool didPop, E? result) {
     super.onPopInvokedWithResult(didPop, result);
 
-    getApp().standardAppPlugin.delegate?._onPopInvokedWithResult(
-      this,
-      didPop,
-      result,
-    );
+    final tDelegate =
+        (settings as StandardPageInterface<R, E>).factoryObject._delegate;
+    tDelegate._onPopInvokedWithResult(this, didPop, result);
   }
 
   @override
   bool get popGestureEnabled {
-    final tDelegate = getApp().standardAppPlugin.delegate;
+    final tDelegate =
+        (settings as StandardPageInterface<R, E>).factoryObject._delegate;
 
-    return (tDelegate?._checkPopGestureEnabled(this) ?? true) &&
-        super.popGestureEnabled;
+    return tDelegate._checkPopGestureEnabled(this) && super.popGestureEnabled;
   }
 
   @override
@@ -1335,7 +1331,8 @@ abstract class StandardPageWithResult<T extends Object?, E extends Object?>
     }
 
     _sendPageDataEvent();
-    getApp().standardAppPlugin.delegate?._updatePages();
+    (Router.of(context).routerDelegate as StandardRouterDelegate?)
+        ?._updatePages();
     onPageData();
   }
 
@@ -1687,6 +1684,7 @@ abstract class StandardPageWithNestedNavigator extends StandardPage<void> {
   Widget build(BuildContext context) {
     _nestedPages = Builder(
       builder: (context) {
+        final tApp = context.read<App>();
         final tPage = ModalRoute.of(context)?.settings as StandardPageInterface;
         final tDelegate = context.watch<StandardRouterDelegate>();
 
@@ -1708,10 +1706,7 @@ abstract class StandardPageWithNestedNavigator extends StandardPage<void> {
             child: Navigator(
               key: nestedNavigatorKey,
               pages: _pageInstances,
-              observers: [
-                ...getApp().navigatorObservers,
-                _nestedPageRouteObserver,
-              ],
+              observers: [...tApp.navigatorObservers, _nestedPageRouteObserver],
               onDidRemovePage: _delegate._onDidRemovePage,
             ),
           ),
@@ -2456,12 +2451,14 @@ class StandardRouterDelegate extends RouterDelegate<StandardRouteData>
   Widget build(BuildContext context) {
     _markRebuild = false;
 
+    final tApp = context.read<App>();
+
     Widget tChild = Navigator(
       key: _navigatorKey,
       restorationScopeId: 'StandardAppNavigator',
       observers: [
         _rootNavigatorObserver,
-        ...getApp().navigatorObservers,
+        ...tApp.navigatorObservers,
         routeObserver,
       ],
       pages: _rootPageInstances,
@@ -2480,11 +2477,11 @@ class StandardRouterDelegate extends RouterDelegate<StandardRouteData>
       providers: [
         ChangeNotifierProvider<StandardRouterDelegate>.value(value: this),
         Provider<RouteObserver<ModalRoute<void>>>.value(value: routeObserver),
-        if (getApp().startupSequence != null)
+        if (tApp.startupSequence != null)
           Provider(
             lazy: false,
             create: (context) {
-              final tStartupSequence = getApp().startupSequence!;
+              final tStartupSequence = tApp.startupSequence!;
               if (!_startupSequenceProcessed) {
                 _startupSequenceProcessed = true;
                 tStartupSequence.resetMachine();
@@ -2716,9 +2713,11 @@ class StandardRouterDelegate extends RouterDelegate<StandardRouteData>
     _initialRouteProcessed = true;
     _continueProcessInitialRoute = true;
 
+    final tApp = context.read<App>();
+
     StandardRouteData? tInitialRouteData =
         _initialRouteData ??
-        (await getApp().standardAppPlugin.parser?.parseRouteInformation(
+        (await tApp.standardAppPlugin.parser?.parseRouteInformation(
           RouteInformation(uri: Uri(path: Navigator.defaultRouteName)),
         ));
     _initialRouteData = null;
@@ -2771,7 +2770,7 @@ class StandardRouterDelegate extends RouterDelegate<StandardRouteData>
       _initialRouteData = configuration;
 
       if (!_startupSequenceProcessed) {
-        final tEnv = getApp().environment;
+        final tEnv = context.read<App>().environment;
         final tAutoProcessInitialRoute = switch (tEnv) {
           StandardAppEnvironment() => tEnv.autoProcessInitialRoute,
           _ => true,
