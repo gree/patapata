@@ -1535,7 +1535,9 @@ abstract class StandardPageWithResult<T extends Object?, E extends Object?>
           ModalRoute.of(context)?.settings as StandardPageInterface;
 
       scheduleFunction(() {
-        _delegate._pushParentPageHistory(tStandardPageInterface);
+        if (_active && mounted) {
+          _delegate._pushParentPageHistory(tStandardPageInterface);
+        }
       });
     }
   }
