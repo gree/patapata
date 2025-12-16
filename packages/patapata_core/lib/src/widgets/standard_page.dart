@@ -605,6 +605,8 @@ base class StandardPageWithNestedNavigatorFactory<
   /// [activeFirstNestedPage] controls whether the first page in [nestedPageFactories] should always be stacked
   /// as the first page of the nested Navigator. The default value is `true`.
   ///
+  /// [enableNavigationAnalytics] is a flag indicating whether to enable navigation analytics. The default is `false`.
+  ///
   /// [links] and [linkGenerator] are optional parameters for deep linking support.
   ///
   /// [pageBuilder] is an optional function for customizing page creation.
@@ -615,6 +617,7 @@ base class StandardPageWithNestedNavigatorFactory<
     required this.nestedPageFactories,
     this.anyNestedPageFactories = const [],
     this.activeFirstNestedPage = true,
+    super.enableNavigationAnalytics = false,
     super.links,
     super.linkGenerator,
     super.pageBuilder,
