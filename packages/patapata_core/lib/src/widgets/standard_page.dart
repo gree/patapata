@@ -452,27 +452,42 @@ base class StandardPageWithResultFactory<
 /// [StandardPageFactory.new]'s `links` allows you to define regular expressions for deep links to navigate to this page. Multiple configurations are possible.
 /// [linkGenerator] creates deep links to navigate to this page from the page data's state for this page.
 ///
+/// ## Regular expression restrictions
+///
+/// When defining regular expressions for deep links, the following rules apply:
+///
+/// * **Only named capture groups are allowed for value extraction**.
+///   Use the `(?<name>...)` syntax to capture values.
+///
+/// * **Numbered capture groups are prohibited**.
+///   Patterns such as `(...)` that allow access via `match.group(1)` must not
+///   be used.
+///
+/// * Non-capturing and conditional group constructs that do not capture values
+///   are allowed, including:
+///   * Non-capturing groups: `(?:...)`
+///   * Lookaheads: `(?=...)`, `(?!...)`
+///   * Lookbehinds: `(?<=...)`, `(?<!...)`
+///
+/// These restrictions require all captured values to be defined using
+/// named capture groups via `match.namedGroup(...)`.
+///
+/// This avoids relying on the positional order of capture groups, which can
+/// change when regular expressions are generated or composed across parent
+/// and child links, and prevents subtle breakage caused by such changes.
+///
 /// example:
 /// ```dart
-/// StandardPageFactory<PageC, DeepLinkData>(
-///   create: (_) => PageC(),
+/// StandardPageFactory<PageC, TestPageData>(
+///   create: (data) => PageC(),
 ///   links: {
-///     r'pageC/(\d+)' : (match, uri) => DeepLinkData(
-///       id: int.parse(uri.queryParameters([‘id’])!),
-///       message: 'this is message',
+///     r'page/(?<id>\d+)': (match, uri) => TestPageData(
+///       id: int.parse(match.namedGroup('id')!),
+///       category: uri.queryParameters['category'],
 ///     ),
 ///   },
-///   linkGenerator: (pageC) => 'pageC/${pageC.id}',
-/// ),
-///
-/// class DeepLinkData {
-///   DeepLinkData({
-///     required this.id,
-///     required this.message,
-///   });
-///   final int id;
-///   final String? message;
-/// }
+///   linkGenerator: (pageData) => 'page/${pageData.id}',
+/// )
 /// ```
 ///
 /// [StandardChildPageFactory] can be used to define child pages that can be navigated to from this page.
@@ -1907,6 +1922,22 @@ class StandardRouterDelegate extends RouterDelegate<StandardRouteData>
 
       Map<String, String> tLinkMap = {};
       if (factory._links.isNotEmpty) {
+        assert(() {
+          final tForbiddenPattern = RegExp(r'(?<!\\)\((?!\?[:<=!>])');
+          final tInvalidLink = factory._links.keys.firstWhereOrNull(
+            (tLink) => tForbiddenPattern.hasMatch(tLink),
+          );
+          if (tInvalidLink != null) {
+            // coverage:ignore-start
+            throw AssertionError(
+              'Link [ $tInvalidLink ] in page factory of type [ ${factory.pageType} ] contains a forbidden capturing group. '
+              'Please use non-capturing groups (?:...) or named capturing groups (?<name>...) instead.',
+            );
+            // coverage:ignore-end
+          }
+          return true;
+        }());
+
         final tLinks = factory._links.keys;
         if (parentPathList.isNotEmpty) {
           final tAbsoluteLinks = tLinks.where((e) => e.startsWith('/'));

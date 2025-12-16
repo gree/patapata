@@ -976,9 +976,9 @@ void main() {
           StandardPageFactory<TestPageC, TestPageData>(
             create: (data) => TestPageC(),
             links: {
-              r'testPageData/(\d+)': (match, uri) => TestPageData(
+              r'testPageData/(?<id>\d+)': (match, uri) => TestPageData(
                 data: 'test page data',
-                id: int.parse(match.group(1)!),
+                id: int.parse(match.namedGroup('id')!),
               ),
             },
             linkGenerator: (pageData) => 'testPageData/${pageData.id}',
@@ -1542,9 +1542,9 @@ void main() {
           StandardPageFactory<TestPageC, TestPageData>(
             create: (data) => TestPageC(),
             links: {
-              r'testPageData/(\d+)': (match, uri) => TestPageData(
+              r'testPageData/(?<id>\d+)': (match, uri) => TestPageData(
                 data: 'test page data',
-                id: int.parse(match.group(1)!),
+                id: int.parse(match.namedGroup('id')!),
               ),
             },
             linkGenerator: (pageData) => 'testPageData/${pageData.id}',
@@ -2381,9 +2381,9 @@ void main() {
           StandardPageFactory<TestPageC, TestPageData>(
             create: (data) => TestPageC(),
             links: {
-              r'testPageData/(\d+)': (match, uri) => TestPageData(
+              r'testPageData/(?<id>\d+)': (match, uri) => TestPageData(
                 data: 'test page data',
-                id: int.parse(match.group(1)!),
+                id: int.parse(match.namedGroup('id')!),
               ),
             },
             linkGenerator: (pageData) => 'testPageData/${pageData.id}',
