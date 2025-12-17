@@ -962,6 +962,30 @@ abstract class _BaseStandardPageRoute<R extends Object?, E extends Object?>
 
     return tDelegate._checkPopGestureEnabled(this) && super.popGestureEnabled;
   }
+
+  @override
+  bool get impliesAppBarDismissal {
+    if (super.impliesAppBarDismissal) {
+      return true;
+    }
+
+    // Check if multiple pages exist in nested navigator.
+    final tPage = settings as StandardPageInterface<R, E>;
+    if (tPage.factoryObject.hasNestedPages) {
+      final tPagesMap = tPage.factoryObject._delegate._nestedPageInstances;
+      for (
+        var tNestedPages = tPagesMap[tPage];
+        tNestedPages != null;
+        tNestedPages = tPagesMap[tNestedPages.last]
+      ) {
+        if (tNestedPages.length > 1) {
+          return true;
+        }
+      }
+    }
+
+    return false;
+  }
 }
 
 /// A [Page] implementation that creates a Material-styled route.

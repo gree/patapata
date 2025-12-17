@@ -2324,6 +2324,104 @@ void main() {
 
     tApp.dispose();
   });
+
+  testWidgets(
+    "Verify that Route's impliesAppBarDismissal is true when the NestedPage's Navigator stack has two or more pages.",
+    (WidgetTester tester) async {
+      await _setTestDeviceSize(tester);
+
+      final tNavigatorMode = TestNavigatorMode(
+        StandardPageNavigationMode.moveToTop,
+      );
+
+      final App tApp = createApp(
+        appWidget: Provider<TestNavigatorMode>.value(
+          value: tNavigatorMode,
+          child: StandardMaterialApp(
+            onGenerateTitle: (context) => 'Generate Test Title',
+            pages: [
+              StandardPageWithNestedNavigatorFactory<TestNestedA>(
+                create: (data) => TestNestedA(),
+                nestedPageFactories: [
+                  StandardPageFactory<TestPageA, void>(
+                    create: (data) => TestPageA(),
+                  ),
+                  StandardPageFactory<TestPageB, void>(
+                    create: (data) => TestPageB(),
+                  ),
+                ],
+              ),
+              StandardPageWithNestedNavigatorFactory<TestNestedB>(
+                create: (data) => TestNestedB(),
+                nestedPageFactories: [
+                  StandardPageFactory<TestPageC, void>(
+                    create: (data) => TestPageC(),
+                  ),
+                ],
+              ),
+              StandardPageFactory<TestPageD, void>(
+                create: (data) => TestPageD(),
+              ),
+            ],
+          ),
+        ),
+      );
+
+      await tApp.run();
+
+      await tApp.runProcess(() async {
+        void fCheckImpliesAppBarDismissal(List<bool> expected) {
+          final tPageInstances = tApp.standardAppPlugin.delegate?.pageInstances
+              .cast<StandardPageInterface>();
+          final tRouteList = tPageInstances!
+              .map((e) => ModalRoute.of(e.standardPageKey.currentContext!)!)
+              .toList();
+
+          expect(tRouteList.map((e) => e.impliesAppBarDismissal), expected);
+        }
+
+        await tester.pumpAndSettle();
+        expect(find.text('Test Title'), findsOneWidget);
+
+        // [[TestNestedA] - [TestPageA]]
+        fCheckImpliesAppBarDismissal([false, false]);
+
+        await tester.tap(find.byKey(const ValueKey(kTestButtonGoNB)));
+        await tester.pumpAndSettle();
+        expect(find.text('Test Title C'), findsOneWidget);
+
+        // [[TestNestedA] - [TestPageA]]- [[TestNestedB] - [TestPageC]]
+        fCheckImpliesAppBarDismissal([false, false, true, false]);
+
+        await tester.tap(find.byKey(const ValueKey(kTestButtonGoD)));
+        await tester.pumpAndSettle();
+        expect(find.text('Test Title D'), findsOneWidget);
+
+        // [[TestNestedA] - [TestPageA]] - [[TestNestedB] - [TestPageC]] - [TestPageD]
+        fCheckImpliesAppBarDismissal([false, false, true, false, true]);
+
+        await tester.tap(find.byKey(const ValueKey(kTestBackButton)));
+        await tester.pumpAndSettle();
+        await tester.tap(find.byKey(const ValueKey(kTestBackButton)));
+        await tester.pumpAndSettle();
+        await tester.tap(find.byKey(const ValueKey(kTestButtonGoB)));
+        await tester.pumpAndSettle();
+        expect(find.text('Test Title B'), findsOneWidget);
+
+        // [[TestNestedA] - [TestPageA] - [TestPageB]]
+        fCheckImpliesAppBarDismissal([true, false, true]);
+
+        await tester.tap(find.byKey(const ValueKey(kTestButtonGoD)));
+        await tester.pumpAndSettle();
+        expect(find.text('Test Title D'), findsOneWidget);
+
+        // [[TestNestedA] - [TestPageA] - [TestPageB]] - [TestPageD]
+        fCheckImpliesAppBarDismissal([true, false, true, true]);
+      });
+
+      tApp.dispose();
+    },
+  );
 }
 
 Future<void> _setTestDeviceSize(WidgetTester tester) async {
