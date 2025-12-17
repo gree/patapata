@@ -1206,6 +1206,30 @@ class _StandardCustomPageRoute<R, E> extends ModalRoute<E> {
   }
 
   @override
+  bool get impliesAppBarDismissal {
+    if (super.impliesAppBarDismissal) {
+      return true;
+    }
+
+    // Check if multiple pages exist in nested navigator.
+    final tPage = settings as StandardPageInterface<R, E>;
+    if (tPage.factoryObject.hasNestedPages) {
+      final tPagesMap = tPage.factoryObject._delegate._nestedPageInstances;
+      for (
+        var tNestedPages = tPagesMap[tPage];
+        tNestedPages != null;
+        tNestedPages = tPagesMap[tNestedPages.last]
+      ) {
+        if (tNestedPages.length > 1) {
+          return true;
+        }
+      }
+    }
+
+    return false;
+  }
+
+  @override
   Widget buildPage(
     BuildContext context,
     Animation<double> animation,

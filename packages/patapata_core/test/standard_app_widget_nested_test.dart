@@ -2422,6 +2422,87 @@ void main() {
       tApp.dispose();
     },
   );
+
+  testWidgets('impliesAppBarDismissal test. with StandardCustomPage', (
+    WidgetTester tester,
+  ) async {
+    await _setTestDeviceSize(tester);
+
+    final tNavigatorMode = TestNavigatorMode(
+      StandardPageNavigationMode.moveToTop,
+    );
+
+    final App tApp = createApp(
+      appWidget: Provider<TestNavigatorMode>.value(
+        value: tNavigatorMode,
+        child: StandardMaterialApp(
+          onGenerateTitle: (context) => 'Generate Test Title',
+          pages: [
+            StandardPageWithNestedNavigatorFactory<TestNestedA>(
+              create: (data) => TestNestedA(),
+              nestedPageFactories: [
+                StandardPageFactory<TestPageA, void>(
+                  create: (data) => TestPageA(),
+                ),
+                StandardPageFactory<TestPageB, void>(
+                  create: (data) => TestPageB(),
+                ),
+              ],
+              pageBuilder:
+                  (
+                    child,
+                    name,
+                    pageData,
+                    pageKey,
+                    restorationId,
+                    standardPageKey,
+                    factoryObject,
+                  ) {
+                    return StandardCustomPage(
+                      name: 'Test Custom Standard Page',
+                      key: pageKey,
+                      restorationId: 'custom-restorationId',
+                      standardPageKey: standardPageKey,
+                      factoryObject: factoryObject,
+                      barrierColor: Colors.blueAccent,
+                      child: child,
+                    );
+                  },
+            ),
+          ],
+        ),
+      ),
+    );
+
+    await tApp.run();
+
+    await tApp.runProcess(() async {
+      void fCheckImpliesAppBarDismissal(List<bool> expected) {
+        final tPageInstances = tApp.standardAppPlugin.delegate?.pageInstances
+            .cast<StandardPageInterface>();
+        final tRouteList = tPageInstances!
+            .map((e) => ModalRoute.of(e.standardPageKey.currentContext!)!)
+            .toList();
+
+        expect(tRouteList.map((e) => e.impliesAppBarDismissal), expected);
+      }
+
+      await tester.pumpAndSettle();
+      expect(find.text('Test Title'), findsOneWidget);
+
+      // [[TestNestedA] - [TestPageA]]
+      fCheckImpliesAppBarDismissal([false, false]);
+
+      await tester.tap(find.byKey(const ValueKey(kTestButtonGoB)));
+      await tester.pumpAndSettle();
+      expect(find.text('Test Title B'), findsOneWidget);
+
+      // [[TestNestedA] - [TestPageA] - [TestPageB]]
+      fCheckImpliesAppBarDismissal([true, false, true]);
+    });
+
+    tApp.dispose();
+  });
 }
 
 Future<void> _setTestDeviceSize(WidgetTester tester) async {
