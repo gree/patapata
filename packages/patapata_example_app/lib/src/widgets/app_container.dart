@@ -6,7 +6,6 @@
 import 'package:flutter/material.dart';
 import 'package:patapata_core/patapata_core.dart';
 import 'package:patapata_core/patapata_widgets.dart';
-import 'package:patapata_example_app/src/pages/top_page.dart';
 import 'package:provider/provider.dart';
 
 import '../pages/home_page.dart';
@@ -28,17 +27,24 @@ class AppContainer extends StandardPageWithNestedNavigator {
     });
   }
 
+  Future<void> dialog(BuildContext context) {
+    return PlatformDialog.show(
+      context: context,
+      message: 'Test Dialog',
+      actions: [
+        PlatformDialogAction(
+          text: 'OK',
+          result: () {},
+        ),
+      ],
+    );
+  }
+
   @override
   Widget buildPage(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text(context.pl('title')),
-        leading: BackButton(
-          onPressed: () {
-            context.go<TopPage, void>(
-                null, StandardPageNavigationMode.removeAll);
-          },
-        ),
       ),
       body: Provider<AppContainer>.value(
         value: this,

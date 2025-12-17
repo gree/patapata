@@ -31,30 +31,35 @@ class CupertinoHomePage extends StandardPage<void> {
 
   @override
   Widget buildPage(BuildContext context) {
-    return CupertinoPageScaffold(
-      navigationBar: CupertinoNavigationBar(
-        middle: Text(context.pl('title')),
-        backgroundColor: CupertinoColors.systemGrey,
-      ),
-      child: Container(
-        color: CupertinoColors.white,
-        child: ListView(
-          children: [
-            Text(context.pl('body')),
-            CupertinoButton(
-              child: Text(l(context, 'pages.tab.test_page_a.title')),
-              onPressed: () {
-                context.go<CupertinoTestPageA, void>(null);
-              },
+    return Container(
+      color: CupertinoColors.white,
+      child: ListView(
+        children: [
+          Center(
+            child: Text(
+              context.pl('title'),
             ),
-            CupertinoButton(
-              child: Text(l(context, 'pages.tab.test_page_b.title')),
-              onPressed: () {
-                context.go<CupertinoTestPageB, void>(null);
-              },
-            ),
-          ],
-        ),
+          ),
+          Text(context.pl('body')),
+          CupertinoButton(
+            child: Text(l(context, 'pages.tab.test_page_a.title')),
+            onPressed: () {
+              context.go<CupertinoTestPageA, void>(null);
+            },
+          ),
+          CupertinoButton(
+            child: Text(l(context, 'pages.tab.test_page_b.title')),
+            onPressed: () {
+              context.go<CupertinoTestPageB, void>(null);
+            },
+          ),
+          CupertinoButton(
+            child: Text('Show dialog'),
+            onPressed: () {
+              context.read<CupertinoAppContainer>().dialog(context);
+            },
+          ),
+        ],
       ),
     );
   }
@@ -66,40 +71,50 @@ class CupertinoTestPageA extends StandardPage<void> {
 
   @override
   Widget buildPage(BuildContext context) {
-    return CupertinoPageScaffold(
-      navigationBar: CupertinoNavigationBar(
-        middle: Text(context.pl('title')),
-        backgroundColor: CupertinoColors.systemGrey,
-      ),
-      child: Container(
-        color: CupertinoColors.systemBlue,
-        child: ListView(
-          children: [
-            Text(context.pl('body')),
-            CupertinoButton(
-              child: Text(
-                l(context, 'pages.tab.test_page_c.title'),
-                style: TextStyle(
-                  color: CupertinoColors.white,
-                ),
-              ),
-              onPressed: () {
-                context.go<CupertinoTestPageC, void>(null);
-              },
+    return Container(
+      color: CupertinoColors.systemBlue,
+      child: ListView(
+        children: [
+          Center(
+            child: Text(
+              context.pl('title'),
             ),
-            CupertinoButton(
-              child: Text(
-                l(context, 'pages.tab.test_page_b.title'),
-                style: TextStyle(
-                  color: CupertinoColors.white,
-                ),
+          ),
+          Text(context.pl('body')),
+          CupertinoButton(
+            child: Text(
+              l(context, 'pages.tab.test_page_c.title'),
+              style: TextStyle(
+                color: CupertinoColors.white,
               ),
-              onPressed: () {
-                context.go<CupertinoTestPageB, void>(null);
-              },
             ),
-          ],
-        ),
+            onPressed: () {
+              context.go<CupertinoTestPageC, void>(null);
+            },
+          ),
+          CupertinoButton(
+            child: Text(
+              l(context, 'pages.tab.test_page_b.title'),
+              style: TextStyle(
+                color: CupertinoColors.white,
+              ),
+            ),
+            onPressed: () {
+              context.go<CupertinoTestPageB, void>(null);
+            },
+          ),
+          CupertinoButton(
+            child: Text(
+              'Show dialog',
+              style: TextStyle(
+                color: CupertinoColors.white,
+              ),
+            ),
+            onPressed: () {
+              context.read<CupertinoAppContainer>().dialog(context);
+            },
+          ),
+        ],
       ),
     );
   }
@@ -111,24 +126,29 @@ class CupertinoTestPageC extends StandardPage<void> {
 
   @override
   Widget buildPage(BuildContext context) {
-    return CupertinoPageScaffold(
-      navigationBar: CupertinoNavigationBar(
-        middle: Text(context.pl('title')),
-        backgroundColor: CupertinoColors.systemGrey,
-      ),
-      child: Container(
-        color: CupertinoColors.systemGreen,
-        child: ListView(
-          children: [
-            Text(context.pl('body')),
-            CupertinoButton(
-              child: Text(l(context, 'pages.tab.test_page_d.title')),
-              onPressed: () {
-                context.go<CupertinoTestPageD, void>(null);
-              },
+    return Container(
+      color: CupertinoColors.systemGreen,
+      child: ListView(
+        children: [
+          Center(
+            child: Text(
+              context.pl('title'),
             ),
-          ],
-        ),
+          ),
+          Text(context.pl('body')),
+          CupertinoButton(
+            child: Text(l(context, 'pages.tab.test_page_d.title')),
+            onPressed: () {
+              context.go<CupertinoTestPageD, void>(null);
+            },
+          ),
+          CupertinoButton(
+            child: Text('Show dialog'),
+            onPressed: () {
+              context.read<CupertinoAppContainer>().dialog(context);
+            },
+          ),
+        ],
       ),
     );
   }
@@ -140,18 +160,23 @@ class CupertinoTestPageD extends StandardPage<void> {
 
   @override
   Widget buildPage(BuildContext context) {
-    return CupertinoPageScaffold(
-      navigationBar: CupertinoNavigationBar(
-        middle: Text(context.pl('title')),
-        backgroundColor: CupertinoColors.systemGrey,
-      ),
-      child: Container(
-        color: CupertinoColors.systemRed,
-        child: ListView(
-          children: [
-            Text(context.pl('body')),
-          ],
-        ),
+    return Container(
+      color: CupertinoColors.systemRed,
+      child: ListView(
+        children: [
+          Center(
+            child: Text(
+              context.pl('title'),
+            ),
+          ),
+          Text(context.pl('body')),
+          CupertinoButton(
+            child: Text('Show dialog'),
+            onPressed: () {
+              context.read<CupertinoAppContainer>().dialog(context);
+            },
+          ),
+        ],
       ),
     );
   }

@@ -8,7 +8,6 @@ import 'package:patapata_core/patapata_core.dart';
 import 'package:patapata_core/patapata_widgets.dart';
 import 'package:provider/provider.dart';
 
-import '../pages/top_page.dart';
 import '../pages/home_page.dart';
 import '../pages/my_page.dart';
 
@@ -28,17 +27,24 @@ class CupertinoAppContainer extends StandardPageWithNestedNavigator {
     });
   }
 
+  Future<void> dialog(BuildContext context) {
+    return PlatformDialog.show(
+      context: context,
+      message: 'Test Dialog',
+      actions: [
+        PlatformDialogAction(
+          text: 'OK',
+          result: () {},
+        ),
+      ],
+    );
+  }
+
   @override
   Widget buildPage(BuildContext context) {
     return CupertinoPageScaffold(
       navigationBar: CupertinoNavigationBar(
         middle: Text(context.pl('title')),
-        leading: CupertinoNavigationBarBackButton(
-          onPressed: () {
-            context.go<CupertinoTopPage, void>(
-                null, StandardPageNavigationMode.removeAll);
-          },
-        ),
       ),
       child: Column(
         children: [

@@ -30,30 +30,35 @@ class HomePage extends StandardPage<void> {
 
   @override
   Widget buildPage(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(context.pl('title')),
-        backgroundColor: Colors.grey[300],
-      ),
-      body: Container(
-        color: Colors.white,
-        child: ListView(
-          children: [
-            Text(context.pl('body')),
-            TextButton(
-              child: Text(l(context, 'pages.tab.test_page_a.title')),
-              onPressed: () {
-                context.go<TestPageA, void>(null);
-              },
+    return Container(
+      color: Colors.white,
+      child: ListView(
+        children: [
+          Center(
+            child: Text(
+              context.pl('title'),
             ),
-            TextButton(
-              child: Text(l(context, 'pages.tab.test_page_b.title')),
-              onPressed: () {
-                context.go<TestPageB, void>(null);
-              },
-            ),
-          ],
-        ),
+          ),
+          Text(context.pl('body')),
+          TextButton(
+            child: Text(l(context, 'pages.tab.test_page_a.title')),
+            onPressed: () {
+              context.go<TestPageA, void>(null);
+            },
+          ),
+          TextButton(
+            child: Text(l(context, 'pages.tab.test_page_b.title')),
+            onPressed: () {
+              context.go<TestPageB, void>(null);
+            },
+          ),
+          TextButton(
+            child: Text('Show dialog'),
+            onPressed: () {
+              context.read<AppContainer>().dialog(context);
+            },
+          ),
+        ],
       ),
     );
   }
@@ -65,30 +70,35 @@ class TestPageA extends StandardPage<void> {
 
   @override
   Widget buildPage(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(context.pl('title')),
-        backgroundColor: Colors.grey[300],
-      ),
-      body: Container(
-        color: Colors.lightBlue,
-        child: ListView(
-          children: [
-            Text(context.pl('body')),
-            TextButton(
-              child: Text(l(context, 'pages.tab.test_page_c.title')),
-              onPressed: () {
-                context.go<TestPageC, void>(null);
-              },
+    return Container(
+      color: Colors.lightBlue,
+      child: ListView(
+        children: [
+          Center(
+            child: Text(
+              context.pl('title'),
             ),
-            TextButton(
-              child: Text(l(context, 'pages.tab.test_page_b.title')),
-              onPressed: () {
-                context.go<TestPageB, void>(null);
-              },
-            ),
-          ],
-        ),
+          ),
+          Text(context.pl('body')),
+          TextButton(
+            child: Text(l(context, 'pages.tab.test_page_c.title')),
+            onPressed: () {
+              context.go<TestPageC, void>(null);
+            },
+          ),
+          TextButton(
+            child: Text(l(context, 'pages.tab.test_page_b.title')),
+            onPressed: () {
+              context.go<TestPageB, void>(null);
+            },
+          ),
+          TextButton(
+            child: Text('Show dialog'),
+            onPressed: () {
+              context.read<AppContainer>().dialog(context);
+            },
+          ),
+        ],
       ),
     );
   }
@@ -100,24 +110,29 @@ class TestPageC extends StandardPage<void> {
 
   @override
   Widget buildPage(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(context.pl('title')),
-        backgroundColor: Colors.grey[300],
-      ),
-      body: Container(
-        color: Colors.lightGreen,
-        child: ListView(
-          children: [
-            Text(context.pl('body')),
-            TextButton(
-              child: Text(l(context, 'pages.tab.test_page_d.title')),
-              onPressed: () {
-                context.go<TestPageD, void>(null);
-              },
+    return Container(
+      color: Colors.lightGreen,
+      child: ListView(
+        children: [
+          Center(
+            child: Text(
+              context.pl('title'),
             ),
-          ],
-        ),
+          ),
+          Text(context.pl('body')),
+          TextButton(
+            child: Text(l(context, 'pages.tab.test_page_d.title')),
+            onPressed: () {
+              context.go<TestPageD, void>(null);
+            },
+          ),
+          TextButton(
+            child: Text('Show dialog'),
+            onPressed: () {
+              context.read<AppContainer>().dialog(context);
+            },
+          ),
+        ],
       ),
     );
   }
@@ -129,18 +144,23 @@ class TestPageD extends StandardPage<void> {
 
   @override
   Widget buildPage(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(context.pl('title')),
-        backgroundColor: Colors.grey[300],
-      ),
-      body: Container(
-        color: Colors.red[300],
-        child: ListView(
-          children: [
-            Text(context.pl('body')),
-          ],
-        ),
+    return Container(
+      color: Colors.red[300],
+      child: ListView(
+        children: [
+          Center(
+            child: Text(
+              context.pl('title'),
+            ),
+          ),
+          Text(context.pl('body')),
+          TextButton(
+            child: Text('Show dialog'),
+            onPressed: () {
+              context.read<AppContainer>().dialog(context);
+            },
+          ),
+        ],
       ),
     );
   }
