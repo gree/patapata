@@ -63,10 +63,12 @@ enum AppStage {
 /// In almost all cases in your application, you can use this to
 /// grab your [App] instance without a [BuildContext]
 /// [T] is not required and will work undefined (as dynamic).
-App<T> getApp<T extends Object>() => ((kDebugMode && !kIsTest)
-    ? (Zone.current[#patapataApp] ?? // coverage:ignore-line
-        _debugAppZone[#patapataApp]) // coverage:ignore-line
-    : Zone.current[#patapataApp]) as App<T>;
+App<T> getApp<T extends Object>() =>
+    ((kDebugMode && !kIsTest)
+            ? (Zone.current[#patapataApp] ?? // coverage:ignore-line
+                  _debugAppZone[#patapataApp]) // coverage:ignore-line
+            : Zone.current[#patapataApp])
+        as App<T>;
 
 // https://github.com/flutter/flutter/issues/93676
 late Zone _debugAppZone; // coverage:ignore-line
@@ -351,9 +353,9 @@ class App<T extends Object> {
     this.onInitFailure,
     this.startupSequence,
     Iterable<Plugin>? plugins,
-  })  : _customProviderKey = providerKey != null,
-        _providerKey =
-            providerKey ?? GlobalKey(debugLabel: 'patapata.App.providerKey') {
+  }) : _customProviderKey = providerKey != null,
+       _providerKey =
+           providerKey ?? GlobalKey(debugLabel: 'patapata.App.providerKey') {
     _plugins.addAll(_defaultRequiredPlugins);
 
     if (kIsTest) {
@@ -370,7 +372,8 @@ class App<T extends Object> {
   /// The default for non-debug builds is to get rid of the
   /// red screen of death.
   static Widget _defaultNonDebugErrorWidgetBuilder(
-      FlutterErrorDetails details) {
+    FlutterErrorDetails details,
+  ) {
     return const SizedBox.shrink();
   }
   // coverage:ignore-end
@@ -429,20 +432,23 @@ class App<T extends Object> {
 
     // Unregister any [RemoteMessaging]
     if (_pluginToRemoteMessagingMap.containsKey(plugin)) {
-      _proxyRemoteMessaging
-          .removeRemoteMessaging(_pluginToRemoteMessagingMap.remove(plugin)!);
+      _proxyRemoteMessaging.removeRemoteMessaging(
+        _pluginToRemoteMessagingMap.remove(plugin)!,
+      );
     }
 
     // Unregister any [RemoteConfig]
     if (_pluginToRemoteConfigMap.containsKey(plugin)) {
-      _proxyRemoteConfig
-          .removeRemoteConfig(_pluginToRemoteConfigMap.remove(plugin)!);
+      _proxyRemoteConfig.removeRemoteConfig(
+        _pluginToRemoteConfigMap.remove(plugin)!,
+      );
     }
 
     // Unregister any [LocalConfig]
     if (_pluginToLocalConfigMap.containsKey(plugin)) {
-      _proxyLocalConfig
-          .removeLocalConfig(_pluginToLocalConfigMap.remove(plugin)!);
+      _proxyLocalConfig.removeLocalConfig(
+        _pluginToLocalConfigMap.remove(plugin)!,
+      );
     }
 
     if (!kIsTest) {
@@ -516,8 +522,10 @@ class App<T extends Object> {
   /// Access to information about the network.
   NetworkPlugin get network {
     final tNetworkPlugin = getPlugin<NetworkPlugin>();
-    assert(tNetworkPlugin != null,
-        'Default required plugin NetworkPlugin removed.');
+    assert(
+      tNetworkPlugin != null,
+      'Default required plugin NetworkPlugin removed.',
+    );
 
     return tNetworkPlugin!;
   }
@@ -525,8 +533,10 @@ class App<T extends Object> {
   /// Access to information about this application's metadata.
   PackageInfoPlugin get package {
     final tPackageInfoPlugin = getPlugin<PackageInfoPlugin>();
-    assert(tPackageInfoPlugin != null,
-        'Default required plugin PackageInfoPlugin removed.');
+    assert(
+      tPackageInfoPlugin != null,
+      'Default required plugin PackageInfoPlugin removed.',
+    );
 
     return tPackageInfoPlugin!;
   }
@@ -534,8 +544,10 @@ class App<T extends Object> {
   /// Access to information about the device that this application is running on.
   DeviceInfoPlugin get device {
     final tDeviceInfoPlugin = getPlugin<DeviceInfoPlugin>();
-    assert(tDeviceInfoPlugin != null,
-        'Default required plugin DeviceInfoPlugin removed.');
+    assert(
+      tDeviceInfoPlugin != null,
+      'Default required plugin DeviceInfoPlugin removed.',
+    );
 
     return tDeviceInfoPlugin!;
   }
@@ -545,27 +557,25 @@ class App<T extends Object> {
   }
 
   void _updateLogLevel() {
-    log.setLevelByValue(remoteConfig.getInt(
-      'patapata_log_level',
-      defaultValue: -kPataInHex,
-    ));
+    log.setLevelByValue(
+      remoteConfig.getInt('patapata_log_level', defaultValue: -kPataInHex),
+    );
   }
-
-  late final StartupNavigatorObserver _startupNavigatorObserver =
-      StartupNavigatorObserver(startupSequence: startupSequence!);
 
   /// A list of all [NavigatorObserver]s to use in a [Navigator]
   /// from all the [Plugin]s registered to this [App].
   /// The [Analytics] and [StartupSequence] system also relies on setting these to any
   /// [Navigator]s in the application.
   List<NavigatorObserver> get navigatorObservers => [
-        for (var v in _plugins) ...v.navigatorObservers,
-        AnalyticsNavigatorObserver(analytics: analytics),
-        if (startupSequence != null) _startupNavigatorObserver,
-      ];
+    for (var v in _plugins) ...v.navigatorObservers,
+    AnalyticsNavigatorObserver(analytics: analytics),
+    if (startupSequence != null)
+      StartupNavigatorObserver(startupSequence: startupSequence!),
+  ];
 
-  static const _forceRemoveNativeSplashScreenDuration =
-      Duration(milliseconds: 5000);
+  static const _forceRemoveNativeSplashScreenDuration = Duration(
+    milliseconds: 5000,
+  );
   Timer? _forceRemoveNativeSplashScreenTimer;
   bool _removedNativeSplashScreen = false;
 
@@ -586,8 +596,9 @@ class App<T extends Object> {
 
     // When invokeMethod fails to find the platform plugin, it returns null
     // instead of throwing an exception.
-    await const OptionalMethodChannel('plugin/splash_screen')
-        .invokeMethod<void>('removeNativeSplashScreen');
+    await const OptionalMethodChannel(
+      'plugin/splash_screen',
+    ).invokeMethod<void>('removeNativeSplashScreen');
   }
 
   /// Run the app.
@@ -624,8 +635,9 @@ class App<T extends Object> {
           } else {
             // coverage:ignore-start
             _forceRemoveNativeSplashScreenTimer ??= Timer(
-                _forceRemoveNativeSplashScreenDuration,
-                removeNativeSplashScreen);
+              _forceRemoveNativeSplashScreenDuration,
+              removeNativeSplashScreen,
+            );
             // coverage:ignore-end
           }
 
@@ -665,9 +677,10 @@ class App<T extends Object> {
           await remoteConfig.init();
           // Allow this fetch to fail like for offline startups.
           remoteConfig.addListener(_onRemoteConfigChange);
-          await remoteConfig
-              .fetch()
-              .timeout(const Duration(seconds: 2), onTimeout: () {});
+          await remoteConfig.fetch().timeout(
+            const Duration(seconds: 2),
+            onTimeout: () {}, // coverage:ignore-line
+          );
 
           _stage = AppStage.initializingPluginsWithRemoteConfig;
 
@@ -677,8 +690,10 @@ class App<T extends Object> {
           final tPlugins = _plugins.toList(growable: false);
 
           for (var tPlugin in tPlugins) {
-            if (!remoteConfig.getBool(tPlugin.remoteConfigEnabledKey,
-                defaultValue: true)) {
+            if (!remoteConfig.getBool(
+              tPlugin.remoteConfigEnabledKey,
+              defaultValue: true,
+            )) {
               // Remotely disabled, remove it without initializing.
               await removePlugin(tPlugin);
 
@@ -698,30 +713,16 @@ class App<T extends Object> {
           runApp(
             MultiProvider(
               providers: [
-                Provider<App>.value(
-                  value: this,
-                ),
-                Provider<App<T>>.value(
-                  value: this,
-                ),
-                Provider<T>.value(
-                  value: environment,
-                ),
-                ChangeNotifierProvider<User>.value(
-                  value: user,
-                ),
-                ChangeNotifierProvider<RemoteConfig>.value(
-                  value: remoteConfig,
-                ),
-                ChangeNotifierProvider<LocalConfig>.value(
-                  value: localConfig,
-                ),
+                Provider<App>.value(value: this),
+                Provider<App<T>>.value(value: this),
+                Provider<T>.value(value: environment),
+                ChangeNotifierProvider<User>.value(value: user),
+                ChangeNotifierProvider<RemoteConfig>.value(value: remoteConfig),
+                ChangeNotifierProvider<LocalConfig>.value(value: localConfig),
                 ChangeNotifierProvider<RemoteMessaging>.value(
                   value: remoteMessaging,
                 ),
-                Provider<Analytics>.value(
-                  value: analytics,
-                ),
+                Provider<Analytics>.value(value: analytics),
                 Provider<AnalyticsContext>.value(
                   value: analytics.globalContext,
                 ),
@@ -741,10 +742,7 @@ class App<T extends Object> {
                   );
 
                   if (!_customProviderKey) {
-                    tChild = KeyedSubtree(
-                      key: _providerKey,
-                      child: tChild,
-                    );
+                    tChild = KeyedSubtree(key: _providerKey, child: tChild);
                   }
 
                   for (var tPlugin in _plugins.reversed) {
@@ -802,35 +800,29 @@ class App<T extends Object> {
 
             final tLevel = (error is PatapataException)
                 ? (error.logLevel != null && error.logLevel! > Level.SEVERE)
-                    ? error.logLevel!
-                    : Level.SEVERE
+                      ? error.logLevel!
+                      : Level.SEVERE
                 : Level.SEVERE;
             log.report(
               ReportRecord(
                 level: tLevel,
                 error: error,
                 stackTrace: stackTrace,
-                fingerprint:
-                    (error is PatapataException) ? error.fingerprint : null,
+                fingerprint: (error is PatapataException)
+                    ? error.fingerprint
+                    : null,
                 mechanism: Log.kUnhandledErrorMechanism,
               ),
             );
           },
-          zoneValues: {
-            #patapataApp: this,
-          },
+          zoneValues: {#patapataApp: this},
         );
       } else {
         // All errors are caught by [PlatformDispatcher] in the [Log] system.
         // This also allows [getApp] to work as we set a zone value for it here.
-        runZoned<Future<void>>(
-          () {
-            return fRun();
-          },
-          zoneValues: {
-            #patapataApp: this,
-          },
-        );
+        runZoned<Future<void>>(() {
+          return fRun();
+        }, zoneValues: {#patapataApp: this});
       }
     } catch (e, stackTrace) {
       // coverage:ignore-start

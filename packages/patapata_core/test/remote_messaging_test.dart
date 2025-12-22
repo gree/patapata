@@ -46,9 +46,7 @@ void main() {
   group('RemoteMessage class.', () {
     const tMessageId = 'messageId';
     const tChannel = 'channel';
-    const tData = {
-      'key': 'value',
-    };
+    const tData = {'key': 'value'};
     const tRemoteMessageNotification = RemoteMessageNotification();
 
     test('Instance (no arguments).', () async {
@@ -203,9 +201,7 @@ void main() {
 
       const tRemoteMessage = RemoteMessage();
 
-      final tMessageValues = [
-        tRemoteMessage,
-      ];
+      final tMessageValues = [tRemoteMessage];
 
       final tProxyMessageFuture = expectLater(
         tProxyRemoteMessaging.messages,
@@ -232,9 +228,7 @@ void main() {
 
       const tRemoteMessage = RemoteMessage();
 
-      final tMessageValues = [
-        tRemoteMessage,
-      ];
+      final tMessageValues = [tRemoteMessage];
 
       final tProxyMessageFuture = expectLater(
         tProxyRemoteMessaging.messages,
@@ -261,9 +255,7 @@ void main() {
 
       const tToken = 'token';
 
-      final tTokenValues = [
-        tToken,
-      ];
+      final tTokenValues = [tToken];
 
       final tProxyTokenFuture = expectLater(
         tProxyRemoteMessaging.tokens,

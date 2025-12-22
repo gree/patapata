@@ -5,16 +5,9 @@
 
 typedef TestRecord = (int?, double?, String?);
 
-enum TestPattern {
-  type1,
-  type2,
-}
+enum TestPattern { type1, type2 }
 
-enum TestValue {
-  v1,
-  v2,
-  v3,
-}
+enum TestValue { v1, v2, v3 }
 
 class TestData {
   static final List<Map<int, TestRecord>> _datas = [

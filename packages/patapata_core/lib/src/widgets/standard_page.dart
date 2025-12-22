@@ -5,8 +5,6 @@
 
 part of "standard_app.dart";
 
-const Key _childNavigatorKey = Key('childNavigatorKey');
-
 /// Whether to use the Material app or the Cupertino app to design
 enum StandardAppType {
   /// Use standard material app
@@ -33,6 +31,35 @@ enum StandardPageNavigationMode {
 
   /// Remove the current page from the history and replace it with the page being navigated to.
   replace,
+}
+
+typedef StandardPageBuilder<R, E> =
+    StandardPageInterface<R, E> Function(
+      Widget child,
+      String? name,
+      R pageData,
+      LocalKey pageKey,
+      String restorationId,
+      GlobalKey<StandardPageWithResult<R, E>> standardPageKey,
+      StandardPageWithResultFactory<StandardPageWithResult<R, E>, R, E>
+      factoryObject,
+    );
+
+class _StandardPageFactoryExtendedData {
+  final StandardRouterDelegate delegate;
+
+  final StandardPageWithResultFactory? parentPageFactory;
+
+  final StandardPageWithResultFactory? navigatorPageFactory;
+
+  final bool anyNavigator;
+
+  const _StandardPageFactoryExtendedData({
+    required this.delegate,
+    this.parentPageFactory,
+    this.navigatorPageFactory,
+    this.anyNavigator = false,
+  });
 }
 
 /// A factory class for creating [StandardPageWithResult] instances that returns a value [E].
@@ -71,19 +98,43 @@ enum StandardPageNavigationMode {
 /// ```dart
 /// final tResult = await context.goWithResult<PageWithResult, void, String>(null);
 /// ```
-base class StandardPageWithResultFactory<T extends StandardPageWithResult<R, E>,
-    R extends Object?, E extends Object?> {
+base class StandardPageWithResultFactory<
+  T extends StandardPageWithResult<R, E>,
+  R extends Object?,
+  E extends Object?
+> {
   /// The default group name set when no group is specified for the page.
   static const String defaultGroup = 'StandardPageDefaultGroup';
 
-  late final StandardRouterDelegate _delegate;
+  static final _extendedDataMap = Expando<_StandardPageFactoryExtendedData>();
+
+  StandardRouterDelegate get _delegate => _extendedDataMap[this]!.delegate;
+
+  /// The parent page factory of this page, if any.
+  StandardPageWithResultFactory? get parentPageFactory =>
+      _extendedDataMap[this]?.parentPageFactory;
+
+  /// The navigator page factory of this page, if any.
+  StandardPageWithResultFactory? get navigatorPageFactory =>
+      _extendedDataMap[this]?.navigatorPageFactory;
+
+  /// Add to the deepest navigator when there are multiple nested navigators.
+  bool get anyNavigator => _extendedDataMap[this]?.anyNavigator ?? false;
 
   /// Creates the [T] page that this factory manages.
   final T Function(R pageData) create;
-  final Map<RegExp, R Function(RegExpMatch match, Uri uri)> _links;
+  final Map<String, R Function(RegExpMatch match, Uri uri)> _links;
 
   /// The function to create deep links for this page.
-  /// The return value must match the keys (regular expressions) passed to links and their corresponding [R] 'pageData' destinations.
+  ///
+  /// This function generates a deep link path from the given `pageData`.
+  /// The return value must match the keys (regular expressions) passed to `links` and their corresponding [R] pageData destinations.
+  ///
+  /// The generated link can be either an absolute path (starting with '/') or a relative path.
+  /// When [generateLink] is used, it builds the complete deep link path by combining this function's return value with the parent page's path if the link is relative.
+  ///
+  /// See also:
+  /// * [generateLink], which uses this function to build the complete deep link path.
   final String Function(R pageData)? linkGenerator;
 
   /// The group name used to manage multiple pages as part of the same group when they exist.
@@ -98,12 +149,50 @@ base class StandardPageWithResultFactory<T extends StandardPageWithResult<R, E>,
   /// Flag indicating whether to enable analytics for navigation.
   final bool enableNavigationAnalytics;
 
+  /// The list of child pages that can be navigated to from this page.
+  ///
+  /// See also:
+  /// [StandardChildPageWithResultFactory]
+  final List<StandardChildPageWithResultFactory> childPageFactories;
+
+  /// When using child pages, specifies how to create the parent page data from the page data of this page.
+  ///
+  /// See also:
+  /// [StandardChildPageWithResultFactory]
+  Object? createParentPageData(R pageData) => null;
+
+  /// Flag indicating whether there are child pages that can be navigated to from this page.
+  bool get hasChildPages => childPageFactories.isNotEmpty;
+
+  /// The list of nested pages when using nested Navigators.
+  ///
+  /// See also:
+  /// [StandardPageWithNestedNavigatorFactory]
+  List<StandardPageWithResultFactory> get nestedPageFactories => const [];
+
+  /// The list of nested pages that can be used in any nested Navigator.
+  ///
+  /// See also:
+  /// [StandardPageWithNestedNavigatorFactory]
+  List<StandardPageWithResultFactory> get anyNestedPageFactories => const [];
+
+  /// Flag indicating whether the first page in [nestedPageFactories]
+  /// should always be stacked as the first page of the nested Navigator.
+  ///
+  /// The default value is `true`.
+  ///
+  /// See also:
+  /// [StandardPageWithNestedNavigatorFactory]
+  bool get activeFirstNestedPage => true; // coverage:ignore-line
+
+  /// Flag indicating whether there are nested pages.
+  bool get hasNestedPages =>
+      nestedPageFactories.isNotEmpty || anyNestedPageFactories.isNotEmpty;
+
   /// The method for transitioning to this page from other pages.
   /// Please refer to [StandardPageNavigationMode] for navigation modes.
   final StandardPageNavigationMode navigationMode;
-  final LocalKey Function(
-    R pageData,
-  )? _pageKey;
+  final LocalKey Function(R pageData)? _pageKey;
 
   /// A function for creating [StandardPageInterface].
   ///
@@ -115,16 +204,7 @@ base class StandardPageWithResultFactory<T extends StandardPageWithResult<R, E>,
   /// `restorationId` : A unique ID for state restoration.
   /// `standardPageKey` : A [GlobalKey] for the [StandardPageWithResult] widget.
   /// `factoryObject` : An instance of [StandardPageWithResultFactory].
-  final StandardPageInterface<R, E> Function(
-    Widget child,
-    String? name,
-    R pageData,
-    LocalKey pageKey,
-    String restorationId,
-    GlobalKey<StandardPageWithResult<R, E>> standardPageKey,
-    StandardPageWithResultFactory<StandardPageWithResult<R, E>, R, E>
-        factoryObject,
-  )? pageBuilder;
+  final StandardPageBuilder<R, E>? pageBuilder;
 
   /// A function to generate a replacement value when the pageData passed during navigation is null.
   final R Function()? pageDataWhenNull;
@@ -133,12 +213,7 @@ base class StandardPageWithResultFactory<T extends StandardPageWithResult<R, E>,
   final String? Function()? pageName;
 
   /// A function for generating a value to pass to [Page.restorationId].
-  final String Function(
-    R pageData,
-  )? restorationId;
-
-  /// When using nested [Navigator]s, specifies what the parent page [Type] of this child page should be.
-  final Type? parentPageType;
+  final String Function(R pageData)? restorationId;
 
   /// Create a StandardPageWithResultFactory.
   /// Define deep links for navigating to this page using regular expressions, allowing for multiple configurations.
@@ -155,6 +230,8 @@ base class StandardPageWithResultFactory<T extends StandardPageWithResult<R, E>,
   ///
   /// [enableNavigationAnalytics] is a flag indicating whether to enable navigation analytics. The default is `true`.
   ///
+  /// [childPageFactories] is a list of child pages that can be navigated to from this page.
+  ///
   /// [navigationMode] specifies the NavigationMode when navigating to this page. The default is [StandardPageNavigationMode.moveToTop].
   ///
   /// [pageKey] is a [LocalKey] to identify the page.
@@ -166,9 +243,7 @@ base class StandardPageWithResultFactory<T extends StandardPageWithResult<R, E>,
   /// [pageName] is the name of this page.
   ///
   /// [restorationId] is a unique ID for state restoration.
-  ///
-  /// [parentPageType] is the page type that specifies which page type to consider as the parent.
-  StandardPageWithResultFactory({
+  const StandardPageWithResultFactory({
     required this.create,
     Map<String, R Function(RegExpMatch match, Uri uri)>? links,
     this.linkGenerator,
@@ -176,23 +251,19 @@ base class StandardPageWithResultFactory<T extends StandardPageWithResult<R, E>,
     this.group = defaultGroup,
     this.keepHistory = true,
     this.enableNavigationAnalytics = true,
+    this.childPageFactories = const [],
     this.navigationMode = StandardPageNavigationMode.moveToTop,
-    LocalKey Function(
-      R pageData,
-    )? pageKey,
+    LocalKey Function(R pageData)? pageKey,
     this.pageBuilder,
     this.pageDataWhenNull,
     this.pageName,
     this.restorationId,
-    this.parentPageType,
-  })  : assert((links == null && linkGenerator == null) ||
-            (links != null && linkGenerator != null)),
-        _pageKey = pageKey,
-        _links = links != null
-            ? {
-                for (var i in links.entries) RegExp('^/?${i.key}\$'): i.value,
-              }
-            : const {};
+  }) : assert(
+         (links == null && linkGenerator == null) ||
+             (links != null && linkGenerator != null),
+       ),
+       _pageKey = pageKey,
+       _links = links ?? const {};
 
   /// The page type of this page.
   Type get pageType => T;
@@ -206,29 +277,56 @@ base class StandardPageWithResultFactory<T extends StandardPageWithResult<R, E>,
   /// Flag indicating that the type of page data set for this page is nullable.
   bool get dataTypeIsNonNullable => <R>[] is List<Object>;
 
-  /// Returns the deep link generated by this page given [pageData].
+  /// Returns the deep link generated by this page for the given [pageData].
+  ///
+  /// If [linkGenerator] is not set, it returns null.
+  ///
+  /// If the [linkGenerator] is set and the generated link does not start with a '/',
+  /// it recursively calls the [generateLink] method of the parent page factory to create a complete link.
+  /// In this case, the [createParentPageData] method is used to generate the parent page data.
   String? generateLink(Object? pageData) {
-    if (linkGenerator != null) {
-      // Dart doesn't allow automatic casting 1st citizen objects who
-      // have different less than 1st citizen parameters.
-      // In this case, linkGenerator could be ((MyClass) => String),
-      // But dart only can see ((Object) => String) and therefore
-      // can't convert between them.
-      // We do this trick here from inside the problematic class
-      // to cast as something that we _know_ to be true.
-      return linkGenerator!(pageData as R);
+    if (linkGenerator == null) {
+      return null;
     }
 
-    return null;
+    assert(
+      pageData is R,
+      'pageData must be of type $R, but got ${pageData.runtimeType}', // coverage:ignore-line
+    );
+
+    return _buildFullLinkPath(pageData as R);
+  }
+
+  String? _buildFullLinkPath(R pageData) {
+    final String? tPath = (linkGenerator != null)
+        ? linkGenerator!(pageData)
+        : null;
+
+    String? tParentPath;
+    if (tPath == null || !tPath.startsWith('/')) {
+      final tParentFactory = parentPageFactory ?? navigatorPageFactory;
+      if (tParentFactory != null) {
+        final tParentPageData = createParentPageData(pageData);
+        tParentPath = tParentFactory._buildFullLinkPath(tParentPageData);
+      }
+    }
+
+    return tParentPath != null
+        ? tPath == null
+              ? tParentPath
+              : '${tParentPath == '/' ? '' : tParentPath}/$tPath'
+        : tPath;
   }
 
   /// Navigate to the [StandardPage] of type [T] with the option to pass [pageData] during navigation.
   /// An optional [navigationMode] representing the mode of [StandardPageNavigationMode] to use during navigation can also be provided.
+  /// [pushParentPage] indicates whether to push the parent page when navigating to a child page. default is `false`.
   Future<E?> goWithResult(
     R pageData, [
     StandardPageNavigationMode? navigationMode,
+    bool pushParentPage = false,
   ]) =>
-      _delegate.goWithResult<T, R, E>(pageData, navigationMode);
+      _delegate.goWithResult<T, R, E>(pageData, navigationMode, pushParentPage);
 
   /// Get the key set for this page, as configured for this page.
   LocalKey getPageKey(Object? pageData) {
@@ -241,18 +339,13 @@ base class StandardPageWithResultFactory<T extends StandardPageWithResult<R, E>,
     throw Never;
   }
 
-  LocalKey _defaultPageKey(
-    R pageData,
-  ) =>
-      ValueKey(
-          '${pageType.toString()}:${linkGenerator != null ? linkGenerator!(pageData) : pageData}');
+  LocalKey _defaultPageKey(R pageData) =>
+      ValueKey('${pageType.toString()}:${generateLink(pageData) ?? pageData}');
 
-  String _defaultRestorationId(
-    R pageData,
-  ) =>
-      '${pageType.toString()}:${linkGenerator != null ? linkGenerator!(pageData) : pageData}';
+  String _defaultRestorationId(R pageData) =>
+      '${pageType.toString()}:${generateLink(pageData) ?? pageData}';
 
-  StandardPageInterface<R, E> _defaultPageBuilder(
+  StandardPageInterface<R, E> _defaultMaterialPageBuilder(
     Widget child,
     String? name,
     Object? pageData,
@@ -260,35 +353,61 @@ base class StandardPageWithResultFactory<T extends StandardPageWithResult<R, E>,
     String restorationId,
     GlobalKey<StandardPageWithResult<R, E>> standardPageKey,
     StandardPageWithResultFactory<StandardPageWithResult<R, E>, R, E>
-        factoryObject,
-  ) =>
-      StandardMaterialPage<R, E>(
-        child: child,
-        name: name,
-        arguments: pageData,
-        key: pageKey,
-        restorationId: restorationId,
-        standardPageKey: standardPageKey,
-        factoryObject: factoryObject,
-      );
+    factoryObject,
+  ) => StandardMaterialPage<R, E>(
+    child: child,
+    name: name,
+    arguments: pageData,
+    key: pageKey,
+    restorationId: restorationId,
+    standardPageKey: standardPageKey,
+    factoryObject: factoryObject,
+  );
+
+  StandardPageInterface<R, E> _defaultCupertinoPageBuilder(
+    Widget child,
+    String? name,
+    Object? pageData,
+    LocalKey pageKey,
+    String restorationId,
+    GlobalKey<StandardPageWithResult<R, E>> standardPageKey,
+    StandardPageWithResultFactory<StandardPageWithResult<R, E>, R, E>
+    factoryObject,
+  ) => StandardCupertinoPage<R, E>(
+    child: child,
+    name: name,
+    arguments: pageData,
+    key: pageKey,
+    restorationId: restorationId,
+    standardPageKey: standardPageKey,
+    factoryObject: factoryObject,
+  );
 
   Completer<E?> _createResultCompleter() => Completer<E?>();
 
   StandardPageInterface _createPage(
     LocalKey pageKey,
     R pageData,
+    bool pushParentHistory,
+    StandardAppType appType,
   ) {
     if (pageData == null && pageDataWhenNull != null) {
       pageData = pageDataWhenNull!();
     }
 
-    final tGlobalKey = GlobalKey<StandardPageWithResult<R, E>>();
+    final tGlobalKey = GlobalKey<StandardPageWithResult<R, E>>(
+      debugLabel: pageName?.call() ?? T.toString(),
+    );
 
-    return (pageBuilder ?? _defaultPageBuilder)(
+    return (pageBuilder ??
+        (appType == StandardAppType.cupertino
+            ? _defaultCupertinoPageBuilder
+            : _defaultMaterialPageBuilder))(
       _StandardPageWidget<R, E>(
         key: tGlobalKey,
         factoryObject: this,
         pageData: pageData,
+        initPushParentHistory: pushParentHistory,
       ),
       pageName?.call() ?? T.toString(),
       pageData,
@@ -300,7 +419,7 @@ base class StandardPageWithResultFactory<T extends StandardPageWithResult<R, E>,
   }
 }
 
-/// Factory class for [StandardPage] to be set in the `page` property of [StandardMaterialApp].
+/// Factory class for [StandardPage] to be set in the `page` property of [StandardMaterialApp] or [StandardCupertinoApp].
 /// [T] is the type of the destination page, and [R] is the type of page data.
 /// The following source code is an example of passing [StandardPageFactory] to [StandardMaterialApp.pages].
 ///
@@ -333,64 +452,52 @@ base class StandardPageWithResultFactory<T extends StandardPageWithResult<R, E>,
 /// [StandardPageFactory.new]'s `links` allows you to define regular expressions for deep links to navigate to this page. Multiple configurations are possible.
 /// [linkGenerator] creates deep links to navigate to this page from the page data's state for this page.
 ///
+/// ## Regular expression restrictions
+///
+/// When defining regular expressions for deep links, the following rules apply:
+///
+/// * **Only named capture groups are allowed for value extraction**.
+///   Use the `(?<name>...)` syntax to capture values.
+///
+/// * **Numbered capture groups are prohibited**.
+///   Patterns such as `(...)` that allow access via `match.group(1)` must not
+///   be used.
+///
+/// * Non-capturing and conditional group constructs that do not capture values
+///   are allowed, including:
+///   * Non-capturing groups: `(?:...)`
+///   * Lookaheads: `(?=...)`, `(?!...)`
+///   * Lookbehinds: `(?<=...)`, `(?<!...)`
+///
+/// These restrictions require all captured values to be defined using
+/// named capture groups via `match.namedGroup(...)`.
+///
+/// This avoids relying on the positional order of capture groups, which can
+/// change when regular expressions are generated or composed across parent
+/// and child links, and prevents subtle breakage caused by such changes.
+///
 /// example:
 /// ```dart
-/// StandardPageFactory<PageC, DeepLinkData>(
-///   create: (_) => PageC(),
+/// StandardPageFactory<PageC, TestPageData>(
+///   create: (data) => PageC(),
 ///   links: {
-///     r'pageC/(\d+)' : (match, uri) => DeepLinkData(
-///       id: int.parse(uri.queryParameters([‘id’])!),
-///       message: 'this is message',
+///     r'page/(?<id>\d+)': (match, uri) => TestPageData(
+///       id: int.parse(match.namedGroup('id')!),
+///       category: uri.queryParameters['category'],
 ///     ),
 ///   },
-///   linkGenerator: (pageC) => 'pageC/${pageC.id}',
-/// ),
-///
-/// class DeepLinkData {
-///   DeepLinkData({
-///     required this.id,
-///     required this.message,
-///   });
-///   final int id;
-///   final String? message;
-/// }
+///   linkGenerator: (pageData) => 'page/${pageData.id}',
+/// )
 /// ```
 ///
-/// For each page, you can specify which page class to use as the parent page type using `parentPageType`.
+/// [StandardChildPageFactory] can be used to define child pages that can be navigated to from this page.
+///
+/// [StandardPageWithNestedNavigatorFactory] can be used to define pages with nested Navigators.
 /// This is useful, for example, when implementing applications with multiple footer menus.
-///
-/// example:
-/// ```dart
-/// StandardMaterialApp(
-///   onGenerateTitle: (context) => l(context, 'title'),
-///   pages: [
-///     // HomePage Menu
-///     StandardPageFactory<HomePage, void>(
-///       create: (data) => HomePage(),
-///     ),
-///     StandardPageFactory<TitlePage, void>(
-///       create: (data) => TitlePage(),
-///       parentPageType: HomePage,
-///     ),
-///     StandardPageFactory<TitleDetailsPage, void>(
-///       create: (data) => TitleDetailsPage(),
-///       parentPageType: HomePage,
-///     ),
-///     // MyPage Menu
-///     StandardPageFactory<MyPage, void>(
-///       create: (data) => MyPage(),
-///     ),
-///     StandardPageFactory<MyFavoritePage, void>(
-///       create: (data) => MyFavoritePage(),
-///       parentPageType: MyPage,
-///     ),
-///   ],
-/// );
-/// ```
 base class StandardPageFactory<T extends StandardPage<R>, R extends Object?>
     extends StandardPageWithResultFactory<T, R, void> {
   /// Create a StandardPageFactory
-  StandardPageFactory({
+  const StandardPageFactory({
     required super.create,
     super.links,
     super.linkGenerator,
@@ -404,7 +511,321 @@ base class StandardPageFactory<T extends StandardPage<R>, R extends Object?>
     super.pageDataWhenNull,
     super.pageName,
     super.restorationId,
-    super.parentPageType,
+    super.childPageFactories,
+  });
+}
+
+/// A factory class for creating [StandardPageWithNestedNavigator] pages with nested Navigators.
+///
+/// Nested navigators are useful for implementing applications with multiple navigation contexts,
+/// such as apps with footer menus where each tab maintains its own navigation stack.
+///
+/// This class can be added to the `pages` property of [StandardMaterialApp.new] or [StandardCupertinoApp.new].
+/// [T] represents the type of the page that extends [StandardPageWithNestedNavigator].
+///
+/// ## Navigation
+///
+/// You can navigate to pages created by this factory using `context.go<PageA, void>(null)`.
+/// When navigating to this page, if the nested page stack is empty, the first page from
+/// [nestedPageFactories] will be automatically pushed onto the nested Navigator.
+///
+/// You can also navigate directly to nested pages using `context.go<NestedPageA, void>(null)`.
+/// When navigating to a nested page, this parent page will also be pushed onto the navigation stack.
+///
+/// When nested pages are popped and the nested page stack becomes empty, this parent page
+/// will also be automatically popped from the navigation stack.
+///
+/// ## Properties
+///
+/// The [nestedPageFactories] property defines the pages that will be displayed in each nested Navigator.
+/// At least one page factory must be specified in [nestedPageFactories].
+///
+/// The [anyNestedPageFactories] property defines pages that can be used in any nested Navigator,
+/// allowing shared pages across different navigation contexts.
+/// When navigating to pages defined in [anyNestedPageFactories], the navigation is performed
+/// against the currently active Navigator among the nested navigators.
+/// Pages added by [anyNestedPageFactories] are independent for each Navigator, and will not be
+/// moved to other Navigators by [StandardPageNavigationMode.moveToTop].
+///
+/// The [activeFirstNestedPage] property controls whether the first page in [nestedPageFactories]
+/// is always stacked as the first page of the nested Navigator. The default value is `true`.
+///
+/// See also:
+/// * [StandardPageWithNestedNavigator], which is the page class used with this factory.
+///
+/// example:
+/// ```dart
+/// StandardMaterialApp(
+///   onGenerateTitle: (context) => 'sample',
+///   pages: [
+///     StandardPageWithNestedNavigatorFactory<PageA>(
+///       create: (data) => PageA(),
+///       nestedPageFactories: [
+///         StandardPageFactory<NestedPageA, void>(
+///           create: (data) => NestedPageA(),
+///         ),
+///         StandardPageFactory<NestedPageB, void>(
+///           create: (data) => NestedPageB(),
+///         ),
+///       ],
+///     ),
+///   ],
+/// );
+///
+/// class PageA extends StandardPageWithNestedNavigator {
+///   @override
+///   Widget buildPage(BuildContext context) {
+///     return nestedPages;
+///   }
+/// }
+///
+/// class NestedPageA extends StandardPage<void> {
+///   @override
+///   Widget buildPage(BuildContext context) {
+///     return Scaffold(
+///       appBar: AppBar(
+///         title: Text('Nested Page A'),
+///       ),
+///       body: Text('Nested Page A Message'),
+///     );
+///   }
+/// }
+///
+/// class NestedPageB extends StandardPage<void> {
+///   @override
+///   Widget buildPage(BuildContext context) {
+///     return Scaffold(
+///       appBar: AppBar(
+///         title: Text('Nested Page B'),
+///       ),
+///       body: Text('Nested Page B Message'),
+///     );
+///   }
+/// }
+/// ```
+///
+base class StandardPageWithNestedNavigatorFactory<
+  T extends StandardPageWithNestedNavigator
+>
+    extends StandardPageWithResultFactory<T, void, void> {
+  /// Create a StandardPageWithNestedNavigatorFactory.
+  ///
+  /// [create] is a required parameter. Pass a class that extends [StandardPageWithNestedNavigator] to this argument.
+  ///
+  /// [nestedPageFactories] is a required list of page factories that will be displayed in the nested Navigator.
+  /// At least one page factory must be specified.
+  ///
+  /// [anyNestedPageFactories] is an optional list of page factories that can be used in any nested Navigator.
+  ///
+  /// [activeFirstNestedPage] controls whether the first page in [nestedPageFactories] should always be stacked
+  /// as the first page of the nested Navigator. The default value is `true`.
+  ///
+  /// [enableNavigationAnalytics] is a flag indicating whether to enable navigation analytics. The default is `false`.
+  ///
+  /// [links] and [linkGenerator] are optional parameters for deep linking support.
+  ///
+  /// [pageBuilder] is an optional function for customizing page creation.
+  ///
+  /// [pageName] is an optional function for specifying the page name.
+  const StandardPageWithNestedNavigatorFactory({
+    required super.create,
+    required this.nestedPageFactories,
+    this.anyNestedPageFactories = const [],
+    this.activeFirstNestedPage = true,
+    super.enableNavigationAnalytics = false,
+    super.links,
+    super.linkGenerator,
+    super.pageBuilder,
+    super.pageName,
+  }) : assert(
+         nestedPageFactories.length > 0,
+         'At least one nestedPageFactory is required.',
+       ),
+       super(group: null);
+
+  @override
+  final List<StandardPageWithResultFactory> nestedPageFactories;
+
+  @override
+  final List<StandardPageWithResultFactory> anyNestedPageFactories;
+
+  @override
+  final bool activeFirstNestedPage;
+}
+
+/// A factory class for creating child pages of [StandardPageWithResult].
+///
+/// This class can be added to the `childPageFactories` property of [StandardPageWithResultFactory] or [StandardPageFactory].
+/// [T] represents the data type of the destination page, [R] represents the data type of the page data,
+/// [E] represents the data type of the value returned by the page, [P] represents the data type of the parent page data.
+///
+/// Child pages are designed to have a parent-child relationship with their parent page.
+/// The [createParentPageData] function is required to generate the parent page data from the child page data,
+/// which is used when navigating through the page hierarchy and building deep links.
+///
+/// When navigating to a child page using the `go` method, you can set the `pushParentPage` parameter to `true`
+/// to automatically push the parent page onto the navigation stack before navigating to the child page.
+/// This ensures that the parent page is included in the navigation history.
+///
+/// See also:
+/// * [StandardChildPageFactory], which is a non-result-returning version of this class.
+///
+/// example:
+/// ```dart
+/// StandardMaterialApp(
+///   onGenerateTitle: (context) => 'sample',
+///   pages: [
+///     StandardPageFactory<TestPageA, void>(
+///       create: (data) => TestPageA(),
+///       links: {
+///         r'pageA': (match, uri) {},
+///       },
+///       linkGenerator: (pageData) => 'pageA',
+///       childPageFactories: [
+///         StandardChildPageWithResultFactory<TestPageB, String, Object, void>(
+///           create: (data) => TestPageB(),
+///           links: {
+///             r'pageB': (match, uri) {
+///               return 'pageData';
+///             },
+///           },
+///           linkGenerator: (pageData) => 'pageB',
+///           createParentPageData: (_) {},
+///           childPageFactories: [
+///             StandardChildPageWithResultFactory<TestPageC, String, Object, String>(
+///               create: (data) => TestPageC(),
+///               links: {
+///                 r'pageC': (match, uri) {
+///                   return 'childPageData';
+///                 },
+///               },
+///               linkGenerator: (pageData) => 'pageC',
+///               createParentPageData: (pageData) {
+///                 return 'parentPageData';
+///               },
+///             ),
+///           ],
+///         ),
+///       ],
+///     ),
+///   ],
+/// );
+/// ```
+///
+base class StandardChildPageWithResultFactory<
+  T extends StandardPageWithResult<R, E>,
+  R extends Object?,
+  E extends Object?,
+  P extends Object?
+>
+    extends StandardPageWithResultFactory<T, R, E> {
+  /// Create a StandardChildPageWithResultFactory
+  const StandardChildPageWithResultFactory({
+    required super.create,
+    required P Function(R pageData) createParentPageData,
+    super.links,
+    super.linkGenerator,
+    super.groupRoot,
+    super.group,
+    super.keepHistory,
+    super.enableNavigationAnalytics,
+    super.navigationMode,
+    super.pageKey,
+    super.pageBuilder,
+    super.pageDataWhenNull,
+    super.pageName,
+    super.restorationId,
+    super.childPageFactories,
+  }) : _createParentPageData = createParentPageData;
+
+  final P Function(R pageData) _createParentPageData;
+
+  @override
+  P createParentPageData(R pageData) => _createParentPageData(pageData);
+}
+
+/// A factory class for creating child pages of [StandardPage].
+///
+/// This class can be added to the `childPageFactories` property of [StandardPageFactory] or [StandardPageWithResultFactory].
+/// [T] represents the data type of the destination page, [R] represents the data type of the page data,
+/// [P] represents the data type of the parent page data.
+///
+/// Child pages are designed to have a parent-child relationship with their parent page.
+/// The [createParentPageData] function is required to generate the parent page data from the child page data,
+/// which is used when navigating through the page hierarchy and building deep links.
+///
+/// When navigating to a child page using the `go` method, you can set the `pushParentPage` parameter to `true`
+/// to automatically push the parent page onto the navigation stack before navigating to the child page.
+/// This ensures that the parent page is included in the navigation history.
+///
+/// See also:
+/// * [StandardChildPageWithResultFactory], which is a result-returning version of this class.
+///
+/// example:
+/// ```dart
+/// StandardMaterialApp(
+///   onGenerateTitle: (context) => 'sample',
+///   pages: [
+///     StandardPageFactory<TestPageA, void>(
+///       create: (data) => TestPageA(),
+///       links: {
+///         r'pageA': (match, uri) {},
+///       },
+///       linkGenerator: (pageData) => 'pageA',
+///       childPageFactories: [
+///         StandardChildPageFactory<TestPageB, String, void>(
+///           create: (data) => TestPageB(),
+///           links: {
+///             r'pageB': (match, uri) {
+///               return 'pageData';
+///             },
+///           },
+///           linkGenerator: (pageData) => 'pageB',
+///           createParentPageData: (_) {},
+///           childPageFactories: [
+///             StandardChildPageFactory<TestPageC, String, String>(
+///               create: (data) => TestPageC(),
+///               links: {
+///                 r'pageC': (match, uri) {
+///                   return 'childPageData';
+///                 },
+///               },
+///               linkGenerator: (pageData) => 'pageC',
+///               createParentPageData: (pageData) {
+///                 return 'parentPageData';
+///               },
+///             ),
+///           ],
+///         ),
+///       ],
+///     ),
+///   ],
+/// );
+/// ```
+///
+base class StandardChildPageFactory<
+  T extends StandardPage<R>,
+  R extends Object?,
+  P extends Object?
+>
+    extends StandardChildPageWithResultFactory<T, R, void, P> {
+  /// Create a StandardChildPageFactory
+  const StandardChildPageFactory({
+    required super.create,
+    required super.createParentPageData,
+    super.links,
+    super.linkGenerator,
+    super.groupRoot,
+    super.group,
+    super.keepHistory,
+    super.enableNavigationAnalytics,
+    super.navigationMode,
+    super.pageKey,
+    super.pageBuilder,
+    super.pageDataWhenNull,
+    super.pageName,
+    super.restorationId,
+    super.childPageFactories,
   });
 }
 
@@ -413,7 +834,7 @@ base class StandardPageFactory<T extends StandardPage<R>, R extends Object?>
 base class SplashPageFactory<T extends StandardPage<void>>
     extends StandardPageFactory<T, void> {
   /// Create a SplashPageFactory
-  SplashPageFactory({
+  const SplashPageFactory({
     required super.create,
     super.pageKey,
     super.pageBuilder,
@@ -421,10 +842,7 @@ base class SplashPageFactory<T extends StandardPage<void>>
     super.pageName,
     super.restorationId,
     super.enableNavigationAnalytics,
-  }) : super(
-          group: 'splash',
-          keepHistory: false,
-        );
+  }) : super(group: 'splash', keepHistory: false);
 }
 
 /// A special factory class for creating a page used during a [StartupSequence].
@@ -444,9 +862,7 @@ base class StartupPageFactory<T extends StandardPage<StartupPageCompleter>>
     super.pageDataWhenNull,
     super.pageName,
     super.restorationId,
-  }) : super(
-          group: 'startup${group?.isNotEmpty == true ? '@$group' : ''}',
-        );
+  }) : super(group: 'startup${group?.isNotEmpty == true ? '@$group' : ''}');
 }
 
 /// A special factory class for creating an error page that [PatapataException] can navigate to
@@ -456,7 +872,7 @@ base class StandardErrorPageFactory<T extends StandardPage<ReportRecord>>
   static const String errorGroup = 'error';
 
   /// Create a StandardErrorPageFactory
-  StandardErrorPageFactory({
+  const StandardErrorPageFactory({
     required super.create,
     Map<String, ReportRecord Function(RegExpMatch match, Uri uri)>? links,
     super.linkGenerator,
@@ -474,8 +890,11 @@ base class StandardErrorPageFactory<T extends StandardPage<ReportRecord>>
 }
 
 /// A mixin for creating a [Page] that creates [StandardPageWithResult].
-mixin StandardPageInterface<R extends Object?, E extends Object?>
-    on Page<void> {
+abstract interface class StandardPageInterface<
+  R extends Object?,
+  E extends Object?
+>
+    extends Page<E> {
   /// The page key for the corresponding [StandardPageWithResult].
   GlobalKey<StandardPageWithResult<R, E>> get standardPageKey;
 
@@ -483,41 +902,221 @@ mixin StandardPageInterface<R extends Object?, E extends Object?>
   StandardPageWithResultFactory get factoryObject;
 }
 
-/// Implements functionality to extend [MaterialPage] and create a [StandardPage].
-///
-/// This class includes the [standardPageKey] property for accessing the page's key
-/// and the [factoryObject] property for obtaining an object of the StandardPageFactory class.
-///
-/// [R] represents the type of the page's result.
-/// [E] represents the type of the value that the page returns.
-class StandardMaterialPage<R extends Object?, E extends Object?>
-    extends MaterialPage<void> implements StandardPageInterface<R, E> {
+abstract class _BaseStandardPage<R extends Object?, E extends Object?>
+    extends Page<E>
+    implements StandardPageInterface<R, E> {
   @override
   final GlobalKey<StandardPageWithResult<R, E>> standardPageKey;
 
   @override
   final StandardPageWithResultFactory factoryObject;
 
+  /// The content to be shown in the [Route] created by this page.
+  final Widget child;
+
+  /// {@macro flutter.widgets.ModalRoute.maintainState}
+  final bool maintainState;
+
+  /// {@macro flutter.widgets.PageRoute.fullscreenDialog}
+  final bool fullscreenDialog;
+
+  /// {@macro flutter.widgets.TransitionRoute.allowSnapshotting}
+  final bool allowSnapshotting;
+
+  const _BaseStandardPage({
+    super.key,
+    super.name,
+    this.maintainState = true,
+    this.fullscreenDialog = false,
+    this.allowSnapshotting = true,
+    super.arguments,
+    super.restorationId,
+    required this.standardPageKey,
+    required this.factoryObject,
+    required this.child,
+  });
+}
+
+abstract class _BaseStandardPageRoute<R extends Object?, E extends Object?>
+    extends PageRoute<E> {
+  _BaseStandardPageRoute({
+    required StandardPageInterface<R, E> page,
+    super.allowSnapshotting,
+  }) : super(settings: page) {
+    assert(opaque);
+  }
+
+  @override
+  void onPopInvokedWithResult(bool didPop, E? result) {
+    super.onPopInvokedWithResult(didPop, result);
+
+    final tDelegate =
+        (settings as StandardPageInterface<R, E>).factoryObject._delegate;
+    tDelegate._onPopInvokedWithResult(this, didPop, result);
+  }
+
+  @override
+  bool get popGestureEnabled {
+    final tDelegate =
+        (settings as StandardPageInterface<R, E>).factoryObject._delegate;
+
+    return tDelegate._checkPopGestureEnabled(this) && super.popGestureEnabled;
+  }
+
+  @override
+  bool get impliesAppBarDismissal {
+    if (super.impliesAppBarDismissal) {
+      return true;
+    }
+
+    // Check if multiple pages exist in nested navigator.
+    final tPage = settings as StandardPageInterface<R, E>;
+    if (tPage.factoryObject.hasNestedPages) {
+      final tPagesMap = tPage.factoryObject._delegate._nestedPageInstances;
+      for (
+        var tNestedPages = tPagesMap[tPage];
+        tNestedPages != null;
+        tNestedPages = tPagesMap[tNestedPages.last]
+      ) {
+        if (tNestedPages.length > 1) {
+          return true;
+        }
+      }
+    }
+
+    return false;
+  }
+}
+
+/// A [Page] implementation that creates a Material-styled route.
+///
+/// This class includes the [standardPageKey] property for accessing the page's key
+/// and the [factoryObject] property for obtaining the factory that created this page.
+///
+/// [R] represents the type of page data.
+/// [E] represents the type of the value that the page returns.
+class StandardMaterialPage<R extends Object?, E extends Object?>
+    extends _BaseStandardPage<R, E> {
   /// Create a StandardMaterialPage
   const StandardMaterialPage({
     super.key,
     super.name,
     super.arguments,
     super.restorationId,
-    required this.standardPageKey,
-    required this.factoryObject,
+    required super.standardPageKey,
+    required super.factoryObject,
     required super.child,
   });
+
+  @override
+  Route<E> createRoute(BuildContext context) {
+    return _StandardMaterialPageRoute<R, E>(
+      page: this,
+      allowSnapshotting: allowSnapshotting,
+    );
+  }
+}
+
+class _StandardMaterialPageRoute<R extends Object?, E extends Object?>
+    extends _BaseStandardPageRoute<R, E>
+    with MaterialRouteTransitionMixin<E> {
+  _StandardMaterialPageRoute({
+    required StandardMaterialPage<R, E> page,
+    super.allowSnapshotting,
+  }) : super(page: page);
+
+  StandardMaterialPage<R, E> get _page =>
+      settings as StandardMaterialPage<R, E>;
+
+  @override
+  Widget buildContent(BuildContext context) {
+    return _page.child;
+  }
+
+  @override
+  bool get maintainState => _page.maintainState;
+
+  @override
+  bool get fullscreenDialog => _page.fullscreenDialog;
+
+  @override
+  String get debugLabel => '${super.debugLabel}(${_page.name})';
+}
+
+/// A [Page] implementation that creates a Cupertino-styled route.
+///
+/// This class includes the [standardPageKey] property for accessing the page's key
+/// and the [factoryObject] property for obtaining the factory that created this page.
+///
+/// [R] represents the type of page data.
+/// [E] represents the type of the value that the page returns.
+class StandardCupertinoPage<R extends Object?, E extends Object?>
+    extends _BaseStandardPage<R, E> {
+  /// Create a StandardCupertinoPage
+  const StandardCupertinoPage({
+    super.key,
+    super.name,
+    super.arguments,
+    super.restorationId,
+    required super.standardPageKey,
+    required super.factoryObject,
+    required super.child,
+    this.title,
+  });
+
+  /// {@macro flutter.cupertino.CupertinoRouteTransitionMixin.title}
+  final String? title;
+
+  @override
+  Route<E> createRoute(BuildContext context) {
+    return _StandardCupertinoPageRoute<R, E>(
+      page: this,
+      allowSnapshotting: allowSnapshotting,
+    );
+  }
+}
+
+class _StandardCupertinoPageRoute<R extends Object?, E extends Object?>
+    extends _BaseStandardPageRoute<R, E>
+    with CupertinoRouteTransitionMixin<E> {
+  _StandardCupertinoPageRoute({
+    required StandardCupertinoPage<R, E> page,
+    super.allowSnapshotting = true,
+  }) : super(page: page);
+
+  @override
+  DelegatedTransitionBuilder? get delegatedTransition =>
+      fullscreenDialog ? null : CupertinoPageTransition.delegatedTransition;
+
+  StandardCupertinoPage<R, E> get _page =>
+      settings as StandardCupertinoPage<R, E>;
+
+  @override
+  Widget buildContent(BuildContext context) {
+    return _page.child;
+  }
+
+  @override
+  String? get title => _page.title;
+
+  @override
+  bool get maintainState => _page.maintainState;
+
+  @override
+  bool get fullscreenDialog => _page.fullscreenDialog;
+
+  @override
+  String get debugLabel => '${super.debugLabel}(${_page.name})';
 }
 
 /// Implements functionality to extend [Page] and create a customized [StandardPageWithResult].
 ///
 /// This class includes the [standardPageKey] property for accessing the page's key
-/// and the [factoryObject] property for obtaining an object of the StandardPageWithResult class.
+/// and the [factoryObject] property for obtaining the factory that created this page.
 ///
-/// [R] represents the type of the page's result.
+/// [R] represents the type of page data.
 /// [E] represents the type of the value that the page returns.
-class StandardCustomPage<R, E> extends Page<void>
+class StandardCustomPage<R, E> extends Page<E>
     implements StandardPageInterface<R, E> {
   @override
   final GlobalKey<StandardPageWithResult<R, E>> standardPageKey;
@@ -574,22 +1173,61 @@ class StandardCustomPage<R, E> extends Page<void>
     Animation<double> animation,
     Animation<double> secondaryAnimation,
     Widget child,
-  )? transitionBuilder;
+  )?
+  transitionBuilder;
 
   @override
-  Route<R> createRoute(BuildContext context) {
+  Route<E> createRoute(BuildContext context) {
     return _StandardCustomPageRoute<R, E>(page: this);
   }
 }
 
-class _StandardCustomPageRoute<R, E> extends ModalRoute<R> {
-  _StandardCustomPageRoute({
-    required StandardCustomPage<R, E> page,
-  }) : super(
-          settings: page,
-        );
+class _StandardCustomPageRoute<R, E> extends ModalRoute<E> {
+  _StandardCustomPageRoute({required StandardCustomPage<R, E> page})
+    : super(settings: page);
 
   StandardCustomPage<R, E> get _page => settings as StandardCustomPage<R, E>;
+
+  @override
+  void onPopInvokedWithResult(bool didPop, E? result) {
+    super.onPopInvokedWithResult(didPop, result);
+
+    final tDelegate =
+        (settings as StandardPageInterface<R, E>).factoryObject._delegate;
+    tDelegate._onPopInvokedWithResult(this, didPop, result);
+  }
+
+  @override
+  bool get popGestureEnabled {
+    final tDelegate =
+        (settings as StandardPageInterface<R, E>).factoryObject._delegate;
+
+    return tDelegate._checkPopGestureEnabled(this) && super.popGestureEnabled;
+  }
+
+  @override
+  bool get impliesAppBarDismissal {
+    if (super.impliesAppBarDismissal) {
+      return true;
+    }
+
+    // Check if multiple pages exist in nested navigator.
+    final tPage = settings as StandardPageInterface<R, E>;
+    if (tPage.factoryObject.hasNestedPages) {
+      final tPagesMap = tPage.factoryObject._delegate._nestedPageInstances;
+      for (
+        var tNestedPages = tPagesMap[tPage];
+        tNestedPages != null;
+        tNestedPages = tPagesMap[tNestedPages.last]
+      ) {
+        if (tNestedPages.length > 1) {
+          return true;
+        }
+      }
+    }
+
+    return false;
+  }
 
   @override
   Widget buildPage(
@@ -614,12 +1252,7 @@ class _StandardCustomPageRoute<R, E> extends ModalRoute<R> {
     final tBuilder = _page.transitionBuilder;
 
     if (tBuilder != null) {
-      return tBuilder(
-        context,
-        animation,
-        secondaryAnimation,
-        child,
-      );
+      return tBuilder(context, animation, secondaryAnimation, child);
     }
 
     return child;
@@ -653,13 +1286,16 @@ class _StandardCustomPageRoute<R, E> extends ModalRoute<R> {
 class _StandardPageWidget<T extends Object?, E extends Object?>
     extends StatefulWidget {
   final StandardPageWithResultFactory<StandardPageWithResult<T, E>, T, E>
-      factoryObject;
+  factoryObject;
   final T pageData;
+
+  final bool initPushParentHistory;
 
   const _StandardPageWidget({
     super.key,
     required this.factoryObject,
     required this.pageData,
+    required this.initPushParentHistory,
   });
 
   @override
@@ -679,9 +1315,12 @@ const _kAnalyticsGlobalContextKey = Object();
 /// {@endtemplate}
 /// [E] signifies the type of data that the page returns.
 abstract class StandardPageWithResult<T extends Object?, E extends Object?>
-    extends State<_StandardPageWidget<T, E>> with RouteAware {
+    extends State<_StandardPageWidget<T, E>>
+    with RouteAware {
   late StandardPageWithResultFactory<StandardPageWithResult<T, E>, T, E>
-      _factory;
+  _factory;
+
+  late StandardRouterDelegate _delegate;
 
   void _completeResult(Completer completer, dynamic popResult) {
     if (completer.isCompleted) {
@@ -741,38 +1380,7 @@ abstract class StandardPageWithResult<T extends Object?, E extends Object?>
     _onPageDataChanged();
   }
 
-  Navigator? _navigator;
-
-  /// When [StandardPageWithResultFactory.parentPageType] is set, it retrieves the child [Navigator] widget.
-  /// This is used when creating applications with features like footer tabs.
-  ///
-  /// For example, let's say there's a page called PageA, which is a tab, and it is set as the parentPageType for PageB.
-  /// ```dart
-  ///  StandardMaterialApp(
-  ///    onGenerateTitle: (context) => l(context, 'tab page'),
-  ///    pages: [
-  ///      StandardPageFactory<PageA, void>(
-  ///        create: (data) => PageA(),
-  ///      ),
-  ///      StandardPageFactory<PageB, void>(
-  ///        create: (data) => PageB,
-  ///        parentPageType: PageA,
-  ///      ),
-  ///    ],
-  ///  );
-  /// ```
-  ///
-  /// In this case, PageA displays the widget that shows the tab in the footer,
-  /// but there is no widget to display within it. Therefore, you can use [childNavigator] to retrieve and display the content of PageB
-  /// ```dart
-  /// class PageA extends StandardPage<void> {
-  ///   @override
-  ///   Widget buildPage(BuildContext context) {
-  ///     return childNavigator!; // Display the content of PageB
-  ///   }
-  /// }
-  /// ```
-  Navigator? get childNavigator => _navigator;
+  bool _pushParentHistory = false;
 
   void _onPageDataChanged() {
     if (!mounted) {
@@ -785,12 +1393,6 @@ abstract class StandardPageWithResult<T extends Object?, E extends Object?>
       return;
     }
 
-    // TODO: In the future, we should look at use cases here
-    // And decide if we want to update the current navigation
-    // data (like the URL) or not. Currently, we do not.
-    // If we were to, we'd need to update _pageInstanceToRouteData
-    // with the newest pageData.
-
     _sendPageDataEvent();
     (Router.of(context).routerDelegate as StandardRouterDelegate?)
         ?._updatePages();
@@ -798,26 +1400,22 @@ abstract class StandardPageWithResult<T extends Object?, E extends Object?>
   }
 
   AnalyticsContext _generateAnalyticsContext() => AnalyticsContext({
-        'pageName': name,
-        'pageData': pageData,
-        'pageLink': link,
-        ...Analytics.tryConvertToLoggableJsonParameters(
-            'pageDataJson', pageData),
-      });
+    'pageName': name,
+    'pageData': pageData,
+    'pageLink': link,
+    ...Analytics.tryConvertToLoggableJsonParameters('pageDataJson', pageData),
+  });
 
   void _updateRouteAnalyticsContext() {
     context.read<Analytics>().setRouteContext(
-          _kAnalyticsGlobalContextKey,
-          _generateAnalyticsContext(),
-        );
+      _kAnalyticsGlobalContextKey,
+      _generateAnalyticsContext(),
+    );
   }
 
   void _sendPageDataEvent() {
     _updateRouteAnalyticsContext();
-    context.read<Analytics>().event(
-          name: 'pageDataUpdate',
-          context: context,
-        );
+    context.read<Analytics>().event(name: 'pageDataUpdate', context: context);
   }
 
   /// Called when the page data is updated.
@@ -828,8 +1426,7 @@ abstract class StandardPageWithResult<T extends Object?, E extends Object?>
 
   /// Get the deep link for this page.
   /// Returns null if [StandardPageFactory.linkGenerator] is not defined for this page.
-  String? get link =>
-      _factory.linkGenerator != null ? _factory.linkGenerator!(pageData) : null;
+  String? get link => _factory.generateLink(pageData);
 
   RouteObserver<ModalRoute<void>>? _routeObserver;
 
@@ -854,6 +1451,7 @@ abstract class StandardPageWithResult<T extends Object?, E extends Object?>
   @mustCallSuper
   void initState() {
     super.initState();
+    _pushParentHistory = widget.initPushParentHistory;
     _pageData = widget.pageData;
   }
 
@@ -864,6 +1462,7 @@ abstract class StandardPageWithResult<T extends Object?, E extends Object?>
 
     _ready = true;
 
+    _delegate = context.read<StandardRouterDelegate>();
     _routeObserver ??= context.read<RouteObserver<ModalRoute<void>>>();
     _routeObserver?.subscribe(this, ModalRoute.of(context)!);
 
@@ -925,65 +1524,84 @@ abstract class StandardPageWithResult<T extends Object?, E extends Object?>
     }
   }
 
-  void _updateActiveStatus([bool? forcedStatus]) {
-    // ignore: todo
-    // TODO: Go up the entire tree to support multiple Navigators.
-    // We only want to be active if our [Navigator] is also actually in the front.
+  void _updateActiveStatus({bool? forcedStatus, bool recursive = true}) {
     final tIsCurrentlyActive = _active;
-    _active = mounted &&
-        (forcedStatus ?? (ModalRoute.of(context)?.isCurrent ?? false));
+
+    if (!mounted) {
+      // Testing this case is difficult.
+      _active = false; // coverage:ignore-line
+    } else if (forcedStatus != null) {
+      _active = forcedStatus;
+    } else {
+      final tRoute = ModalRoute.of(context);
+      _active = tRoute?.isCurrent ?? false;
+      if (_active) {
+        StandardPageInterface? tNavigatorPage =
+            _delegate._pageInstanceToNavigatorPage[tRoute!.settings];
+        while (tNavigatorPage != null) {
+          final tContext = tNavigatorPage.standardPageKey.currentContext;
+          if (tContext == null) {
+            // Testing this case is difficult.
+            _active = false; // coverage:ignore-line
+            break;
+          }
+          _active = ModalRoute.of(tContext)?.isCurrent ?? false;
+          if (!_active) {
+            break;
+          }
+          tNavigatorPage =
+              _delegate._pageInstanceToNavigatorPage[tNavigatorPage];
+        }
+      }
+    }
 
     if (_active != tIsCurrentlyActive) {
+      void fUpdateNestedPageActiveStatus() {
+        // If nested Navigators exist, the status of their subordinate pages will also be updated.
+        final tPage = ModalRoute.of(context)?.settings;
+        final tNestedPage = tPage != null
+            ? _delegate._nestedPageInstances[tPage]?.lastOrNull
+            : null;
+        if (tNestedPage != null) {
+          tNestedPage.standardPageKey.currentState?._updateActiveStatus(
+            forcedStatus: forcedStatus,
+            recursive: recursive,
+          );
+        }
+      }
+
       if (_active) {
         _updateRouteAnalyticsContext();
         onActive(_firstActive);
-
         if (_firstActive) {
           _firstActive = false;
         }
+
+        if (recursive && widget.factoryObject.hasNestedPages) {
+          fUpdateNestedPageActiveStatus();
+        }
       } else {
+        if (recursive && widget.factoryObject.hasNestedPages) {
+          fUpdateNestedPageActiveStatus();
+        }
+
         onInactive();
       }
     }
   }
 
-  StandardRouterDelegate? _delegate;
-  Map<StandardPageInterface, List<Page<dynamic>>>? _pageChildInstances;
-  StandardPageWithResultFactory<StandardPageWithResult<Object?, Object?>,
-      Object?, Object?>? _firstPageFactory;
-
   @protected
   @mustCallSuper
   void onActive(bool first) {
-    _delegate = Router.of(context).routerDelegate as StandardRouterDelegate?;
+    if (_pushParentHistory && widget.factoryObject.parentPageFactory != null) {
+      var tStandardPageInterface =
+          ModalRoute.of(context)?.settings as StandardPageInterface;
 
-    _pageChildInstances = _delegate?._pageChildInstances;
-
-    final Map<Type, List<Type>>? tStandardPagesMap =
-        _delegate?._standardPagesMap;
-
-    if (first && _pageChildInstances != null && tStandardPagesMap != null) {
-      if (tStandardPagesMap.containsKey(_factory.pageType) &&
-          tStandardPagesMap[_factory.pageType]!.isNotEmpty) {
-        // Create an instance of the first child element to be displayed by default.
-        var tStandardPageInterface =
-            ModalRoute.of(context)?.settings as StandardPageInterface;
-
-        final Type tChildPageType;
-        if (_delegate?._targetFirstChildPage != null) {
-          tChildPageType = _delegate!._targetFirstChildPage!.pageType;
-        } else {
-          tChildPageType = tStandardPagesMap[_factory.pageType]!.first;
+      scheduleFunction(() {
+        if (_active && mounted) {
+          _delegate._pushParentPageHistory(tStandardPageInterface);
         }
-
-        _delegate?._standardPageInterfaceToType[tStandardPageInterface]!
-            .add(tChildPageType);
-
-        _firstPageFactory = _delegate?._addChildFirstPage(
-          tChildPageType,
-          tStandardPageInterface,
-        );
-      }
+      });
     }
   }
 
@@ -1012,12 +1630,11 @@ abstract class StandardPageWithResult<T extends Object?, E extends Object?>
   /// An assertion error occurs if [localizationKey] is not set.
   /// {@endtemplate}
   @protected
-  String pl(
-    String key, [
-    Map<String, Object>? namedParameters,
-  ]) {
-    assert(localizationKey.isNotEmpty,
-        'localizationKey is not set. Please override localizationKey.');
+  String pl(String key, [Map<String, Object>? namedParameters]) {
+    assert(
+      localizationKey.isNotEmpty,
+      'localizationKey is not set. Please override localizationKey.',
+    );
 
     return l(context, '$localizationKey.$key', namedParameters);
   }
@@ -1033,10 +1650,7 @@ abstract class StandardPageWithResult<T extends Object?, E extends Object?>
         .where((v) => v.initialized && !v.disposed);
 
     for (var i in tPlugins) {
-      tChild = _SingleChildPluginBuilder(
-        plugin: i,
-        child: tChild,
-      );
+      tChild = _SingleChildPluginBuilder(plugin: i, child: tChild);
     }
 
     final tAnalyticsEvent = analyticsSingletonEvent;
@@ -1071,51 +1685,6 @@ abstract class StandardPageWithResult<T extends Object?, E extends Object?>
       );
     }
 
-    // Build Child Navigator
-    if (_firstPageFactory != null) {
-      // Create a Navigator by referencing the parent page instance when _firstPageFactory exists
-      final tParentPageInstance =
-          ModalRoute.of(context)?.settings as StandardPageInterface;
-
-      if (_pageChildInstances![tParentPageInstance] != null &&
-          // Countermeasure for an error if the Navigator is empty when
-          // proceeding from a page with child to a page without child
-          _pageChildInstances![tParentPageInstance]!.isNotEmpty) {
-        _navigator = Navigator(
-          key: _childNavigatorKey,
-          pages: _pageChildInstances![tParentPageInstance]!,
-          // TODO: To be addressed in the future.
-          // ignore: deprecated_member_use
-          onPopPage: (route, result) {
-            if (_delegate?.willPopPage != null) {
-              if (_delegate!.willPopPage!(route, result)) {
-                // We return false here because while a _pop_ was handled elsewhere,
-                // it was not _this_ route whose pop is succeeding.
-                return false;
-              }
-            }
-
-            var tCurrentPage =
-                _delegate?._pageChildInstances[tParentPageInstance]?.lastOrNull;
-            if (tCurrentPage != null) {
-              _delegate?._removePageChildInstance(
-                  tParentPageInstance, tCurrentPage);
-            }
-
-            if (route.settings is StandardPageInterface) {
-              return _delegate?.removeRoute(route, result) ?? false;
-            }
-
-            return false;
-          },
-        );
-
-        _delegate?._pageChildInstancesUpdater[tParentPageInstance] = () {
-          setState(() {});
-        };
-      }
-    }
-
     return tChild;
   }
 
@@ -1131,10 +1700,7 @@ class _SingleChildPluginBuilder extends StatelessWidget {
   final StandardPagePluginMixin plugin;
   final Widget child;
 
-  const _SingleChildPluginBuilder({
-    required this.plugin,
-    required this.child,
-  });
+  const _SingleChildPluginBuilder({required this.plugin, required this.child});
 
   @override
   Widget build(BuildContext context) => plugin.buildPage(context, child);
@@ -1143,6 +1709,79 @@ class _SingleChildPluginBuilder extends StatelessWidget {
 /// {@macro patapata_widgets.StandardPageWithResult}
 abstract class StandardPage<T extends Object?>
     extends StandardPageWithResult<T, void> {}
+
+/// This class is used to create pages that return values when building an application with Patapata.
+///
+/// Define page classes that inherit from this class and pass them to [StandardPageWithNestedNavigatorFactory].
+/// Pages created with [StandardPageWithNestedNavigator] must override [buildPage].
+///
+/// This class is used to create pages that contain a nested Navigator.
+/// The nested Navigator manages its own stack of pages independently from the parent Navigator.
+///
+/// The [nestedPages] property provides access to the Widget containing the nested Navigator
+/// and its page stack. This widget should be included in the [buildPage] method to display
+/// the nested navigation structure.
+abstract class StandardPageWithNestedNavigator extends StandardPage<void> {
+  final nestedNavigatorKey = GlobalKey<NavigatorState>(
+    debugLabel: 'StandardPageWithNestedNavigator:nestedNavigatorKey',
+  );
+
+  late Widget _nestedPages;
+
+  /// The nested pages managed by the nested Navigator.
+  ///
+  /// This widget contains the nested Navigator and should be included in your page's widget tree
+  /// to display the nested navigation stack. The pages displayed in this Navigator are defined
+  /// by the [StandardPageWithNestedNavigatorFactory.nestedPageFactories] and
+  /// [StandardPageWithNestedNavigatorFactory.anyNestedPageFactories] properties.
+  Widget get nestedPages => _nestedPages;
+
+  final _nestedPageRouteObserver = RouteObserver<ModalRoute<void>>();
+
+  List<StandardPageInterface> _pageInstances = const [];
+
+  void _onNestedNavigatorPopHandler(Object? result) {
+    nestedNavigatorKey.currentState?.maybePop(result);
+  }
+
+  @override
+  @mustCallSuper
+  Widget build(BuildContext context) {
+    _nestedPages = Builder(
+      builder: (context) {
+        final tApp = context.read<App>();
+        final tPage = ModalRoute.of(context)?.settings as StandardPageInterface;
+        final tDelegate = context.watch<StandardRouterDelegate>();
+
+        final tPageInstances = tDelegate._nestedPageInstances[tPage];
+        // Update the page instances.
+        //
+        // Do not update when the list is empty, as Navigator cannot handle an empty page list.
+        // This situation occurs when the parent Navigator has been popped.
+        if (tPageInstances?.isNotEmpty == true) {
+          // Flutter's Navigator detects a change in the page stack when the reference to the List<Page> changes.
+          // Therefore, instead of mutating the list, we must assign a new List instance.
+          _pageInstances = tPageInstances!.toList();
+        }
+
+        return Provider<RouteObserver<ModalRoute<void>>>.value(
+          value: _nestedPageRouteObserver,
+          child: NavigatorPopHandler(
+            onPopWithResult: _onNestedNavigatorPopHandler,
+            child: Navigator(
+              key: nestedNavigatorKey,
+              pages: _pageInstances,
+              observers: [...tApp.navigatorObservers, _nestedPageRouteObserver],
+              onDidRemovePage: _delegate._onDidRemovePage,
+            ),
+          ),
+        );
+      },
+    );
+
+    return super.build(context);
+  }
+}
 
 /// A data class to be specified when implementing Patapata's [Router] using [StandardRouterDelegate].
 class StandardRouteData {
@@ -1153,10 +1792,7 @@ class StandardRouteData {
   final Object? pageData;
 
   /// Create a StandardRouteData
-  StandardRouteData({
-    required this.factory,
-    required this.pageData,
-  });
+  StandardRouteData({required this.factory, required this.pageData});
 }
 
 /// A class that implements [RouteInformationParser] necessary for Patapata's [Router].
@@ -1176,7 +1812,8 @@ class StandardRouteInformationParser
 
   @override
   Future<StandardRouteData> parseRouteInformation(
-      RouteInformation routeInformation) async {
+    RouteInformation routeInformation,
+  ) async {
     final tApp = context.read<App>();
     final tPlugins = tApp.getPluginsOfType<StandardAppRoutePluginMixin>();
 
@@ -1184,7 +1821,7 @@ class StandardRouteInformationParser
       final tParsed = await i.parseRouteInformation(routeInformation);
 
       if (tParsed != null) {
-        return SynchronousFuture(tParsed);
+        return tParsed;
       }
     }
 
@@ -1204,10 +1841,7 @@ class StandardRouteInformationParser
         try {
           if (i(tLocation)) {
             // Handled. Return early.
-            return SynchronousFuture(StandardRouteData(
-              factory: null,
-              pageData: null,
-            ));
+            return StandardRouteData(factory: null, pageData: null);
           }
         } catch (e, stackTrace) {
           _logger.severe('Error while handling link', e, stackTrace);
@@ -1215,28 +1849,26 @@ class StandardRouteInformationParser
       }
     }
 
-    final tRouteData = routerDelegate._getStandardRouteDataForPath(tLocation) ??
-        StandardRouteData(
-          factory: null,
-          pageData: null,
-        );
+    final tRouteData =
+        routerDelegate._getStandardRouteDataForPath(tLocation) ??
+        StandardRouteData(factory: null, pageData: null);
 
-    return SynchronousFuture(tRouteData);
+    return tRouteData;
   }
 
   @override
   RouteInformation? restoreRouteInformation(StandardRouteData configuration) {
     final tStringLocation = configuration.factory?.generateLink(
-        configuration.pageData ??
-            configuration.factory?.pageDataWhenNull?.call());
+      configuration.pageData ?? configuration.factory?.pageDataWhenNull?.call(),
+    );
 
     if (tStringLocation != null) {
-      final tLocation = Uri.tryParse(tStringLocation);
+      final tLocation = Uri.tryParse(
+        tStringLocation.startsWith('/') ? tStringLocation : '/$tStringLocation',
+      );
 
       if (tLocation != null) {
-        return RouteInformation(
-          uri: tLocation,
-        );
+        return RouteInformation(uri: tLocation);
       }
     }
 
@@ -1248,169 +1880,493 @@ class StandardRouteInformationParser
 class StandardRouterDelegate extends RouterDelegate<StandardRouteData>
     with ChangeNotifier, PopNavigatorRouterDelegateMixin {
   final _navigatorKey = GlobalKey<NavigatorState>(
-      debugLabel: 'StandardRouterDelegate:navigatorKey');
-  final _multiProviderKey =
-      GlobalKey(debugLabel: 'StandardRouterDelegate:multiProviderKey');
+    debugLabel: 'StandardRouterDelegate:navigatorKey',
+  );
+  final _multiProviderKey = GlobalKey(
+    debugLabel: 'StandardRouterDelegate:multiProviderKey',
+  );
 
   /// Navigator observer that notifies RouteAware of changes in route state.
   final RouteObserver<ModalRoute<void>> routeObserver =
       RouteObserver<ModalRoute<void>>();
 
+  late final _RootNavigatorObserver _rootNavigatorObserver =
+      _RootNavigatorObserver(this);
+
   /// A handle to the location of a widget in the widget tree.
   final BuildContext context;
-  List<Page> _pageInstances = [];
-  final Map<StandardPageInterface, List<Page>> _pageChildInstances = {};
+
+  final StandardAppType _appType;
+
+  List<StandardPageInterface> _rootPageInstances = [];
+  final Map<StandardPageInterface, List<StandardPageInterface>>
+  _nestedPageInstances = {};
+
+  final _pageInstanceToRouteData = <StandardPageInterface, StandardRouteData>{};
+  final _pageInstanceCompleterMap = <StandardPageInterface, Completer>{};
+  final _pageInstanceToNavigatorPage =
+      <StandardPageInterface, StandardPageInterface?>{};
+  final _pageInstanceToPageType = <StandardPageInterface, Type>{};
 
   /// Wrap the entire Patapata Navigator-related application,
   /// enabling the use of screen transition-related functionalities through a function.
   Widget Function(BuildContext context, Widget? child)? routableBuilder;
 
-  /// A function called when the app goes back to the previous page.
-  bool Function(Route<dynamic> route, dynamic result)? willPopPage;
-  final Map<StandardPageInterface, List<Type>> _standardPageInterfaceToType =
-      {};
+  /// A function called when a page is removed from the navigator.
+  void Function(Page page)? onDidRemovePage;
 
   final _factoryTypeMap = <Type, StandardPageWithResultFactory>{};
-  final _pageInstanceToTypeMap = <Page, Type>{};
-  final _pageInstanceToRouteData = <Page, StandardRouteData>{};
-  final _pageInstanceCompleterMap = <Page, Completer>{};
+  final _links = Expando<List<(RegExp, Object? Function(RegExpMatch, Uri))>>();
 
+  /// Get the default root page factory.
   StandardPageWithResultFactory get defaultRootPageFactory =>
       (_factoryTypeMap.entries
-          .firstWhereOrNull((e) =>
-              e.value.group == StandardPageWithResultFactory.defaultGroup)
+          .firstWhereOrNull(
+            (e) => e.value.group == StandardPageWithResultFactory.defaultGroup,
+          )
           ?.value) ??
       _factoryTypeMap.values.first;
 
   bool _initialRouteProcessed = false;
 
+  bool _continueProcessInitialRoute = false;
+
   bool _startupSequenceProcessed = false;
-
-  final Map<Type, List<Type>> _standardPagesMap = {};
-
-  final Map<StandardPageInterface, VoidCallback> _pageChildInstancesUpdater =
-      {};
-
-  StandardPageWithResultFactory<StandardPageWithResult<Object?, Object?>,
-      Object?, Object?>? _targetFirstChildPage;
 
   /// Create a StandardRouterDelegate
   StandardRouterDelegate({
     required this.context,
     required List<StandardPageWithResultFactory> pageFactories,
+    StandardAppType appType = StandardAppType.material,
     this.routableBuilder,
-    this.willPopPage,
-  }) : assert(pageFactories.isNotEmpty) {
+    this.onDidRemovePage,
+  }) : _appType = appType,
+       assert(pageFactories.isNotEmpty) {
     _updatePageFactories(pageFactories);
   }
 
   void _updatePageFactories(List<StandardPageWithResultFactory> pageFactories) {
-    // Remove the deleted page from the _factoryTypeMap Map variable during hot reloading
-    _factoryTypeMap.clear();
-    _standardPagesMap.clear();
-
-    final tWithDummySplashPage =
-        pageFactories.whereType<SplashPageFactory>().isEmpty;
-
-    for (var tFactory in pageFactories) {
-      tFactory._delegate = this;
-      _factoryTypeMap[tFactory.pageType] = tFactory;
-      // Create Standard Navigator Map
-      if (tFactory.parentPageType == null &&
-          !_standardPagesMap.containsKey(tFactory.pageType)) {
-        _standardPagesMap[tFactory.pageType] = [];
-      } else if (tFactory.parentPageType != null) {
-        if (!_standardPagesMap.containsKey(tFactory.parentPageType)) {
-          _standardPagesMap[tFactory.parentPageType!] = [];
-        }
-        _standardPagesMap[tFactory.parentPageType]!.add(tFactory.pageType);
-      }
-    }
-    if (tWithDummySplashPage) {
-      final tDummySplashPage = SplashPageFactory(
-        create: (_) => _DummySplashPage(),
-        enableNavigationAnalytics: false,
-      ).._delegate = this;
-      _factoryTypeMap[_DummySplashPage] = tDummySplashPage;
-      _standardPagesMap[_DummySplashPage] = [];
-    }
-
-    if (_pageInstances.isNotEmpty) {
-      for (var i in _pageInstanceToTypeMap.values) {
-        if (!_factoryTypeMap.containsKey(i)) {
-          // The page has been deleted.
-          // Wipe out everything and start the app over.
-          _pageInstances = [];
-          _pageChildInstances.clear();
-          _pageInstanceToTypeMap.clear();
-          _pageInstanceToRouteData.clear();
-          for (var i in _pageInstanceCompleterMap.values) {
-            if (!i.isCompleted) {
-              // Basically this only happens during development
-              // so we will not have an official error code or class.
-              i.completeError('Page deleted');
-            }
-          }
-          _pageInstanceCompleterMap.clear();
-          break;
-        }
-      }
-    }
-
-    if (_pageInstances.isEmpty) {
-      final StandardPageWithResultFactory<
-          StandardPageWithResult<Object?, Object?>,
-          Object?,
-          Object?> tStandardPage;
-
-      if (!_initialRouteProcessed) {
-        tStandardPage = (tWithDummySplashPage)
-            ? _factoryTypeMap[_DummySplashPage]!
-            : pageFactories.whereType<SplashPageFactory>().first;
-      } else if (pageFactories.first.parentPageType == null) {
-        tStandardPage = pageFactories.first;
-      } else {
-        // If the first page of pageFactories has a parentType set, the parent page will be added first.
-        var tResult = pageFactories.where((element) =>
-            element.pageType == pageFactories.first.parentPageType);
-        tStandardPage = tResult.first;
-      }
-
-      final tPageData = tStandardPage.pageDataWhenNull?.call();
-
-      final tPage = _initializePage(
-        tStandardPage,
-        tStandardPage.getPageKey(tPageData),
-        tPageData,
+    void fMappedPageFactory(
+      StandardPageWithResultFactory factory,
+      StandardPageWithResultFactory? parentPageFactory,
+      StandardPageWithResultFactory? navigatorPageFactory,
+      bool anyNavigator,
+      List<String> parentPathList,
+    ) {
+      assert(
+        _factoryTypeMap.containsKey(factory.pageType) == false,
+        'Duplicate pageType found: ${factory.pageType}. Each pageType must be unique.', // coverage:ignore-line
       );
 
-      _pageInstanceToTypeMap[tPage] = tStandardPage.pageType;
-      _pageInstanceToRouteData[tPage] =
-          StandardRouteData(factory: tStandardPage, pageData: tPageData);
-      _pageInstanceCompleterMap[tPage] = tStandardPage._createResultCompleter();
-      _pageInstances.add(tPage);
+      StandardPageWithResultFactory._extendedDataMap[factory] =
+          _StandardPageFactoryExtendedData(
+            delegate: this,
+            parentPageFactory: parentPageFactory,
+            navigatorPageFactory: navigatorPageFactory,
+            anyNavigator: anyNavigator,
+          );
+
+      _factoryTypeMap[factory.pageType] = factory;
+
+      Map<String, String> tLinkMap = {};
+      if (factory._links.isNotEmpty) {
+        assert(() {
+          final tForbiddenPattern = RegExp(r'(?<!\\)\((?!\?[:<=!>])');
+          final tInvalidLink = factory._links.keys.firstWhereOrNull(
+            (tLink) => tForbiddenPattern.hasMatch(tLink),
+          );
+          if (tInvalidLink != null) {
+            // coverage:ignore-start
+            throw AssertionError(
+              'Link [ $tInvalidLink ] in page factory of type [ ${factory.pageType} ] contains a forbidden capturing group. '
+              'Please use non-capturing groups (?:...) or named capturing groups (?<name>...) instead.',
+            );
+            // coverage:ignore-end
+          }
+          return true;
+        }());
+
+        final tLinks = factory._links.keys;
+        if (parentPathList.isNotEmpty) {
+          final tAbsoluteLinks = tLinks.where((e) => e.startsWith('/'));
+          for (var tLink in tAbsoluteLinks) {
+            tLinkMap[tLink] = tLink;
+          }
+
+          final tRelativeLinks = tLinks.where((e) => !e.startsWith('/'));
+          for (var tParentPath in parentPathList) {
+            for (var tLink in tRelativeLinks) {
+              tLinkMap[tLink] =
+                  '${tParentPath == '/' ? '' : tParentPath}/$tLink';
+            }
+          }
+        } else {
+          for (var tLink in tLinks) {
+            tLinkMap[tLink] = tLink;
+          }
+        }
+
+        final tCallbackList = <(RegExp, Object? Function(RegExpMatch, Uri))>[];
+        for (var tLink in tLinkMap.entries) {
+          final tRegExp = RegExp(
+            '^/?${tLink.value.startsWith('/') ? tLink.value.substring(1) : tLink.value}\$',
+          );
+          tCallbackList.add((tRegExp, factory._links[tLink.key]!));
+        }
+        _links[factory] = tCallbackList;
+      }
+
+      for (var childPageFactory in factory.childPageFactories) {
+        fMappedPageFactory(
+          childPageFactory,
+          factory,
+          navigatorPageFactory,
+          anyNavigator,
+          (tLinkMap.isNotEmpty) ? tLinkMap.values.toList() : parentPathList,
+        );
+      }
+      for (var nestedPageFactories in factory.nestedPageFactories) {
+        fMappedPageFactory(
+          nestedPageFactories,
+          null,
+          factory,
+          false,
+          (tLinkMap.isNotEmpty) ? tLinkMap.values.toList() : parentPathList,
+        );
+      }
+      for (var anyNestedPageFactories in factory.anyNestedPageFactories) {
+        fMappedPageFactory(
+          anyNestedPageFactories,
+          null,
+          factory,
+          true,
+          (tLinkMap.isNotEmpty) ? tLinkMap.values.toList() : parentPathList,
+        );
+      }
+    }
+
+    // Remove the deleted page from the _factoryTypeMap Map variable during hot reloading
+    _factoryTypeMap.clear();
+
+    for (var i in pageFactories) {
+      fMappedPageFactory(i, null, null, false, const []);
+    }
+
+    final tWithDummySplashPage =
+        _factoryTypeMap.values.whereType<SplashPageFactory>().firstOrNull ==
+        null;
+
+    if (tWithDummySplashPage) {
+      final tDummySplashPageFactory = SplashPageFactory(
+        create: (_) => _DummySplashPage(),
+        enableNavigationAnalytics: false,
+      );
+      StandardPageWithResultFactory._extendedDataMap[tDummySplashPageFactory] =
+          _StandardPageFactoryExtendedData(delegate: this);
+      _factoryTypeMap[tDummySplashPageFactory.pageType] =
+          tDummySplashPageFactory;
+    }
+
+    if (_rootPageInstances.isNotEmpty) {
+      final tDeletedPage = _pageInstanceToPageType.entries.firstWhereOrNull(
+        (entry) => !_factoryTypeMap.containsKey(entry.value),
+      );
+
+      if (tDeletedPage != null) {
+        // The page has been deleted.
+        // Wipe out everything and start the app over.
+        _rootPageInstances = [];
+        _nestedPageInstances.clear();
+        _pageInstanceToRouteData.clear();
+        _pageInstanceToNavigatorPage.clear();
+        _pageInstanceToPageType.clear();
+        for (var i in _pageInstanceCompleterMap.values) {
+          if (!i.isCompleted) {
+            // Basically this only happens during development
+            // so we will not have an official error code or class.
+            i.completeError('Page deleted');
+          }
+        }
+        _pageInstanceCompleterMap.clear();
+      }
+    }
+
+    if (_rootPageInstances.isEmpty) {
+      final tRouteDatas = <StandardRouteData>[];
+
+      StandardPageWithResultFactory? tRootPageFactory =
+          (!_initialRouteProcessed)
+          ? _factoryTypeMap.values.whereType<SplashPageFactory>().first
+          : defaultRootPageFactory;
+      Object? tRootPageData = tRootPageFactory.pageDataWhenNull?.call();
+
+      final tNavigatorHierarchy = _getNavigatorHierarchy(tRootPageFactory);
+
+      for (var tFactory in tNavigatorHierarchy) {
+        tRouteDatas.add(StandardRouteData(factory: tFactory, pageData: null));
+      }
+
+      tRouteDatas.add(
+        StandardRouteData(factory: tRootPageFactory, pageData: tRootPageData),
+      );
+
+      for (var tRouteData in tRouteDatas) {
+        final tPage = _initializePage(tRouteData, true);
+        _pushPageInstance(tPage, tRouteData);
+      }
     }
   }
 
-  Page _initializePage(StandardPageWithResultFactory factory, LocalKey pageKey,
-      Object? pageData) {
-    final tPage = factory._createPage(pageKey, pageData);
+  void _pushPageInstance(
+    StandardPageInterface page,
+    StandardRouteData routeData, [
+    int? index,
+  ]) {
+    final tFactory = page.factoryObject;
+    final tNavigatorPageFactory = tFactory.navigatorPageFactory;
 
-    if (factory.parentPageType == null) {
-      _pageChildInstances[tPage] = [];
-      if (_standardPageInterfaceToType[tPage] == null) {
-        _standardPageInterfaceToType[tPage] = [];
+    if (tNavigatorPageFactory != null) {
+      final StandardPageInterface tNavigatorPage;
+      if (tFactory.anyNavigator) {
+        StandardPageInterface tBaseNavigatorPage = _pageInstanceToPageType
+            .entries
+            .firstWhere(
+              (entry) => entry.value == tNavigatorPageFactory.pageType,
+            )
+            .key;
+        StandardPageInterface? tLastPage =
+            _nestedPageInstances[tBaseNavigatorPage]?.lastOrNull;
+        while (tLastPage != null && tLastPage.factoryObject.hasNestedPages) {
+          tBaseNavigatorPage = tLastPage;
+          tLastPage = _nestedPageInstances[tLastPage]?.lastOrNull;
+        }
+
+        tNavigatorPage = tBaseNavigatorPage;
+      } else {
+        tNavigatorPage = _pageInstanceToPageType.entries
+            .firstWhere(
+              (entry) => entry.value == tNavigatorPageFactory.pageType,
+            )
+            .key;
       }
-      _standardPageInterfaceToType[tPage]?.add(factory.pageType);
+
+      assert(_nestedPageInstances.containsKey(tNavigatorPage));
+
+      if (index != null) {
+        _nestedPageInstances[tNavigatorPage]!.insert(index, page);
+      } else {
+        _nestedPageInstances[tNavigatorPage]!.add(page);
+      }
+      _pageInstanceToNavigatorPage[page] = tNavigatorPage;
+    } else {
+      if (index != null) {
+        _rootPageInstances.insert(index, page);
+      } else {
+        _rootPageInstances.add(page);
+      }
+      _pageInstanceToNavigatorPage[page] = null;
     }
 
-    return tPage;
+    if (tFactory.hasNestedPages) {
+      _nestedPageInstances.putIfAbsent(page, () => []);
+    }
+
+    _pageInstanceToPageType[page] = tFactory.pageType;
+    _pageInstanceToRouteData[page] = routeData;
+    _pageInstanceCompleterMap[page] = tFactory._createResultCompleter();
+  }
+
+  void _checkDefaultNestedPage(StandardPageInterface navigatorPage) {
+    assert(_nestedPageInstances[navigatorPage] != null);
+
+    final tPageInstances = _nestedPageInstances[navigatorPage]!;
+
+    if (tPageInstances.length <= 1) {
+      final tDefaultFirstPageFactory =
+          navigatorPage.factoryObject.nestedPageFactories.first;
+
+      if (tPageInstances.isEmpty) {
+        // Add the default nested page if there is no nested page.
+        final tPageData = tDefaultFirstPageFactory.pageDataWhenNull?.call();
+        final tRouteData = StandardRouteData(
+          factory: tDefaultFirstPageFactory,
+          pageData: tPageData,
+        );
+        final tPage = _initializePage(tRouteData);
+        _pushPageInstance(tPage, tRouteData);
+
+        if (tPage.factoryObject.hasNestedPages) {
+          _checkDefaultNestedPage(tPage);
+        }
+      } else if (navigatorPage.factoryObject.activeFirstNestedPage) {
+        // Ensure that the first nested page is the default one.
+        final tFirstPage = tPageInstances.first;
+        final tDefaultFirstPageData = tDefaultFirstPageFactory.pageDataWhenNull
+            ?.call(); // coverage:ignore-line
+        if (_pageInstanceToPageType[tFirstPage] !=
+                tDefaultFirstPageFactory.pageType &&
+            tFirstPage.key !=
+                tDefaultFirstPageFactory.getPageKey(tDefaultFirstPageData)) {
+          final tRouteData = StandardRouteData(
+            factory: tDefaultFirstPageFactory,
+            pageData: tDefaultFirstPageData,
+          );
+          final tPage = _initializePage(tRouteData);
+          _pushPageInstance(tPage, tRouteData, 0);
+
+          if (tPage.factoryObject.hasNestedPages) {
+            _checkDefaultNestedPage(tPage);
+          }
+        }
+      }
+    }
+  }
+
+  void _pushParentPageHistory(StandardPageInterface page) {
+    final tParentFactory = page.factoryObject.parentPageFactory;
+    if (tParentFactory == null) {
+      return;
+    }
+
+    final Object? tParentPageData;
+    if (page.standardPageKey.currentState != null) {
+      tParentPageData =
+          page.factoryObject.createParentPageData(
+            page.standardPageKey.currentState?.pageData,
+          ) ??
+          tParentFactory.pageDataWhenNull?.call();
+    } else {
+      final tPageRoute = _pageInstanceToRouteData[page];
+      tParentPageData =
+          page.factoryObject.createParentPageData(tPageRoute?.pageData) ??
+          tParentFactory.pageDataWhenNull?.call();
+    }
+    final tParentPageKey = tParentFactory.getPageKey(tParentPageData);
+
+    final tNavigatorPage = _pageInstanceToNavigatorPage[page];
+
+    assert(
+      tNavigatorPage == null ||
+          _nestedPageInstances.containsKey(tNavigatorPage),
+    );
+
+    final tPageInstances = (tNavigatorPage != null)
+        ? _nestedPageInstances[tNavigatorPage]!
+        : _rootPageInstances;
+    final tPageIndex = tPageInstances.indexOf(page);
+
+    assert(tPageIndex > -1);
+
+    if (tPageIndex > 0) {
+      final tPrevPage = tPageInstances[tPageIndex - 1];
+      if (tPrevPage.factoryObject.pageType == tParentFactory.pageType ||
+          tPrevPage.key == tParentPageKey) {
+        // The parent page is already the previous page.
+        tPrevPage.standardPageKey.currentState?._pushParentHistory = true;
+        _pushParentPageHistory(tPrevPage);
+        return;
+      }
+    }
+
+    for (var i = tPageInstances.length - 1; i >= 0; i--) {
+      final tExistingPage = tPageInstances[i];
+      if (tExistingPage.key == tParentPageKey) {
+        tPageInstances.removeAt(i);
+        final tIndex = tPageInstances.indexOf(page);
+        tPageInstances.insert(tIndex, tExistingPage);
+
+        tExistingPage.standardPageKey.currentState?._pushParentHistory = true;
+        tExistingPage.standardPageKey.currentState?._updateActiveStatus(
+          forcedStatus: false,
+        );
+
+        _updatePages();
+
+        _pushParentPageHistory(tExistingPage);
+        return;
+      }
+    }
+
+    final tParentRouteData = StandardRouteData(
+      factory: tParentFactory,
+      pageData: tParentPageData,
+    );
+
+    final tParentPage = _initializePage(tParentRouteData, true);
+    _pushPageInstance(tParentPage, tParentRouteData, tPageIndex);
+
+    _updatePages();
+
+    _pushParentPageHistory(tParentPage);
+  }
+
+  void _checkGroupRoot(StandardPageInterface page) {
+    final tFactory = page.factoryObject;
+
+    if (!tFactory.groupRoot && tFactory.group != null) {
+      // Search to see if a group root exists and add it.
+      final tGroup = tFactory.group;
+
+      for (var i in _factoryTypeMap.entries) {
+        final tGroupRootFactory = i.value;
+
+        if (tGroupRootFactory.group == tGroup && tGroupRootFactory.groupRoot) {
+          // Found one. See if it's already in the history.
+          if (!_pageInstanceToPageType.containsValue(i.key)) {
+            // There isn't. So add it.
+            final tNavigatorHierarchy = _getNavigatorHierarchy(
+              tGroupRootFactory,
+            );
+            for (var tNavigatorFactory in tNavigatorHierarchy) {
+              if (!_pageInstanceToPageType.containsValue(
+                tNavigatorFactory.pageType,
+              )) {
+                final tRouteData = StandardRouteData(
+                  factory: tNavigatorFactory,
+                  pageData: null,
+                );
+                final tPage = _initializePage(tRouteData);
+                _pushPageInstance(tPage, tRouteData, 0);
+              }
+            }
+
+            final tGroupRootPageData = tGroupRootFactory.pageDataWhenNull
+                ?.call(); // coverage:ignore-line
+            final tGroupRootRouteData = StandardRouteData(
+              factory: tGroupRootFactory,
+              pageData: tGroupRootPageData,
+            );
+            final tGroupRootPage = _initializePage(tGroupRootRouteData);
+            _pushPageInstance(tGroupRootPage, tGroupRootRouteData, 0);
+          }
+        }
+      }
+    }
+  }
+
+  StandardPageInterface _initializePage(
+    StandardRouteData routeData, [
+    bool pushParentHistory = false,
+  ]) {
+    assert(routeData.factory != null);
+
+    final tFactory = routeData.factory!;
+    final tPageData = routeData.pageData;
+    final tPageKey = tFactory.getPageKey(tPageData);
+
+    return routeData.factory!._createPage(
+      tPageKey,
+      tPageData,
+      pushParentHistory,
+      _appType,
+    );
   }
 
   StandardPageWithResultFactory<T, R, E> _getFactory<
-      T extends StandardPageWithResult<R, E>,
-      R extends Object?,
-      E extends Object?>() {
+    T extends StandardPageWithResult<R, E>,
+    R extends Object?,
+    E extends Object?
+  >() {
     final tFactory = _getFactoryFromPageType(T);
 
     assert(tFactory.dataType == R);
@@ -1428,53 +2384,122 @@ class StandardRouterDelegate extends RouterDelegate<StandardRouteData>
 
   /// {@template patapata_widgets.StandardRouteDelegate.pageInstances}
   /// The current [Page] history.
+  ///
+  /// Returns a flattened list of all [Page] instances, including both root pages
+  /// and nested pages within nested navigators, collected recursively in order of addition.
   /// {@endtemplate}
-  List<Page<dynamic>> get pageInstances => _pageInstances.toList();
+  List<StandardPageInterface> get pageInstances {
+    final tInstances = <StandardPageInterface>[];
+
+    void fPushNestedPages(StandardPageInterface page) {
+      tInstances.add(page);
+
+      final tNestedPages = _nestedPageInstances[page];
+      if (tNestedPages != null) {
+        for (var i in tNestedPages) {
+          fPushNestedPages(i);
+        }
+      }
+    }
+
+    for (var i in _rootPageInstances) {
+      fPushNestedPages(i);
+    }
+
+    return tInstances;
+  }
+
+  /// {@template patapata_widgets.StandardRouteDelegate.rootPageInstances}
+  /// The root Navigator's current page instances.
+  /// {@endtemplate}
+  List<StandardPageInterface> get rootPageInstances =>
+      List<StandardPageInterface>.from(_rootPageInstances);
+
+  /// {@template patapata_widgets.StandardRouteDelegate.nestedPageInstances}
+  /// The current nested page instances within each navigator.
+  ///
+  /// Returns a map where each key is a [StandardPageInterface] representing a navigator page,
+  /// and the corresponding value is a list of [StandardPageInterface] instances that are nested within that navigator.
+  /// {@endtemplate}
+  Map<StandardPageInterface, List<StandardPageInterface>>
+  get nestedPageInstances =>
+      Map<StandardPageInterface, List<StandardPageInterface>>.fromEntries(
+        _nestedPageInstances.entries.map(
+          (e) => MapEntry<StandardPageInterface, List<StandardPageInterface>>(
+            e.key,
+            List<StandardPageInterface>.from(e.value),
+          ),
+        ),
+      );
 
   /// {@template patapata_widgets.StandardRouteDelegate.getPageFactory}
   /// Get the factory class [StandardPageWithResultFactory] of [StandardPageWithResult].
   /// [T] is the type of the destination page. [R] is the type of page data. [E] is the data type of the value that the page returns.
   /// {@endtemplate}
   StandardPageWithResultFactory<T, R, E> getPageFactory<
-          T extends StandardPageWithResult<R, E>,
-          R extends Object?,
-          E extends Object?>() =>
-      _getFactory<T, R, E>();
+    T extends StandardPageWithResult<R, E>,
+    R extends Object?,
+    E extends Object?
+  >() => _getFactory<T, R, E>();
 
   /// {@template patapata_widgets.StandardRouteDelegate.goWithResult}
   /// Navigate to the [StandardPageWithResult] of type [T] that returns a value, with the option to pass [pageData] during the navigation.
   /// [T] is the type of the destination page. [R] is the type of page data. [E] is the data type of the value that the page returns.
   /// [navigationMode] is optional and represents the mode of [StandardPageNavigationMode] to use during navigation.
+  /// [pushParentPage] indicates whether to push the parent page when navigating to a child page. default is `false`.
   /// {@endtemplate}
-  Future<E?> goWithResult<T extends StandardPageWithResult<R, E>,
-          R extends Object?, E extends Object?>(R pageData,
-      [StandardPageNavigationMode? navigationMode]) {
-    return _goWithFactory<E>(_getFactory<T, R, E>(), pageData, navigationMode);
+  Future<E?> goWithResult<
+    T extends StandardPageWithResult<R, E>,
+    R extends Object?,
+    E extends Object?
+  >(
+    R pageData, [
+    StandardPageNavigationMode? navigationMode,
+    bool pushParentPage = false,
+  ]) {
+    return _goWithFactory<E>(
+      _getFactory<T, R, E>(),
+      pageData,
+      navigationMode,
+      pushParentPage,
+    );
   }
 
   /// {@template patapata_widgets.StandardRouteDelegate.go}
   /// Navigate to the [StandardPage] of type [T] with the option to pass [pageData]
   /// during navigation.
   /// [T] represents the type of the destination page, and [R] signifies the type of page data.
+  /// [navigationMode] is an optional mode of [StandardPageNavigationMode] to use during navigation.
+  /// [pushParentPage] indicates whether to push the parent page when navigating to a child page. default is `false`.
+  ///
+  /// When the page is a [StandardPageWithNestedNavigator] and that page does not yet exist,
+  /// the default first page within the nested navigator is also automatically pushed.
+  /// Additionally, if the current page is the same [StandardPageWithNestedNavigator],
+  /// the page stack within the nested navigator is cleared, and the default first page is pushed again.
   /// {@endtemplate}
-  Future<void> go<T extends StandardPage<R>, R extends Object?>(R pageData,
-      [StandardPageNavigationMode? navigationMode]) {
-    return goWithResult<T, R, void>(pageData, navigationMode);
+  Future<void> go<T extends StandardPage<R>, R extends Object?>(
+    R pageData, [
+    StandardPageNavigationMode? navigationMode,
+    bool pushParentPage = false,
+  ]) {
+    return goWithResult<T, R, void>(pageData, navigationMode, pushParentPage);
   }
 
   /// {@template patapata_widgets.StandardRouteDelegate.goErrorPage}
   /// Navigate to the error page with the option to pass an error log information [record].
-  /// [record] represents the error log information of type [ReportRecord] to pass, and [navigationMode] signifies the optional mode of [StandardPageNavigationMode] to use during navigation.
+  /// [record] represents the error log information to be passed to the error page.
+  /// [navigationMode] is an optional mode of [StandardPageNavigationMode] to use during navigation.
+  /// [pushParentPage] indicates whether to push the parent page when navigating to a child page. default is `false`.
   /// {@endtemplate}
-  void goErrorPage(ReportRecord record,
-      [StandardPageNavigationMode? navigationMode]) {
-    final tFactory = _factoryTypeMap.values
+  void goErrorPage(
+    ReportRecord record, [
+    StandardPageNavigationMode? navigationMode,
+    bool pushParentPage = false,
+  ]) {
+    _factoryTypeMap.values
         .whereType<StandardErrorPageFactory>()
-        .firstOrNull;
-
-    if (tFactory != null) {
-      _goWithFactory<void>(tFactory, record, navigationMode);
-    }
+        .firstOrNull
+        ?.goWithResult(record, navigationMode, pushParentPage);
   }
 
   /// {@template patapata_widgets.StandardRouteDelegate.routeWithConfiguration}
@@ -1483,45 +2508,61 @@ class StandardRouterDelegate extends RouterDelegate<StandardRouteData>
   /// for example, when navigating from a plugin.
   /// [configuration] represents the page data to be passed to [goWithResult],
   /// [navigationMode] is an optional mode of [StandardPageNavigationMode] to use during navigation.
+  /// [pushParentPage] indicates whether to push the parent page when navigating to a child page. default is `true`.
   /// {@endtemplate}
-  void routeWithConfiguration(StandardRouteData configuration,
-      [StandardPageNavigationMode? navigationMode]) {
-    configuration.factory?.goWithResult(configuration.pageData, navigationMode);
+  void routeWithConfiguration(
+    StandardRouteData configuration, [
+    StandardPageNavigationMode? navigationMode,
+    bool pushParentPage = true,
+  ]) {
+    if (kIsWeb || StandardAppPlugin.debugIsWeb) {
+      if (configuration.factory == null) {
+        throw WebPageNotFound();
+      }
+    }
+
+    configuration.factory?.goWithResult(
+      configuration.pageData,
+      navigationMode,
+      pushParentPage,
+    );
   }
 
   @override
   Widget build(BuildContext context) {
+    _markRebuild = false;
+
+    final tApp = context.read<App>();
+
     Widget tChild = Navigator(
       key: _navigatorKey,
       restorationScopeId: 'StandardAppNavigator',
       observers: [
-        ...context.read<App>().navigatorObservers,
+        _rootNavigatorObserver,
+        ...tApp.navigatorObservers,
         routeObserver,
       ],
-      pages: _pageInstances,
-      // TODO: To be addressed in the future.
-      // ignore: deprecated_member_use
-      onPopPage: _onPopPage,
+      pages: _rootPageInstances,
+      onDidRemovePage: _onDidRemovePage,
     );
 
     if (routableBuilder != null) {
       tChild = Builder(
-        builder:
-            ((child) => (context) => routableBuilder!(context, child))(tChild),
+        builder: ((child) =>
+            (context) => routableBuilder!(context, child))(tChild),
       );
     }
 
     return MultiProvider(
       key: _multiProviderKey,
       providers: [
-        Provider<RouteObserver<ModalRoute<void>>>.value(
-          value: routeObserver,
-        ),
-        if (getApp().startupSequence != null)
+        ChangeNotifierProvider<StandardRouterDelegate>.value(value: this),
+        Provider<RouteObserver<ModalRoute<void>>>.value(value: routeObserver),
+        if (tApp.startupSequence != null)
           Provider(
             lazy: false,
             create: (context) {
-              final tStartupSequence = getApp().startupSequence!;
+              final tStartupSequence = tApp.startupSequence!;
               if (!_startupSequenceProcessed) {
                 _startupSequenceProcessed = true;
                 tStartupSequence.resetMachine();
@@ -1534,81 +2575,203 @@ class StandardRouterDelegate extends RouterDelegate<StandardRouteData>
     );
   }
 
+  bool _markRebuild = false;
+
   void _updatePages() {
-    _pageInstances = _pageInstances.toList();
-    final tPageChildInstances = _pageChildInstances;
-    for (var entry in tPageChildInstances.entries) {
-      _pageChildInstances[entry.key] = _pageChildInstances[entry.key]!.toList();
+    if (_markRebuild) {
+      return;
     }
+
+    // Flutter's Navigator detects a change in the page stack when the reference to the List<Page> changes.
+    // Therefore, instead of mutating the list, we must assign a new List instance.
+    _rootPageInstances = _rootPageInstances.toList();
+
+    _markRebuild = true;
     notifyListeners();
   }
 
-  bool _onPopPage(Route<dynamic> route, dynamic result) {
-    if (willPopPage != null) {
-      if (willPopPage!(route, result)) {
-        // We return false here because while a _pop_ was handled elsewhere,
-        // it was not _this_ route whose pop is succeeding.
-        return false;
-      }
+  bool _popGestureEnabled = true;
+
+  bool _checkPopGestureEnabled(Route route) {
+    if (!_popGestureEnabled) {
+      return false;
     }
 
-    if (route.settings is StandardPageInterface) {
-      // Remove child navigator page from pageChildInstances only when swiping back
-      var tParentType = _pageInstanceToTypeMap[route.settings];
-      if (tParentType != null) {
-        final tParentPageInstance = _getStandardPageInterface(tParentType);
+    // Get the current active navigator.
+    // This is important for nested navigators to prevent unintended pops.
+    NavigatorState? tCurrentNavigator = currentNavigator;
 
-        if (tParentPageInstance != null) {
-          if (_pageChildInstances.containsKey(tParentPageInstance)) {
-            _pageChildInstances[tParentPageInstance]!.clear();
+    // If the current navigator cannot pop, traverse the page hierarchy to find a navigator that can pop.
+    // This ensures that the pop gesture is only enabled when there is a valid navigator to handle the pop action.
+    if (tCurrentNavigator.canPop() != true) {
+      tCurrentNavigator = navigator;
+
+      for (
+        var tPage = _pageInstanceToNavigatorPage[currentPage];
+        tPage != null;
+        tPage = _pageInstanceToNavigatorPage[tPage]
+      ) {
+        if (tPage.standardPageKey.currentContext != null) {
+          tCurrentNavigator = Navigator.of(
+            tPage.standardPageKey.currentContext!,
+          );
+          if (tCurrentNavigator.canPop()) {
+            break;
           }
-
-          _pageChildInstances.remove(tParentPageInstance);
-          _standardPageInterfaceToType.remove(tParentPageInstance);
-          _pageChildInstancesUpdater.remove(tParentPageInstance);
         }
       }
 
-      return removeRoute(route, result);
-    }
-
-    return false;
-  }
-
-  /// {@template patapata_widgets.StandardRouteDelegate.removeRoute}
-  /// Removes the provided [route] from the navigator and returns true if
-  /// it is successfully removed, or false if not found.
-  /// If the route is removed successfully, it will trigger [Route.didPop].
-  /// [route] represents the removed [Route], and [result] signifies the result passed as an argument to [Route.didPop].
-  /// {@endtemplate}
-  bool removeRoute(Route<dynamic> route, dynamic result) {
-    _pageInstances.remove(route.settings);
-    _pageInstanceToTypeMap.remove(route.settings);
-    _pageInstanceToRouteData.remove(route.settings);
-
-    if (route.settings is StandardPageInterface) {
-      final tState = (route.settings as StandardPageInterface)
-          .standardPageKey
-          .currentState;
-      final tCompleter = _pageInstanceCompleterMap.remove(route.settings);
-
-      if (tCompleter != null) {
-        tState?._completeResult(tCompleter, result);
+      if (tCurrentNavigator?.canPop() != true) {
+        // If no navigator can pop, fall back to the route navigator.
+        tCurrentNavigator = route.navigator;
       }
-
-      tState?._updateActiveStatus(false);
     }
 
-    _updatePages();
-
-    if (route.didPop(result)) {
-      return true;
-    }
-
-    return false;
+    return tCurrentNavigator == route.navigator;
   }
 
-  bool _continueProcessInitialRoute = false;
+  void _onPopInvokedWithResult(Route route, bool didPop, dynamic result) {
+    if (didPop) {
+      final tRouteSettings = route.settings;
+      if (_pageInstanceToPageType.containsKey(tRouteSettings)) {
+        _onRemovePageInvoked(
+          tRouteSettings as StandardPageInterface,
+          result,
+          true,
+        );
+
+        scheduleFunction(_updatePages);
+      }
+    }
+  }
+
+  void _onDidRemovePage(Page page) {
+    if (_pageInstanceToPageType.containsKey(page)) {
+      // Handling cases where a page is removed directly without going through Patapata's mechanism,
+      // such as Navigator.removeRoute.
+      //
+      // However, prior to Flutter 3.35.7, page-based routes cannot be completed with imperative APIs.
+      // In this case, Navigator.removeRoute will result in an assert error.
+      // Therefore, it cannot be covered by code coverage.
+
+      // coverage:ignore-start
+      _onRemovePageInvoked(page as StandardPageInterface, null, false);
+
+      scheduleFunction(_updatePages);
+      // coverage:ignore-end
+    }
+
+    onDidRemovePage?.call(page);
+  }
+
+  void _onRemovePageInvoked(
+    StandardPageInterface page,
+    Object? result,
+    bool onPop,
+  ) {
+    final tNavigatorHierarchy = <StandardPageInterface>[];
+    for (
+      var i = _pageInstanceToNavigatorPage[page];
+      i != null;
+      i = _pageInstanceToNavigatorPage[i]
+    ) {
+      tNavigatorHierarchy.add(i);
+    }
+
+    _removePage(page, result);
+
+    // After removing the page, check if the navigator page needs a default nested page.
+    for (var i in tNavigatorHierarchy) {
+      if (_pageInstanceToPageType.containsKey(i)) {
+        _checkDefaultNestedPage(i);
+        break;
+      }
+    }
+
+    // After removing the page, update the active page.
+    //
+    // When onPop is true, RouteObserver handles the update automatically.
+    // When onPop is false (e.g., removeRoute directly deletes Route), manually traverse
+    // the navigator hierarchy to find and activate the appropriate page.
+    if (!onPop) {
+      StandardPageInterface? tPage = currentPage;
+      if (tPage != null &&
+          tPage.standardPageKey.currentState?.active == false) {
+        while (tPage != null) {
+          final tNavigatorPage = _pageInstanceToNavigatorPage[tPage];
+          if (tNavigatorPage == null ||
+              tNavigatorPage.standardPageKey.currentState?.active == true) {
+            break;
+          }
+          tPage = tNavigatorPage;
+        }
+
+        tPage?.standardPageKey.currentState?._updateActiveStatus(
+          forcedStatus: true,
+        );
+      }
+    }
+  }
+
+  void _removePage(
+    StandardPageInterface page,
+    Object? result, [
+    bool keepEmptyNavigatorPage = false,
+  ]) {
+    final tPageInstances = _nestedPageInstances[page]?.reversed.toList();
+    if (tPageInstances != null) {
+      for (var tPage in tPageInstances) {
+        _removePage(tPage, null, true);
+      }
+      _nestedPageInstances.remove(page);
+    }
+
+    final tCompleter = _pageInstanceCompleterMap.remove(page);
+    final tState = page.standardPageKey.currentState;
+
+    if (tCompleter != null) {
+      tState?._completeResult(tCompleter, result);
+    }
+
+    tState?._updateActiveStatus(forcedStatus: false, recursive: false);
+
+    _pageInstanceToPageType.remove(page);
+    _pageInstanceToRouteData.remove(page);
+
+    final tNavigatorPage = _pageInstanceToNavigatorPage.remove(page);
+    if (tNavigatorPage != null) {
+      final tPageInstances = _nestedPageInstances[tNavigatorPage];
+      tPageInstances?.remove(page);
+      if (!keepEmptyNavigatorPage && tPageInstances?.isEmpty == true) {
+        _removePage(tNavigatorPage, null, keepEmptyNavigatorPage);
+      }
+    } else {
+      _rootPageInstances.remove(page);
+    }
+  }
+
+  /// Removes the specified [route] from the navigation stack.
+  ///
+  /// {@template patapata_widgets.StandardRouteDelegate.removeRoute}
+  /// If the route corresponds to a [StandardPageInterface], it performs necessary cleanup
+  /// and updates the page stack accordingly.
+  /// If the route does not correspond to a [StandardPageInterface], it directly removes the
+  /// route from the navigator.
+  /// {@endtemplate}
+  void removeRoute(Route<dynamic> route, Object? result) {
+    final tRouteSettings = route.settings;
+    if (tRouteSettings is StandardPageInterface) {
+      if (_pageInstanceToPageType.containsKey(tRouteSettings)) {
+        _onRemovePageInvoked(tRouteSettings, result, false);
+
+        _updatePages();
+      }
+    } else {
+      route.navigator?.removeRoute(route, result);
+
+      _updatePages();
+    }
+  }
 
   /// {@template patapata_widgets.StandardRouteDelegate.processInitialRoute}
   /// Selects the initial page that the application should display and navigates to that page.
@@ -1631,9 +2794,13 @@ class StandardRouterDelegate extends RouterDelegate<StandardRouteData>
     _initialRouteProcessed = true;
     _continueProcessInitialRoute = true;
 
-    StandardRouteData? tInitialRouteData = _initialRouteData ??
-        (await getApp().standardAppPlugin.parser?.parseRouteInformation(
-            RouteInformation(uri: Uri(path: Navigator.defaultRouteName))));
+    final tApp = context.read<App>();
+
+    StandardRouteData? tInitialRouteData =
+        _initialRouteData ??
+        (await tApp.standardAppPlugin.parser?.parseRouteInformation(
+          RouteInformation(uri: Uri(path: Navigator.defaultRouteName)),
+        ));
     _initialRouteData = null;
 
     if (!_continueProcessInitialRoute) {
@@ -1684,13 +2851,13 @@ class StandardRouterDelegate extends RouterDelegate<StandardRouteData>
       _initialRouteData = configuration;
 
       if (!_startupSequenceProcessed) {
-        final tEnv = getApp().environment;
+        final tEnv = context.read<App>().environment;
         final tAutoProcessInitialRoute = switch (tEnv) {
           StandardAppEnvironment() => tEnv.autoProcessInitialRoute,
-          _ => true
+          _ => true,
         };
         if (tAutoProcessInitialRoute) {
-          processInitialRoute();
+          return processInitialRoute();
         }
       }
 
@@ -1703,39 +2870,102 @@ class StandardRouterDelegate extends RouterDelegate<StandardRouteData>
   }
 
   @override
-  StandardRouteData? get currentConfiguration => _pageInstances.isEmpty
-      ? null
-      : _pageInstanceToRouteData[_pageInstances.last];
+  StandardRouteData? get currentConfiguration {
+    final tCurrentPage = currentPage;
+    if (tCurrentPage == null) {
+      return null;
+    }
+    return _pageInstanceToRouteData[tCurrentPage];
+  }
 
+  /// Retrieves the root `NavigatorKey`.
   @override
   GlobalKey<NavigatorState>? get navigatorKey => _navigatorKey;
 
-  /// Retrieves the current `Navigator`.
+  /// Retrieves the current `NavigatorKey`.
+  GlobalKey<NavigatorState>? get currentNavigatorKey {
+    final tCurrentPage = currentPage;
+    if (tCurrentPage == null) {
+      return navigatorKey; // coverage:ignore-line
+    }
+
+    final tNavigatorPage =
+        _pageInstanceToNavigatorPage[tCurrentPage]?.standardPageKey.currentState
+            as StandardPageWithNestedNavigator?;
+
+    return tNavigatorPage?.nestedNavigatorKey ?? navigatorKey;
+  }
+
+  /// Retrieves the current `StandardPageInterface`.
+  StandardPageInterface? get currentPage {
+    StandardPageInterface? tPage = _rootPageInstances.lastOrNull;
+
+    if (tPage != null) {
+      StandardPageInterface? tNestedPageInstance;
+      do {
+        tNestedPageInstance = _nestedPageInstances[tPage]?.lastOrNull;
+        tPage = tNestedPageInstance ?? tPage;
+      } while (tNestedPageInstance != null);
+    }
+
+    return tPage;
+  }
+
+  /// Retrieves the root `Navigator`.
   NavigatorState get navigator {
-    assert(_navigatorKey.currentState != null,
-        'Navigator does not exist yet. Wait for the first build to finish before using [navigator].');
+    assert(
+      _navigatorKey.currentState != null,
+      'Navigator does not exist yet. Wait for the first build to finish before using [navigator].',
+    );
 
     return _navigatorKey.currentState!;
   }
 
-  /// Retrieves the `BuildContext` of the Navigator.
+  /// Retrieves the `BuildContext` of the root Navigator.
   BuildContext get navigatorContext {
-    assert(_navigatorKey.currentContext != null,
-        'Navigator does not exist yet. Wait for the first build to finish before using [navigatorContext].');
+    assert(
+      _navigatorKey.currentContext != null,
+      'Navigator does not exist yet. Wait for the first build to finish before using [navigatorContext].',
+    );
 
     return _navigatorKey.currentContext!;
   }
 
+  /// Retrieves the current `Navigator`.
+  NavigatorState get currentNavigator {
+    final tKey = currentNavigatorKey;
+
+    assert(
+      tKey?.currentState != null,
+      'Navigator does not exist yet. Wait for the first build to finish before using [navigator].',
+    );
+
+    return tKey!.currentState!;
+  }
+
+  /// Retrieves the `BuildContext` of the current Navigator.
+  BuildContext get currentNavigatorContext {
+    final tKey = currentNavigatorKey;
+
+    assert(
+      tKey?.currentContext != null,
+      'Navigator does not exist yet. Wait for the first build to finish before using [navigatorContext].',
+    );
+
+    return tKey!.currentContext!;
+  }
+
   StandardRouteData? _getStandardRouteDataForPath(Uri location) {
     for (var i in _factoryTypeMap.values) {
-      for (var j in i._links.entries) {
-        final tMatch = j.key.firstMatch(location.path);
+      final tLinks = _links[i] ?? const [];
+      for (var j in tLinks) {
+        final tMatch = j.$1.firstMatch(location.path);
 
         if (tMatch != null) {
           try {
             return StandardRouteData(
               factory: i,
-              pageData: j.value(tMatch, location),
+              pageData: j.$2(tMatch, location),
             );
           } catch (e, stackTrace) {
             _logger.info('Exception during links callback', e, stackTrace);
@@ -1748,320 +2978,315 @@ class StandardRouterDelegate extends RouterDelegate<StandardRouteData>
     return null;
   }
 
+  List<StandardPageWithResultFactory> _getNavigatorHierarchy(
+    StandardPageWithResultFactory factory,
+  ) {
+    final tHierarchy = <StandardPageWithResultFactory>[];
+    StandardPageWithResultFactory? tPageFactory = factory.navigatorPageFactory;
+    while (tPageFactory != null) {
+      tHierarchy.add(tPageFactory);
+      tPageFactory = tPageFactory.navigatorPageFactory;
+    }
+    return tHierarchy.reversed.toList();
+  }
+
   Future<E?> _goWithFactory<E extends Object?>(
     StandardPageWithResultFactory factory,
     Object? pageData,
     StandardPageNavigationMode? navigationMode,
+    bool pushParentHistory,
   ) {
     _continueProcessInitialRoute = false;
 
-    StandardPageWithResultFactory tFactory = factory;
+    final tNavigationMode = navigationMode ?? factory.navigationMode;
 
-    var tCurrentPage = _pageInstances.lastOrNull;
-    StandardPageWithResultFactory<StandardPageWithResult<Object?, Object?>,
-        Object?, Object?>? tParentPageFactory;
+    final StandardPageInterface? tCurrentPage = currentPage;
 
-    if (factory.parentPageType != null) {
-      final tParentPageInstance =
-          _getStandardPageInterface(factory.parentPageType!);
-      if (tParentPageInstance == null) {
-        tParentPageFactory = _getFactoryFromPageType(factory.parentPageType!);
-        _targetFirstChildPage = factory;
-      } else {
-        _targetFirstChildPage = null;
-      }
-    } else {
-      _targetFirstChildPage = null;
-    }
-
-    tFactory = tParentPageFactory ?? factory;
-
-    void fCleanupPage(StandardPageInterface page) {
-      final tCompleter = _pageInstanceCompleterMap.remove(page);
-      final tState = page.standardPageKey.currentState;
-
-      if (tCompleter != null) {
-        tState?._completeResult(tCompleter, null);
-      }
-
-      tState?._updateActiveStatus(false);
-    }
-
-    void fRemoveLastPage() {
-      final tPage = _pageInstances.removeLast();
-      _pageInstanceToTypeMap.remove(tPage);
-      _pageInstanceToRouteData.remove(tPage);
-      fCleanupPage(tPage as StandardPageInterface);
-    }
+    assert(
+      tCurrentPage == null || _pageInstanceToPageType.containsKey(tCurrentPage),
+    );
 
     if (tCurrentPage != null) {
-      assert(_pageInstanceToTypeMap.containsKey(tCurrentPage));
-
-      var tCurrentFactory =
-          _getFactoryFromPageType(_pageInstanceToTypeMap[tCurrentPage]!);
-
-      if (!tCurrentFactory.keepHistory) {
-        fRemoveLastPage();
-      }
-
-      if (tFactory.group != null) {
-        while (true) {
-          tCurrentPage = _pageInstances.lastOrNull;
-
-          if (tCurrentPage == null) {
-            break;
-          }
-
-          assert(_pageInstanceToTypeMap.containsKey(tCurrentPage));
-
-          tCurrentFactory =
-              _getFactoryFromPageType(_pageInstanceToTypeMap[tCurrentPage]!);
-
-          if (tCurrentFactory.group != null) {
-            break;
-          }
-        }
-
-        if (tCurrentPage != null && tCurrentFactory.group != tFactory.group) {
-          // Different group than the current one.
-          // Remove all history.
-          var tReversedPageInstances = _pageInstances.reversed.toList();
-
-          _pageInstanceToTypeMap.clear();
-          _pageInstanceToRouteData.clear();
-          _pageInstances.clear();
+      bool tRemoved = false;
+      for (
+        var tNavigatorPage = _pageInstanceToNavigatorPage[tCurrentPage];
+        tNavigatorPage != null;
+        tNavigatorPage = _pageInstanceToNavigatorPage[tNavigatorPage]
+      ) {
+        if (tNavigatorPage.factoryObject.pageType == factory.pageType) {
+          // Navigating to the same page as the current navigator page.
+          // Remove all nested pages.
+          final tReversedPageInstances = _nestedPageInstances[tNavigatorPage]!
+              .reversed
+              .toList();
           for (var tPageInstance in tReversedPageInstances) {
-            fCleanupPage(tPageInstance as StandardPageInterface);
+            _removePage(tPageInstance, null);
           }
+          tRemoved = true;
+          break;
         }
       }
-    }
 
-    final tNavigationMode = navigationMode ?? tFactory.navigationMode;
+      if (!tRemoved) {
+        if (!tCurrentPage.factoryObject.keepHistory ||
+            tNavigationMode == StandardPageNavigationMode.replace) {
+          // Current page does not keep history or navigation mode is replace.
+          // Remove the current page from history.
+          _removePage(tCurrentPage, null);
+        } else {
+          if ((tNavigationMode == StandardPageNavigationMode.removeAll) ||
+              (factory.group != null &&
+                  tCurrentPage.factoryObject.group != null &&
+                  tCurrentPage.factoryObject.group != factory.group)) {
+            // Different group than the current one.
+            // Remove all history.
+            final tReversedPageInstances = _rootPageInstances.reversed.toList();
 
-    if (tNavigationMode == StandardPageNavigationMode.removeAll) {
-      // Remove all history.
-      var tReversedPageInstances = _pageInstances.reversed.toList();
-
-      _pageInstanceToTypeMap.clear();
-      _pageInstanceToRouteData.clear();
-      _pageInstances.clear();
-      for (var tPageInstance in tReversedPageInstances) {
-        fCleanupPage(tPageInstance as StandardPageInterface);
-      }
-    } else if (tNavigationMode == StandardPageNavigationMode.replace) {
-      fRemoveLastPage();
-    }
-
-    final tPageKey = tFactory.getPageKey(pageData);
-
-    void fCheckGroupRoot() {
-      if (!tFactory.groupRoot) {
-        // Search to see if a group root exists and add it.
-        final tGroup = tFactory.group;
-
-        for (var i in _factoryTypeMap.entries) {
-          final tGroupRootFactory = i.value;
-
-          if (tGroupRootFactory.group == tGroup &&
-              tGroupRootFactory.groupRoot) {
-            // Found one. See if it's already in the history.
-            if (!_pageInstanceToTypeMap.containsValue(i.key)) {
-              // There isn't. So add it.
-              final tGroupRootPageData =
-                  tGroupRootFactory.pageDataWhenNull?.call();
-              final tGroupRootPageKey =
-                  tGroupRootFactory.getPageKey(tGroupRootPageData);
-              final tGroupRootPage = _initializePage(
-                  tGroupRootFactory, tGroupRootPageKey, tGroupRootPageData);
-
-              _pageInstanceToTypeMap[tGroupRootPage] =
-                  tGroupRootFactory.pageType;
-              _pageInstanceToRouteData[tGroupRootPage] = StandardRouteData(
-                factory: tGroupRootFactory,
-                pageData: tGroupRootPageData,
-              );
-              _pageInstanceCompleterMap[tGroupRootPage] =
-                  tGroupRootFactory._createResultCompleter();
-              _pageInstances.insert(0, tGroupRootPage);
+            for (var tPageInstance in tReversedPageInstances) {
+              _removePage(tPageInstance, null);
             }
           }
         }
       }
     }
 
-    // First check to see if we already have this page's representation
-    // in the history stack. If we do, modify the history stack and use the old instance.
-    for (var i = 0, il = _pageInstances.length; i < il; i++) {
-      if (_pageInstances[i].key == tPageKey) {
-        switch (tNavigationMode) {
-          case StandardPageNavigationMode.moveToTop:
-          case StandardPageNavigationMode.replace:
-            if (i == il - 1) {
+    StandardPageInterface fNavigate(
+      StandardPageWithResultFactory factory,
+      Object? pageData,
+      StandardPageNavigationMode mode,
+      bool pushParentHistory, [
+      bool isHierarchyPage = false,
+    ]) {
+      final StandardPageInterface? tNavigatorPage;
+      if (factory.navigatorPageFactory != null) {
+        final tNavigatorPageFactory = factory.navigatorPageFactory!;
+
+        if (factory.anyNavigator) {
+          // Add to the deepest nested navigator page starting from the base navigator.
+          StandardPageInterface tBaseNavigatorPage = _pageInstanceToPageType
+              .entries
+              .firstWhere(
+                (entry) => entry.value == tNavigatorPageFactory.pageType,
+              )
+              .key;
+          StandardPageInterface? tLastPage =
+              _nestedPageInstances[tBaseNavigatorPage]?.lastOrNull;
+          while (tLastPage != null && tLastPage.factoryObject.hasNestedPages) {
+            tBaseNavigatorPage = tLastPage;
+            tLastPage = _nestedPageInstances[tLastPage]?.lastOrNull;
+          }
+
+          tNavigatorPage = tBaseNavigatorPage;
+        } else {
+          tNavigatorPage = _pageInstanceToPageType.entries
+              .firstWhere(
+                (entry) => entry.value == tNavigatorPageFactory.pageType,
+              )
+              .key;
+        }
+      } else {
+        tNavigatorPage = null;
+      }
+
+      assert(
+        factory.navigatorPageFactory == null ||
+            (tNavigatorPage != null &&
+                _nestedPageInstances.containsKey(tNavigatorPage)),
+      );
+
+      final tPageInstances =
+          _nestedPageInstances[tNavigatorPage] ?? _rootPageInstances;
+
+      final tPageKey = factory.getPageKey(pageData);
+
+      // First check to see if we already have this page's representation
+      // in the history stack. If we do, modify the history stack and use the old instance.
+      for (var i = 0, il = tPageInstances.length; i < il; i++) {
+        if (tPageInstances[i].key == tPageKey) {
+          switch (mode) {
+            case StandardPageNavigationMode.moveToTop:
+            case StandardPageNavigationMode.replace:
+              if (i == il - 1) {
+                break;
+              }
+
+              final tLastPage = tPageInstances.lastOrNull;
+
+              // Update active status of all pages being moved to inactive status.
+              if (tLastPage != null) {
+                tLastPage.standardPageKey.currentState?._updateActiveStatus(
+                  forcedStatus: false,
+                );
+              }
+
+              final tPageToMove = tPageInstances[i];
+
+              // Shift all instances from this point to the left by one.
+              // Ignore the last index as we just replace it
+              for (var j = i; j < il - 1; j++) {
+                tPageInstances[j] = tPageInstances[j + 1];
+              }
+
+              tPageInstances[il - 1] = tPageToMove;
+
               break;
-            }
+            case StandardPageNavigationMode.removeAbove:
+              for (var j = il - 1; j > i; j--) {
+                final tLastPage = tPageInstances.lastOrNull;
+                if (tLastPage != null) {
+                  _removePage(tLastPage, null);
+                }
+              }
 
-            final tLastPage = (_pageInstances.last as StandardPageInterface?)
-                ?.standardPageKey
-                .currentState;
-            tLastPage?._updateActiveStatus(false);
+              break;
+            default:
+              break;
+          }
 
-            final tPageToMove = _pageInstances[i];
-
-            // Shift all instances from this point to the left by one.
-            // Ignore the last index as we just replace it
-            for (var j = i; j < il - 1; j++) {
-              _pageInstances[j] = _pageInstances[j + 1];
-            }
-
-            _pageInstances[il - 1] = tPageToMove;
-
-            break;
-          case StandardPageNavigationMode.removeAbove:
-            for (var j = il - 1; j > i; j--) {
-              fRemoveLastPage();
-            }
-
-            break;
-          default:
-            break;
+          break;
         }
+      }
 
-        final tLastPageInstance = _pageInstances.last;
-        final tLastPage = (tLastPageInstance as StandardPageInterface?)
-            ?.standardPageKey
-            .currentState;
+      if (tPageInstances.lastOrNull?.key == tPageKey) {
+        final tLastPage = tPageInstances.last;
+        final tLastPageState = tLastPage.standardPageKey.currentState;
 
         bool tLastPageDataChanged = false;
 
-        if (tLastPage != null) {
-          if (tLastPage.pageData != pageData) {
-            tLastPage.pageData = pageData;
+        if (tLastPageState != null) {
+          if (tLastPageState.pageData != pageData) {
+            tLastPageState.pageData = pageData;
             tLastPageDataChanged = true;
           }
 
-          if (tLastPage.active) {
-            tLastPage.onRefocus();
+          if (tLastPageState.active) {
+            tLastPageState.onRefocus();
           } else {
-            final tRoute = ModalRoute.of(tLastPage.context);
+            final tRoute = ModalRoute.of(tLastPageState.context);
 
             if (tRoute != null) {
-              tLastPage.context.read<Analytics>().routeViewEvent(
-                    tRoute,
-                    navigationType: AnalyticsNavigationType.push,
-                  );
+              tLastPageState.context.read<Analytics>().routeViewEvent(
+                tRoute,
+                navigationType: AnalyticsNavigationType.push,
+              );
             }
-            tLastPage._updateActiveStatus(true);
+            tLastPageState._pushParentHistory = pushParentHistory;
+            // Update active status to true.
+            // If it's a hierarchy page, do not update recursively.
+            // This is because it is not yet known which of the subordinate pages is active.
+            tLastPageState._updateActiveStatus(
+              forcedStatus: true,
+              recursive: !isHierarchyPage,
+            );
           }
         }
 
-        fCheckGroupRoot();
-
-        final tCompleter = _pageInstanceCompleterMap[tLastPageInstance]!;
-
-        assert(
-          tCompleter is Completer<E?>,
-          'Same PageKey used for pages that have different return types.'
-          'This is not allowed. PageKey: $tPageKey',
-        );
-
-        final tFuture = (tCompleter as Completer<E?>).future;
-
         if (tLastPageDataChanged) {
-          _pageInstanceToRouteData[tLastPageInstance] = StandardRouteData(
-            factory: tFactory,
+          _pageInstanceToRouteData[tLastPage] = StandardRouteData(
+            factory: factory,
             pageData: pageData,
           );
         }
 
-        _updatePages();
+        return tLastPage;
+      } else {
+        final tRouteData = StandardRouteData(
+          factory: factory,
+          pageData: pageData,
+        );
 
-        return tFuture;
+        final tPage = _initializePage(tRouteData, pushParentHistory);
+        _pushPageInstance(tPage, tRouteData);
+
+        return tPage;
       }
     }
 
-    final tPage = _initializePage(tFactory, tPageKey, pageData);
-
-    _pageInstanceToTypeMap[tPage] = tFactory.pageType;
-    _pageInstanceToRouteData[tPage] = StandardRouteData(
-      factory: tFactory,
-      pageData: pageData,
+    final tNavigatorHierarchy = _getNavigatorHierarchy(factory);
+    for (var tNavigatorFactory in tNavigatorHierarchy) {
+      final tNavigatorPage = fNavigate(
+        tNavigatorFactory,
+        null,
+        tNavigationMode,
+        false,
+        true,
+      );
+      _checkDefaultNestedPage(tNavigatorPage);
+    }
+    final tPage = fNavigate(
+      factory,
+      pageData,
+      tNavigationMode,
+      pushParentHistory,
     );
-    final tResultCompleter = _pageInstanceCompleterMap[tPage] =
-        tFactory._createResultCompleter() as Completer<E?>;
-
-    if (factory.parentPageType == null ||
-        (factory.parentPageType != null && tParentPageFactory != null)) {
-      _pageInstances.add(tPage);
-    } else {
-      var tParentStandardPageInterface =
-          _getStandardPageInterface(factory.parentPageType!);
-
-      if (tParentStandardPageInterface != null) {
-        _addPageChildInstance(tParentStandardPageInterface, tPage);
-
-        if (_pageChildInstancesUpdater[tParentStandardPageInterface] != null) {
-          _pageChildInstancesUpdater[tParentStandardPageInterface]!();
-        }
-      }
+    if (tPage.factoryObject.hasNestedPages) {
+      _checkDefaultNestedPage(tPage);
+    }
+    if (pushParentHistory) {
+      tPage.standardPageKey.currentState?._pushParentHistory = true;
+      _pushParentPageHistory(tPage);
     }
 
-    fCheckGroupRoot();
+    final tCompleter = _pageInstanceCompleterMap[tPage]!;
+
+    assert(
+      tCompleter is Completer<E?>,
+      'Same PageKey used for pages that have different return types.'
+      'This is not allowed. PageKey: ${factory.getPageKey(pageData)}', // coverage:ignore-line
+    );
+
+    _checkGroupRoot(currentPage!);
 
     _updatePages();
 
-    return tResultCompleter.future;
+    return (tCompleter as Completer<E?>).future;
+  }
+}
+
+class _RootNavigatorObserver extends NavigatorObserver {
+  final StandardRouterDelegate _delegate;
+
+  _RootNavigatorObserver(this._delegate);
+
+  @override
+  void didPush(Route<dynamic> route, Route<dynamic>? previousRoute) {
+    if (route.settings is! StandardPageInterface && route.isCurrent) {
+      _delegate._popGestureEnabled = false;
+      return;
+    }
   }
 
-  void _addPageChildInstance(Page parentPage, Page page) {
-    _pageChildInstances[parentPage]?.add(page);
+  @override
+  void didPop(Route<dynamic> route, Route<dynamic>? previousRoute) {
+    if (route.settings is! StandardPageInterface &&
+        (previousRoute?.settings == null ||
+            previousRoute?.settings is StandardPageInterface &&
+                previousRoute!.isCurrent)) {
+      _delegate._popGestureEnabled = true;
+      return;
+    }
   }
 
-  void _removePageChildInstance(Page parentPage, Page page) {
-    _pageChildInstances[parentPage]?.remove(page);
+  @override
+  void didRemove(Route<dynamic> route, Route<dynamic>? previousRoute) {
+    if (route.settings is! StandardPageInterface &&
+        (previousRoute?.settings == null ||
+            previousRoute?.settings is StandardPageInterface &&
+                previousRoute!.isCurrent)) {
+      _delegate._popGestureEnabled = true;
+      return;
+    }
   }
 
-  StandardPageInterface? _getStandardPageInterface(Type pageType) {
-    // Check the page Type in _standardPageInterfaceToType
-    // _addPageChildInstance under which parent entity the tPage
-    // generated by _initializePage isdetermine whether to add
-    final tStandardPageInterfaceToType = _standardPageInterfaceToType.entries
-        .firstWhereOrNull((standardPageInterfaceToType) {
-      final tResult = standardPageInterfaceToType.value
-          .where((element) => element == pageType);
-      return tResult.isNotEmpty;
-    });
-
-    if (tStandardPageInterfaceToType == null) {
-      return null;
+  @override
+  void didReplace({Route<dynamic>? newRoute, Route<dynamic>? oldRoute}) {
+    if (newRoute == null) {
+      return;
     }
 
-    return tStandardPageInterfaceToType.key;
-  }
-
-  StandardPageWithResultFactory _addChildFirstPage(
-    Type pageType,
-    StandardPageInterface parentPageInstance,
-  ) {
-    final tFactory = _getFactoryFromPageType(pageType);
-    final tPageData = tFactory.pageDataWhenNull?.call();
-    final tPageKey = tFactory.getPageKey(tPageData);
-
-    final tPage = _initializePage(tFactory, tPageKey, tPageData);
-
-    _pageInstanceToTypeMap[tPage] = tFactory.pageType;
-    _pageInstanceToRouteData[tPage] = StandardRouteData(
-      factory: tFactory,
-      pageData: tPageData,
-    );
-    _pageInstanceCompleterMap[tPage] = tFactory._createResultCompleter();
-
-    // If the page to be added belongs to the parent Navigator, add it to _pageChildInstances
-    if (_pageChildInstances.keys.contains(parentPageInstance)) {
-      _addPageChildInstance(parentPageInstance, tPage);
+    if (newRoute.isCurrent == true) {
+      _delegate._popGestureEnabled = newRoute.settings is StandardPageInterface;
     }
-
-    return tFactory;
   }
 }
 
@@ -2070,10 +3295,7 @@ extension StandardPageContext on BuildContext {
   /// {@macro patapata_widgets.StandardPageWithResult.pl}
   ///
   /// Throws an exception if [StandardPageWithResult] does not exist in the widget tree of the context.
-  String pl(
-    String key, [
-    Map<String, Object>? namedParameters,
-  ]) {
+  String pl(String key, [Map<String, Object>? namedParameters]) {
     if (this is StatefulElement) {
       final tElement = (this as StatefulElement);
       if (tElement.state is StandardPageWithResult) {
@@ -2086,6 +3308,7 @@ extension StandardPageContext on BuildContext {
   }
 }
 
+/// Exception thrown when a web page is not found.
 class WebPageNotFound extends PatapataCoreException {
   WebPageNotFound() : super(code: PatapataCoreExceptionCode.PPE601);
 

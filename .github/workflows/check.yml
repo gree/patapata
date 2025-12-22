@@ -18,9 +18,8 @@ jobs:
     strategy:
       matrix:
         flutterVersion:
-          - '3.35.4'
-          - '3.32.8'
-          - '3.29.0'
+          - '3.38.5'
+          - '3.35.0'
 
     steps:
       - uses: actions/checkout@v3

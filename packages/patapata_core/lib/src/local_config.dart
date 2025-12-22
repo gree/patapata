@@ -83,8 +83,10 @@ class ProxyLocalConfig extends LocalConfig {
   /// Retrieves the double value with the name [key] from the current [LocalConfig].
   /// If it cannot be retrieved, [defaultValue] is returned.
   @override
-  double getDouble(String key,
-      {double defaultValue = Config.defaultValueForDouble}) {
+  double getDouble(
+    String key, {
+    double defaultValue = Config.defaultValueForDouble,
+  }) {
     if (_current.hasKey(key)) {
       return _current.getDouble(key, defaultValue: defaultValue);
     }
@@ -114,8 +116,10 @@ class ProxyLocalConfig extends LocalConfig {
   /// Retrieves the String value with the name [key] from the current [LocalConfig].
   /// If it cannot be retrieved, [defaultValue] is returned.
   @override
-  String getString(String key,
-      {String defaultValue = Config.defaultValueForString}) {
+  String getString(
+    String key, {
+    String defaultValue = Config.defaultValueForString,
+  }) {
     if (_current.hasKey(key)) {
       return _current.getString(key, defaultValue: defaultValue);
     }
@@ -221,18 +225,20 @@ mixin MemoryLocalConfig on LocalConfig {
     return store.containsKey(key) && store[key] is bool
         ? store[key] as bool
         : defaults.containsKey(key) && defaults[key] is bool
-            ? defaults[key] as bool
-            : defaultValue;
+        ? defaults[key] as bool
+        : defaultValue;
   }
 
   @override
-  double getDouble(String key,
-      {double defaultValue = Config.defaultValueForDouble}) {
+  double getDouble(
+    String key, {
+    double defaultValue = Config.defaultValueForDouble,
+  }) {
     return store.containsKey(key) && store[key] is double
         ? store[key] as double
         : defaults.containsKey(key) && defaults[key] is double
-            ? defaults[key] as double
-            : defaultValue;
+        ? defaults[key] as double
+        : defaultValue;
   }
 
   @override
@@ -240,18 +246,20 @@ mixin MemoryLocalConfig on LocalConfig {
     return store.containsKey(key) && store[key] is int
         ? store[key] as int
         : defaults.containsKey(key) && defaults[key] is int
-            ? defaults[key] as int
-            : defaultValue;
+        ? defaults[key] as int
+        : defaultValue;
   }
 
   @override
-  String getString(String key,
-      {String defaultValue = Config.defaultValueForString}) {
+  String getString(
+    String key, {
+    String defaultValue = Config.defaultValueForString,
+  }) {
     return store.containsKey(key) && store[key] is String
         ? store[key] as String
         : defaults.containsKey(key) && defaults[key] is String
-            ? defaults[key] as String
-            : defaultValue;
+        ? defaults[key] as String
+        : defaultValue;
   }
 
   @override

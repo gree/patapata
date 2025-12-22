@@ -23,9 +23,7 @@ class CacheDurationException implements Exception {}
 @RepositoryClass(sets: {Filter1, Filter2, Filter3})
 abstract class _TestModel extends ProviderModel<TestModel>
     implements RepositoryModelCache {
-  _TestModel({
-    required this.id,
-  });
+  _TestModel({required this.id});
 
   _TestModel.init(
     this.id, {
@@ -39,7 +37,9 @@ abstract class _TestModel extends ProviderModel<TestModel>
     if (v1 != null) {
       tBatch.set<int?>(_value1, v1);
       tBatch.set<HasNotBuilderModel>(
-          _deepModel, HasNotBuilderModel.init(id, v1));
+        _deepModel,
+        HasNotBuilderModel.init(id, v1),
+      );
     }
 
     if (v2 != null) {
@@ -53,17 +53,8 @@ abstract class _TestModel extends ProviderModel<TestModel>
     tBatch.commit(notify: false);
   }
 
-  _TestModel.fromRecord(
-    int id,
-    TestRecord v, {
-    Duration? cacheDuration,
-  }) : this.init(
-          id,
-          v1: v.$1,
-          v2: v.$2,
-          v3: v.$3,
-          cacheDuration: cacheDuration,
-        );
+  _TestModel.fromRecord(int id, TestRecord v, {Duration? cacheDuration})
+    : this.init(id, v1: v.$1, v2: v.$2, v3: v.$3, cacheDuration: cacheDuration);
 
   Duration? cacheDuration;
   bool errorOnCacheDuration = false;
@@ -90,9 +81,7 @@ abstract class _TestModel extends ProviderModel<TestModel>
 
 class HasNotBuilderModel extends ProviderModel<HasNotBuilderModel>
     with RepositoryModel<HasNotBuilderModel, int> {
-  HasNotBuilderModel({
-    required this.id,
-  });
+  HasNotBuilderModel({required this.id});
 
   HasNotBuilderModel.init(this.id, int value) {
     final tBatch = begin();
@@ -114,6 +103,6 @@ class HasNotBuilderModel extends ProviderModel<HasNotBuilderModel>
 
   @override
   Map<Type, Set<ProviderModelVariable>> get repositorySetVariables => {
-        HasNotBuilderModel: {_value},
-      };
+    HasNotBuilderModel: {_value},
+  };
 }

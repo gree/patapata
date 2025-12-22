@@ -53,25 +53,17 @@ enum NetworkConnectivity {
 class NetworkInformation {
   final List<NetworkConnectivity> connectivities;
 
-  const NetworkInformation({
-    required this.connectivities,
-  });
+  const NetworkInformation({required this.connectivities});
 
-  factory NetworkInformation.unknown() => const NetworkInformation(
-        connectivities: [NetworkConnectivity.unknown],
-      );
+  factory NetworkInformation.unknown() =>
+      const NetworkInformation(connectivities: [NetworkConnectivity.unknown]);
 
   @override
-  String toString() => 'NetworkInformation:connectivity=[${[
-        for (final tConnectivity in connectivities) tConnectivity.name
-      ]}]';
+  String toString() =>
+      'NetworkInformation:connectivity=[${[for (final tConnectivity in connectivities) tConnectivity.name]}]';
 
-  NetworkInformation copyWith({
-    List<NetworkConnectivity>? connectivities,
-  }) =>
-      NetworkInformation(
-        connectivities: connectivities ?? this.connectivities,
-      );
+  NetworkInformation copyWith({List<NetworkConnectivity>? connectivities}) =>
+      NetworkInformation(connectivities: connectivities ?? this.connectivities);
 
   @override
   operator ==(Object other) =>
@@ -112,14 +104,14 @@ class NetworkPlugin extends Plugin with WidgetsBindingObserver {
   Stream<NetworkInformation> get informationStream => _streamController.stream;
 
   StreamSubscription<List<ConnectivityResult>>?
-      _onConnectivityChangedSubscription;
+  _onConnectivityChangedSubscription;
 
   @override
   FutureOr<bool> init(App app) async {
     await super.init(app);
     WidgetsBinding.instance.addObserver(this);
-    _onConnectivityChangedSubscription =
-        _connectivity.onConnectivityChanged.listen(_onConnectivityChanged);
+    _onConnectivityChangedSubscription = _connectivity.onConnectivityChanged
+        .listen(_onConnectivityChanged);
     _onConnectivityChanged(await _connectivity.checkConnectivity());
 
     return true;
@@ -163,7 +155,7 @@ class NetworkPlugin extends Plugin with WidgetsBindingObserver {
           ConnectivityResult.ethernet => NetworkConnectivity.ethernet,
           ConnectivityResult.bluetooth => NetworkConnectivity.bluetooth,
           ConnectivityResult.vpn => NetworkConnectivity.vpn,
-        }
+        },
     ];
 
     if (const IterableEquality().equals(
@@ -217,9 +209,7 @@ class NetworkPlugin extends Plugin with WidgetsBindingObserver {
       TestMockStreamHandler.inline(
         onListen: (data, sink) {
           tMockStreamSubscription = _mockStreamController!.stream.listen((v) {
-            sink.success(
-              [for (final tConnectivity in v) tConnectivity.name],
-            );
+            sink.success([for (final tConnectivity in v) tConnectivity.name]);
             _testChangeConnectivityCompleter?.complete();
             _testChangeConnectivityCompleter = null;
           });
@@ -245,5 +235,5 @@ class NetworkPlugin extends Plugin with WidgetsBindingObserver {
 
 @visibleForTesting
 List<NetworkConnectivity> testOnConnectivityChangedValue = [
-  NetworkConnectivity.none
+  NetworkConnectivity.none,
 ];

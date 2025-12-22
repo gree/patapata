@@ -6,44 +6,56 @@
 import 'package:flutter/material.dart';
 import 'package:patapata_core/patapata_core.dart';
 import 'package:patapata_core/patapata_widgets.dart';
-import 'package:patapata_example_app/src/widgets/app_tab.dart';
+import 'package:patapata_example_app/src/pages/my_page.dart';
+import 'package:patapata_example_app/src/widgets/app_container.dart';
+import 'package:provider/provider.dart';
 
-/// [HomePage] is the parent StandardPage for applications with a tabbed footer.
-/// This HomePage has two child StandardPages, namely [TitlePage] and [TitleDetailsPage].
-class HomePage extends StandardPage<void> {
+class HomePageParent extends StandardPageWithNestedNavigator {
+  @override
+  void onActive(bool first) {
+    super.onActive(first);
+
+    context.read<AppContainer>().selectedFooterType = HomePageParent;
+  }
+
   @override
   Widget buildPage(BuildContext context) {
-    // When creating an application with features like a footer, please return childNavigator in the buildPage method.
-    return childNavigator ?? const SizedBox.shrink();
+    return nestedPages;
   }
 }
 
-/// [TitlePage] is a StandardPage representing the [HomePage] tab in an application with a tabbed footer.
-class TitlePage extends StandardPage<void> {
+class HomePage extends StandardPage<void> {
   @override
   String localizationKey = 'pages.tab.home';
 
   @override
   Widget buildPage(BuildContext context) {
-    return AppTab(
-      appBar: AppBar(
-        title: Text(context.pl('title')),
-        automaticallyImplyLeading: false,
-        leading: const StandardPageBackButton(),
-      ),
-      body: ListView(
+    return Container(
+      color: Colors.white,
+      child: ListView(
         children: [
           Center(
-            child: Builder(
-              builder: (context) {
-                return Text(context.pl('body'));
-              },
+            child: Text(
+              context.pl('title'),
             ),
           ),
+          Text(context.pl('body')),
           TextButton(
-            child: Text(l(context, 'pages.tab.title_details.title')),
+            child: Text(l(context, 'pages.tab.test_page_a.title')),
             onPressed: () {
-              context.go<TitleDetailsPage, void>(null);
+              context.go<TestPageA, void>(null);
+            },
+          ),
+          TextButton(
+            child: Text(l(context, 'pages.tab.test_page_b.title')),
+            onPressed: () {
+              context.go<TestPageB, void>(null);
+            },
+          ),
+          TextButton(
+            child: Text('Show dialog'),
+            onPressed: () {
+              context.read<AppContainer>().dialog(context);
             },
           ),
         ],
@@ -52,27 +64,101 @@ class TitlePage extends StandardPage<void> {
   }
 }
 
-/// [TitleDetailsPage] is a StandardPage that serves as a child of [TitlePage] in the [HomePage] tab of an application with a tabbed footer.
-class TitleDetailsPage extends StandardPage<void> {
+class TestPageA extends StandardPage<void> {
   @override
-  String localizationKey = 'pages.tab.title_details';
+  String localizationKey = 'pages.tab.test_page_a';
 
   @override
   Widget buildPage(BuildContext context) {
-    return AppTab(
-      appBar: AppBar(
-        title: Text(context.pl('title')),
-        automaticallyImplyLeading: false,
-        leading: const StandardPageBackButton(),
-      ),
-      body: ListView(
+    return Container(
+      color: Colors.lightBlue,
+      child: ListView(
         children: [
           Center(
-            child: Builder(
-              builder: (context) {
-                return Text(context.pl('body'));
-              },
+            child: Text(
+              context.pl('title'),
             ),
+          ),
+          Text(context.pl('body')),
+          TextButton(
+            child: Text(l(context, 'pages.tab.test_page_c.title')),
+            onPressed: () {
+              context.go<TestPageC, void>(null);
+            },
+          ),
+          TextButton(
+            child: Text(l(context, 'pages.tab.test_page_b.title')),
+            onPressed: () {
+              context.go<TestPageB, void>(null);
+            },
+          ),
+          TextButton(
+            child: Text('Show dialog'),
+            onPressed: () {
+              context.read<AppContainer>().dialog(context);
+            },
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class TestPageC extends StandardPage<void> {
+  @override
+  String localizationKey = 'pages.tab.test_page_c';
+
+  @override
+  Widget buildPage(BuildContext context) {
+    return Container(
+      color: Colors.lightGreen,
+      child: ListView(
+        children: [
+          Center(
+            child: Text(
+              context.pl('title'),
+            ),
+          ),
+          Text(context.pl('body')),
+          TextButton(
+            child: Text(l(context, 'pages.tab.test_page_d.title')),
+            onPressed: () {
+              context.go<TestPageD, void>(null);
+            },
+          ),
+          TextButton(
+            child: Text('Show dialog'),
+            onPressed: () {
+              context.read<AppContainer>().dialog(context);
+            },
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class TestPageD extends StandardPage<void> {
+  @override
+  String localizationKey = 'pages.tab.test_page_d';
+
+  @override
+  Widget buildPage(BuildContext context) {
+    return Container(
+      color: Colors.red[300],
+      child: ListView(
+        children: [
+          Center(
+            child: Text(
+              context.pl('title'),
+            ),
+          ),
+          Text(context.pl('body')),
+          TextButton(
+            child: Text('Show dialog'),
+            onPressed: () {
+              context.read<AppContainer>().dialog(context);
+            },
           ),
         ],
       ),

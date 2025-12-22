@@ -58,8 +58,10 @@ class WebLocalConfig extends PatapataPlugin {
         break;
       case 'setBool':
         var tArgs = call.arguments as List<Object?>;
-        web.window.localStorage
-            .setItem(tArgs[0] as String, 'b${(tArgs[1] as bool) ? '1' : '0'}');
+        web.window.localStorage.setItem(
+          tArgs[0] as String,
+          'b${(tArgs[1] as bool) ? '1' : '0'}',
+        );
         break;
       case 'setInt':
         var tArgs = call.arguments as List<Object?>;

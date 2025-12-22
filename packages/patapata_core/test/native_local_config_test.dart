@@ -11,7 +11,9 @@ void main() async {
   TestWidgetsFlutterBinding.ensureInitialized();
 
   testSetMockMethodCallHandler = TestDefaultBinaryMessengerBinding
-      .instance.defaultBinaryMessenger.setMockMethodCallHandler;
+      .instance
+      .defaultBinaryMessenger
+      .setMockMethodCallHandler;
 
   const kBoolValueKey = 'kBoolValueKey';
   const kDoubleValueKey = 'kDoubleValueKey';
@@ -23,7 +25,9 @@ void main() async {
     await tNativeLocalConfig.init();
 
     expect(
-        tNativeLocalConfig.getBool(kBoolValueKey), Config.defaultValueForBool);
+      tNativeLocalConfig.getBool(kBoolValueKey),
+      Config.defaultValueForBool,
+    );
 
     await tNativeLocalConfig.setDefaults({kBoolValueKey: true});
     expect(tNativeLocalConfig.getBool(kBoolValueKey), true);
@@ -39,8 +43,10 @@ void main() async {
     NativeLocalConfig tNativeLocalConfig = NativeLocalConfig();
     await tNativeLocalConfig.init();
 
-    expect(tNativeLocalConfig.getDouble(kDoubleValueKey),
-        Config.defaultValueForDouble);
+    expect(
+      tNativeLocalConfig.getDouble(kDoubleValueKey),
+      Config.defaultValueForDouble,
+    );
 
     await tNativeLocalConfig.setDefaults({kDoubleValueKey: 1.0});
     expect(tNativeLocalConfig.getDouble(kDoubleValueKey), 1.0);
@@ -72,8 +78,10 @@ void main() async {
     NativeLocalConfig tNativeLocalConfig = NativeLocalConfig();
     await tNativeLocalConfig.init();
 
-    expect(tNativeLocalConfig.getString(kStringValueKey),
-        Config.defaultValueForString);
+    expect(
+      tNativeLocalConfig.getString(kStringValueKey),
+      Config.defaultValueForString,
+    );
 
     await tNativeLocalConfig.setDefaults({kStringValueKey: '1'});
     expect(tNativeLocalConfig.getString(kStringValueKey), '1');
@@ -102,12 +110,18 @@ void main() async {
     await tNativeLocalConfig.resetAll();
 
     expect(
-        tNativeLocalConfig.getBool(kBoolValueKey), Config.defaultValueForBool);
-    expect(tNativeLocalConfig.getDouble(kDoubleValueKey),
-        Config.defaultValueForDouble);
+      tNativeLocalConfig.getBool(kBoolValueKey),
+      Config.defaultValueForBool,
+    );
+    expect(
+      tNativeLocalConfig.getDouble(kDoubleValueKey),
+      Config.defaultValueForDouble,
+    );
     expect(tNativeLocalConfig.getInt(kIntValueKey), Config.defaultValueForInt);
-    expect(tNativeLocalConfig.getString(kStringValueKey),
-        Config.defaultValueForString);
+    expect(
+      tNativeLocalConfig.getString(kStringValueKey),
+      Config.defaultValueForString,
+    );
   });
 
   test('resetMany', () async {
@@ -119,10 +133,7 @@ void main() async {
     const kIsNotSetKey1 = 'isNotSet1';
     const kIsNotSetKey2 = 'isNotSet2';
 
-    await tNativeLocalConfig.setDefaults({
-      kIsSetKey1: 1,
-      kIsSetKey2: 1,
-    });
+    await tNativeLocalConfig.setDefaults({kIsSetKey1: 1, kIsSetKey2: 1});
 
     await tNativeLocalConfig.setInt(kIsSetKey1, 2);
     await tNativeLocalConfig.setInt(kIsNotSetKey1, 2);
@@ -144,9 +155,7 @@ void main() async {
     NativeLocalConfig tNativeLocalConfig = NativeLocalConfig();
     await tNativeLocalConfig.init();
 
-    final Map<String, Object> tObjects = {
-      'name': 'GREE, Inc.',
-    };
+    final Map<String, Object> tObjects = {'name': 'GREE, Inc.'};
 
     await tNativeLocalConfig.setMany(tObjects);
 

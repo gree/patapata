@@ -11,11 +11,7 @@ class SplashPage extends StandardPage<void> {
   @override
   Widget buildPage(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text(
-          'SplashPage',
-        ),
-      ),
+      appBar: AppBar(title: const Text('SplashPage')),
       body: const SizedBox.shrink(),
     );
   }
@@ -25,11 +21,7 @@ class StartupPageA extends StandardPage<StartupPageCompleter> {
   @override
   Widget buildPage(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text(
-          'StartupPageA',
-        ),
-      ),
+      appBar: AppBar(title: const Text('StartupPageA')),
       body: ListView(
         children: [
           TextButton(
@@ -46,9 +38,11 @@ class StartupPageA extends StandardPage<StartupPageCompleter> {
           ),
           TextButton(
             onPressed: () {
-              Navigator.of(context).push(MaterialPageRoute(
-                builder: (context) => StartupModalPageA(completer: pageData),
-              ));
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => StartupModalPageA(completer: pageData),
+                ),
+              );
             },
             child: const Text('PushModalA'),
           ),
@@ -62,11 +56,7 @@ class StartupPageB extends StandardPage<StartupPageCompleter> {
   @override
   Widget buildPage(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text(
-          'StartupPageB',
-        ),
-      ),
+      appBar: AppBar(title: const Text('StartupPageB')),
       body: ListView(
         children: [
           TextButton(
@@ -88,21 +78,14 @@ class StartupPageB extends StandardPage<StartupPageCompleter> {
 }
 
 class StartupModalPageA extends StatelessWidget {
-  const StartupModalPageA({
-    super.key,
-    this.completer,
-  });
+  const StartupModalPageA({super.key, this.completer});
 
   final StartupPageCompleter? completer;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text(
-          'StartupModalPageA',
-        ),
-      ),
+      appBar: AppBar(title: const Text('StartupModalPageA')),
       body: ListView(
         children: [
           TextButton(
@@ -114,9 +97,11 @@ class StartupModalPageA extends StatelessWidget {
           TextButton(
             onPressed: () {
               completer?.call(true);
-              Navigator.of(context).push(MaterialPageRoute(
-                builder: (context) => const StartupModalPageB(),
-              ));
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => const StartupModalPageB(),
+                ),
+              );
             },
             child: const Text('CompleteAndPushModaB'),
           ),
@@ -125,9 +110,7 @@ class StartupModalPageA extends StatelessWidget {
               Navigator.of(context).replace(
                 oldRoute: ModalRoute.of(context)!,
                 newRoute: MaterialPageRoute(
-                  builder: (context) => StartupModalPageB(
-                    completer: completer,
-                  ),
+                  builder: (context) => StartupModalPageB(completer: completer),
                 ),
               );
             },
@@ -135,7 +118,7 @@ class StartupModalPageA extends StatelessWidget {
           ),
           TextButton(
             onPressed: () {
-              Navigator.of(context).removeRoute(ModalRoute.of(context)!);
+              context.removeRoute();
             },
             child: const Text('Remove'),
           ),
@@ -152,35 +135,30 @@ class StartupModalPageA extends StatelessWidget {
 }
 
 class StartupModalPageB extends StatelessWidget {
-  const StartupModalPageB({
-    super.key,
-    this.completer,
-  });
+  const StartupModalPageB({super.key, this.completer});
 
   final StartupPageCompleter? completer;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text(
-          'StartupModalPageB',
-        ),
-      ),
+      appBar: AppBar(title: const Text('StartupModalPageB')),
       body: ListView(
         children: [
           TextButton(
             onPressed: () {
               completer?.call(true);
-              Navigator.of(context).push(MaterialPageRoute(
-                builder: (context) => const StartupModalPageC(),
-              ));
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => const StartupModalPageC(),
+                ),
+              );
             },
             child: const Text('CompleteAndPushModaC'),
           ),
           TextButton(
             onPressed: () {
-              Navigator.of(context).removeRoute(ModalRoute.of(context)!);
+              context.removeRoute();
             },
             child: const Text('Remove'),
           ),
@@ -191,23 +169,17 @@ class StartupModalPageB extends StatelessWidget {
 }
 
 class StartupModalPageC extends StatelessWidget {
-  const StartupModalPageC({
-    super.key,
-  });
+  const StartupModalPageC({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text(
-          'StartupModalPageC',
-        ),
-      ),
+      appBar: AppBar(title: const Text('StartupModalPageC')),
       body: ListView(
         children: [
           TextButton(
             onPressed: () {
-              Navigator.of(context).removeRoute(ModalRoute.of(context)!);
+              context.removeRoute();
             },
             child: const Text('Remove'),
           ),
@@ -221,11 +193,7 @@ class TestHomePage extends StandardPage<void> {
   @override
   Widget buildPage(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text(
-          'HomePage',
-        ),
-      ),
+      appBar: AppBar(title: const Text('HomePage')),
       body: const SizedBox.shrink(),
     );
   }

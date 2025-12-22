@@ -51,11 +51,7 @@ class _TestPageA extends StandardPageWithResult<TestPageDataA, int> {
   @override
   Widget buildPage(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          l(context, 'title test page A'),
-        ),
-      ),
+      appBar: AppBar(title: Text(l(context, 'title test page A'))),
       body: ListView(
         children: [
           Center(

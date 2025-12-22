@@ -6,34 +6,175 @@
 import 'package:flutter/cupertino.dart';
 import 'package:patapata_core/patapata_core.dart';
 import 'package:patapata_core/patapata_widgets.dart';
-import 'package:patapata_example_app/src/cupertino/widgets/app_tab.dart';
+import 'package:patapata_example_app/src/cupertino/widgets/app_container.dart';
+import 'package:patapata_example_app/src/cupertino/pages/my_page.dart';
+import 'package:provider/provider.dart';
 
-/// This sample transforms the HomePage, designed with Material's design, into Cupertino's design.
-/// The structure remains the same as HomePage.
-class CupertinoHomePage extends StandardPage<void> {
+class CupertinoHomePageParent extends StandardPageWithNestedNavigator {
+  @override
+  void onActive(bool first) {
+    super.onActive(first);
+
+    context.read<CupertinoAppContainer>().selectedFooterType =
+        CupertinoHomePageParent;
+  }
+
   @override
   Widget buildPage(BuildContext context) {
-    // When creating an application with features like a footer, please return childNavigator in the buildPage method.
-    return childNavigator ?? const SizedBox.shrink();
+    return nestedPages;
   }
 }
 
-/// This sample transforms the TitlePage, designed with Material's design, into Cupertino's design.
-/// The basic structure remains the same as TitlePage, but it uses an AppBar tailored for Cupertino.
-class CupertinoTitlePage extends StandardPage<void> {
+class CupertinoHomePage extends StandardPage<void> {
+  @override
+  String localizationKey = 'pages.tab.home';
+
   @override
   Widget buildPage(BuildContext context) {
-    return CupertinoAppBar(
-      body: ListView(
+    return Container(
+      color: CupertinoColors.white,
+      child: ListView(
         children: [
           Center(
-            child: Builder(
-              builder: (context) {
-                return Text(
-                  l(context, 'pages.tab.home.body'),
-                );
-              },
+            child: Text(
+              context.pl('title'),
             ),
+          ),
+          Text(context.pl('body')),
+          CupertinoButton(
+            child: Text(l(context, 'pages.tab.test_page_a.title')),
+            onPressed: () {
+              context.go<CupertinoTestPageA, void>(null);
+            },
+          ),
+          CupertinoButton(
+            child: Text(l(context, 'pages.tab.test_page_b.title')),
+            onPressed: () {
+              context.go<CupertinoTestPageB, void>(null);
+            },
+          ),
+          CupertinoButton(
+            child: Text('Show dialog'),
+            onPressed: () {
+              context.read<CupertinoAppContainer>().dialog(context);
+            },
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class CupertinoTestPageA extends StandardPage<void> {
+  @override
+  String localizationKey = 'pages.tab.test_page_a';
+
+  @override
+  Widget buildPage(BuildContext context) {
+    return Container(
+      color: CupertinoColors.systemBlue,
+      child: ListView(
+        children: [
+          Center(
+            child: Text(
+              context.pl('title'),
+            ),
+          ),
+          Text(context.pl('body')),
+          CupertinoButton(
+            child: Text(
+              l(context, 'pages.tab.test_page_c.title'),
+              style: TextStyle(
+                color: CupertinoColors.white,
+              ),
+            ),
+            onPressed: () {
+              context.go<CupertinoTestPageC, void>(null);
+            },
+          ),
+          CupertinoButton(
+            child: Text(
+              l(context, 'pages.tab.test_page_b.title'),
+              style: TextStyle(
+                color: CupertinoColors.white,
+              ),
+            ),
+            onPressed: () {
+              context.go<CupertinoTestPageB, void>(null);
+            },
+          ),
+          CupertinoButton(
+            child: Text(
+              'Show dialog',
+              style: TextStyle(
+                color: CupertinoColors.white,
+              ),
+            ),
+            onPressed: () {
+              context.read<CupertinoAppContainer>().dialog(context);
+            },
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class CupertinoTestPageC extends StandardPage<void> {
+  @override
+  String localizationKey = 'pages.tab.test_page_c';
+
+  @override
+  Widget buildPage(BuildContext context) {
+    return Container(
+      color: CupertinoColors.systemGreen,
+      child: ListView(
+        children: [
+          Center(
+            child: Text(
+              context.pl('title'),
+            ),
+          ),
+          Text(context.pl('body')),
+          CupertinoButton(
+            child: Text(l(context, 'pages.tab.test_page_d.title')),
+            onPressed: () {
+              context.go<CupertinoTestPageD, void>(null);
+            },
+          ),
+          CupertinoButton(
+            child: Text('Show dialog'),
+            onPressed: () {
+              context.read<CupertinoAppContainer>().dialog(context);
+            },
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class CupertinoTestPageD extends StandardPage<void> {
+  @override
+  String localizationKey = 'pages.tab.test_page_d';
+
+  @override
+  Widget buildPage(BuildContext context) {
+    return Container(
+      color: CupertinoColors.systemRed,
+      child: ListView(
+        children: [
+          Center(
+            child: Text(
+              context.pl('title'),
+            ),
+          ),
+          Text(context.pl('body')),
+          CupertinoButton(
+            child: Text('Show dialog'),
+            onPressed: () {
+              context.read<CupertinoAppContainer>().dialog(context);
+            },
           ),
         ],
       ),

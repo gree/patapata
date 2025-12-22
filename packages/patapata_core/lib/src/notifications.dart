@@ -49,11 +49,11 @@ mixin NotificationsEnvironment {
 class NotificationsPlugin extends Plugin with StandardAppRoutePluginMixin {
   static const AndroidNotificationChannel kDefaultAndroidChannel =
       AndroidNotificationChannel(
-    'default',
-    'Primary Channel',
-    importance: Importance.max,
-    enableLights: true,
-  );
+        'default',
+        'Primary Channel',
+        importance: Importance.max,
+        enableLights: true,
+      );
 
   // coverage:ignore-start
   static Future<void> initializeNotificationsForBackgroundIsolate() async {
@@ -127,8 +127,9 @@ class NotificationsPlugin extends Plugin with StandardAppRoutePluginMixin {
       await tPlugin.initialize(
         InitializationSettings(
           android: AndroidInitializationSettings(
-              tEnvironment?.notificationsAndroidDefaultIcon ??
-                  '@mipmap/ic_launcher'),
+            tEnvironment?.notificationsAndroidDefaultIcon ??
+                '@mipmap/ic_launcher',
+          ),
           iOS: DarwinInitializationSettings(
             requestAlertPermission: false,
             requestBadgePermission: false,
@@ -168,8 +169,10 @@ class NotificationsPlugin extends Plugin with StandardAppRoutePluginMixin {
       );
 
       if (defaultTargetPlatform == TargetPlatform.android) {
-        final tPlatform = tPlugin.resolvePlatformSpecificImplementation<
-            AndroidFlutterLocalNotificationsPlugin>()!;
+        final tPlatform = tPlugin
+            .resolvePlatformSpecificImplementation<
+              AndroidFlutterLocalNotificationsPlugin
+            >()!;
 
         if (tEnvironment != null) {
           for (var i in tEnvironment.notificationsAndroidChannels) {
@@ -209,7 +212,7 @@ class NotificationsPlugin extends Plugin with StandardAppRoutePluginMixin {
 
   String get payloadLocationKey => app.environment is NotificationsEnvironment
       ? (app.environment as NotificationsEnvironment)
-          .notificationsPayloadLocationKey
+            .notificationsPayloadLocationKey
       : 'location';
 
   Uri? uriFromPayload(String? payload) {
@@ -243,8 +246,9 @@ class NotificationsPlugin extends Plugin with StandardAppRoutePluginMixin {
 
     if (tLaunchNotification?.notificationResponse != null) {
       if (tLaunchNotification!.didNotificationLaunchApp) {
-        final tPayload =
-            uriFromPayload(tLaunchNotification.notificationResponse!.payload);
+        final tPayload = uriFromPayload(
+          tLaunchNotification.notificationResponse!.payload,
+        );
 
         if (tPayload != null) {
           final tRouteData = await app
@@ -297,19 +301,16 @@ class NotificationsPlugin extends Plugin with StandardAppRoutePluginMixin {
   @visibleForTesting
   void setMockMethodCallHandler() {
     // ignore: invalid_use_of_visible_for_testing_member
-    testSetMockMethodCallHandler(
-      _methodChannel,
-      (methodCall) async {
-        methodCallLogs.add(methodCall);
-        switch (methodCall.method) {
-          case 'initialize':
-            return true;
-          case 'getNotificationAppLaunchDetails':
-            return notificationAppLaunchDetailsMap;
-        }
-        return null;
-      },
-    );
+    testSetMockMethodCallHandler(_methodChannel, (methodCall) async {
+      methodCallLogs.add(methodCall);
+      switch (methodCall.method) {
+        case 'initialize':
+          return true;
+        case 'getNotificationAppLaunchDetails':
+          return notificationAppLaunchDetailsMap;
+      }
+      return null;
+    });
   }
 }
 
@@ -318,7 +319,6 @@ Map<String, dynamic>? notificationAppLaunchDetailsMap;
 
 /// Throw when exception if an error occurs in initializing [NotificationsPlugin].
 class NotificationsInitializationException extends PatapataCoreException {
-  NotificationsInitializationException({
-    super.original,
-  }) : super(code: PatapataCoreExceptionCode.PPE501);
+  NotificationsInitializationException({super.original})
+    : super(code: PatapataCoreExceptionCode.PPE501);
 }

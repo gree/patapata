@@ -79,15 +79,25 @@ pages:
     change_page_data_type: Change PageData Type
     change_page_data_result: Current PageData Value:{prefix} 
   tab:
+    title: Tab Sample
     home:
       title: Home
-      body: This is the home tab.
-    title_details:
-      title: Title Details
-      body: This is the title details tab.
+      body: This is the home tab top page.
     my_page:
       title: My Page
-      body: This is the my page tab.
+      body: This is the my page tab top page.
+    test_page_a:
+      title: Test Page A
+      body: This page is displayed on the home tab.
+    test_page_b:
+      title: Test Page B
+      body: This page is displayed on the my page tab.
+    test_page_c:
+      title: Test Page C
+      body: This page is displayed on the active tab at the time of transition.
+    test_page_d:
+      title: Test Page D
+      body: This page is a child page of Test Page C.
   screen_layout_example:
     title: ScreenLayout Sample
     body: This is a sample of ScreenLayout.

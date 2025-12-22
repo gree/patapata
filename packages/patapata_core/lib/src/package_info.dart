@@ -62,10 +62,7 @@ class PackageInfoPlugin extends Plugin {
 
   @override
   Widget createAppWidgetWrapper(Widget child) {
-    return Provider<PackageInfoPlugin>.value(
-      value: this,
-      child: child,
-    );
+    return Provider<PackageInfoPlugin>.value(value: this, child: child);
   }
 
   @override

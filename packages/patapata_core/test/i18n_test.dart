@@ -38,23 +38,15 @@ void main() {
       testInitialize();
     });
 
-    test(
-      'Create L10n class.',
-      () async {
-        const tL10n = L10n(
-          Locale('en'),
-          {
-            'aaa': 'Test',
-          },
-        );
+    test('Create L10n class.', () async {
+      const tL10n = L10n(Locale('en'), {'aaa': 'Test'});
 
-        expect(tL10n.locale, equals(const Locale('en')));
-        expect(tL10n.containsMessageKey('aaa'), isTrue);
-        expect(tL10n.lookup('aaa'), equals('Test'));
-        expect(tL10n.containsMessageKey('bbb'), isFalse);
-        expect(tL10n.lookup('bbb'), equals('bbb'));
-      },
-    );
+      expect(tL10n.locale, equals(const Locale('en')));
+      expect(tL10n.containsMessageKey('aaa'), isTrue);
+      expect(tL10n.lookup('aaa'), equals('Test'));
+      expect(tL10n.containsMessageKey('bbb'), isFalse);
+      expect(tL10n.lookup('bbb'), equals('bbb'));
+    });
 
     test(
       'The resource is loaded from assets and the lookup works correctly.',
@@ -75,18 +67,12 @@ void main() {
         expect(tL10nEn.lookup('home.title'), equals('HomePage'));
         expect(tL10nEn.containsMessageKey('test.title'), isTrue);
         expect(
-          tL10nEn.lookup(
-            'test.title',
-            namedParameters: {'param': 'en'},
-          ),
+          tL10nEn.lookup('test.title', namedParameters: {'param': 'en'}),
           equals('TestMessage:en'),
         );
         expect(tL10nEn.containsMessageKey('test2.title'), isFalse);
         expect(
-          tL10nEn.lookup(
-            'test2.title',
-            namedParameters: {'param': 'en'},
-          ),
+          tL10nEn.lookup('test2.title', namedParameters: {'param': 'en'}),
           equals('test2.title'),
         );
 
@@ -95,18 +81,12 @@ void main() {
         expect(tL10nJa.lookup('home.title'), equals('ホーム'));
         expect(tL10nJa.containsMessageKey('test.title'), isTrue);
         expect(
-          tL10nJa.lookup(
-            'test.title',
-            namedParameters: {'param': 'ja'},
-          ),
+          tL10nJa.lookup('test.title', namedParameters: {'param': 'ja'}),
           equals('テストメッセージ:ja'),
         );
         expect(tL10nJa.containsMessageKey('test2.title'), isFalse);
         expect(
-          tL10nJa.lookup(
-            'test2.title',
-            namedParameters: {'param': 'ja'},
-          ),
+          tL10nJa.lookup('test2.title', namedParameters: {'param': 'ja'}),
           equals('test2.title'),
         );
       },
@@ -130,18 +110,12 @@ void main() {
         expect(tL10nEn.lookup('home.title'), equals('HomePage2'));
         expect(tL10nEn.containsMessageKey('test.title'), isTrue);
         expect(
-          tL10nEn.lookup(
-            'test.title',
-            namedParameters: {'param': 'en'},
-          ),
+          tL10nEn.lookup('test.title', namedParameters: {'param': 'en'}),
           equals('TestMessage:en'),
         );
         expect(tL10nEn.containsMessageKey('test2.title'), isTrue);
         expect(
-          tL10nEn.lookup(
-            'test2.title',
-            namedParameters: {'param': 'en'},
-          ),
+          tL10nEn.lookup('test2.title', namedParameters: {'param': 'en'}),
           equals('TestMessage2:en'),
         );
 
@@ -149,18 +123,12 @@ void main() {
         expect(tL10nJa.lookup('home.title'), equals('ホーム2'));
         expect(tL10nJa.containsMessageKey('test.title'), isTrue);
         expect(
-          tL10nJa.lookup(
-            'test.title',
-            namedParameters: {'param': 'ja'},
-          ),
+          tL10nJa.lookup('test.title', namedParameters: {'param': 'ja'}),
           equals('テストメッセージ:ja'),
         );
         expect(tL10nJa.containsMessageKey('test2.title'), isTrue);
         expect(
-          tL10nJa.lookup(
-            'test2.title',
-            namedParameters: {'param': 'ja'},
-          ),
+          tL10nJa.lookup('test2.title', namedParameters: {'param': 'ja'}),
           equals('テストメッセージ2:ja'),
         );
       },
@@ -198,44 +166,44 @@ void main() {
       },
     );
 
-    test(
-      'Parse error in yaml.',
-      () async {
-        Object? tException;
-        final tLogSubscription =
-            Logger.root.onRecord.listen((LogRecord record) {
-          tException = record.error;
-        });
+    test('Parse error in yaml.', () async {
+      Object? tException;
+      final tLogSubscription = Logger.root.onRecord.listen((LogRecord record) {
+        tException = record.error;
+      });
 
-        final tL10nError = await L10n.fromAssets(
-          locale: const Locale('en'),
-          paths: ['parse_error'],
-          assetBundle: mockL10nAssetBundle,
-        );
+      final tL10nError = await L10n.fromAssets(
+        locale: const Locale('en'),
+        paths: ['parse_error'],
+        assetBundle: mockL10nAssetBundle,
+      );
 
-        expect(tL10nError.containsMessageKey('home.title'), isFalse);
-        expect(tL10nError.containsMessageKey('patapata_dummy_never'), isFalse);
-        expect(tException, isA<L10nLoadAssetsException>());
-        expect((tException as L10nLoadAssetsException).code,
-            equals(PatapataCoreExceptionCode.PPE401.name));
+      expect(tL10nError.containsMessageKey('home.title'), isFalse);
+      expect(tL10nError.containsMessageKey('patapata_dummy_never'), isFalse);
+      expect(tException, isA<L10nLoadAssetsException>());
+      expect(
+        (tException as L10nLoadAssetsException).code,
+        equals(PatapataCoreExceptionCode.PPE401.name),
+      );
 
-        // Empty yaml file
-        tException = null;
-        final tL10nEmpty = await L10n.fromAssets(
-          locale: const Locale('en'),
-          paths: ['empty'],
-          assetBundle: mockL10nAssetBundle,
-        );
+      // Empty yaml file
+      tException = null;
+      final tL10nEmpty = await L10n.fromAssets(
+        locale: const Locale('en'),
+        paths: ['empty'],
+        assetBundle: mockL10nAssetBundle,
+      );
 
-        expect(tL10nEmpty.containsMessageKey('home.title'), isFalse);
-        expect(tL10nEmpty.containsMessageKey('patapata_dummy_never'), isFalse);
-        expect(tException, isA<L10nLoadAssetsException>());
-        expect((tException as L10nLoadAssetsException).code,
-            equals(PatapataCoreExceptionCode.PPE401.name));
+      expect(tL10nEmpty.containsMessageKey('home.title'), isFalse);
+      expect(tL10nEmpty.containsMessageKey('patapata_dummy_never'), isFalse);
+      expect(tException, isA<L10nLoadAssetsException>());
+      expect(
+        (tException as L10nLoadAssetsException).code,
+        equals(PatapataCoreExceptionCode.PPE401.name),
+      );
 
-        tLogSubscription.cancel();
-      },
-    );
+      tLogSubscription.cancel();
+    });
   });
 
   group('Initialize I18nPlugin and load assets.', () {
@@ -251,12 +219,16 @@ void main() {
         expect(tI18nPlugin.i18n.supportedL10ns, [tLocale]);
         expect(tI18nPlugin.i18n.delegate.isSupported(tLocale), isTrue);
         expect(
-            tI18nPlugin.i18n.delegate.isSupported(const Locale('ja')), isFalse);
+          tI18nPlugin.i18n.delegate.isSupported(const Locale('ja')),
+          isFalse,
+        );
         expect(tI18nPlugin.i18n.delegate.l10n, isNull);
         await tI18nPlugin.i18n.delegate.load(tLocale);
         expect(tI18nPlugin.i18n.delegate.l10n, isNotNull);
-        expect(tI18nPlugin.i18n.delegate.l10n!.containsMessageKey('test.title'),
-            isTrue);
+        expect(
+          tI18nPlugin.i18n.delegate.l10n!.containsMessageKey('test.title'),
+          isTrue,
+        );
       },
     );
 
@@ -264,107 +236,90 @@ void main() {
       'If I18nEnvironment.l10nPaths is not set, `l10n` will be the default.',
       () async {
         final tApp = createApp(
-            environment: const _I18nEnvironment(null, [Locale('en')]));
+          environment: const _I18nEnvironment(null, [Locale('en')]),
+        );
         final tI18nPlugin = I18nPlugin();
         const tLocale = Locale('en');
 
         final bool tResult = await tI18nPlugin.init(tApp);
         expect(tResult, isTrue);
         await tI18nPlugin.i18n.delegate.load(tLocale);
-        expect(tI18nPlugin.i18n.delegate.l10n!.containsMessageKey('test.title'),
-            isTrue);
+        expect(
+          tI18nPlugin.i18n.delegate.l10n!.containsMessageKey('test.title'),
+          isTrue,
+        );
       },
     );
 
-    test(
-      'If I18nEnvironment.supportedL10ns is required.',
-      () async {
-        final tApp = createApp(environment: const _I18nEnvironment(null, null));
-        final tI18nPlugin = I18nPlugin();
+    test('If I18nEnvironment.supportedL10ns is required.', () async {
+      final tApp = createApp(environment: const _I18nEnvironment(null, null));
+      final tI18nPlugin = I18nPlugin();
 
-        final bool tResult = await tI18nPlugin.init(tApp);
-        expect(tResult, isFalse);
-      },
-    );
+      final bool tResult = await tI18nPlugin.init(tApp);
+      expect(tResult, isFalse);
+    });
   });
 
-  group(
-    'Widget tests',
-    () {
-      late App tApp;
+  group('Widget tests', () {
+    late App tApp;
 
-      setUp(() async {
-        tApp = createApp(
-          appWidget: StandardMaterialApp(
-            onGenerateTitle: (context) => 'Test Title',
-            pages: [
-              StandardPageFactory<HomePage, void>(
-                create: (data) => HomePage(),
-              ),
-            ],
-          ),
+    setUp(() async {
+      tApp = createApp(
+        appWidget: StandardMaterialApp(
+          onGenerateTitle: (context) => 'Test Title',
+          pages: [
+            StandardPageFactory<HomePage, void>(create: (data) => HomePage()),
+          ],
+        ),
+      );
+    });
+
+    testWidgets('l function process correctly.', (WidgetTester tester) async {
+      tApp.run();
+
+      await tApp.runProcess(() async {
+        await tester.pumpAndSettle();
+
+        expect(
+          l(StandardMaterialApp.globalNavigatorContext!, 'home.title'),
+          equals('HomePage'),
+        );
+        expect(
+          l(StandardMaterialApp.globalNavigatorContext!, 'test.title', {
+            'param': 'test',
+          }),
+          equals('TestMessage:test'),
         );
       });
 
-      testWidgets(
-        'l function process correctly.',
-        (WidgetTester tester) async {
-          tApp.run();
+      tApp.dispose();
+    });
 
-          await tApp.runProcess(
-            () async {
-              await tester.pumpAndSettle();
+    testWidgets('L10n.containsKey process correctly.', (
+      WidgetTester tester,
+    ) async {
+      tApp.run();
 
-              expect(
-                l(StandardMaterialApp.globalNavigatorContext!, 'home.title'),
-                equals('HomePage'),
-              );
-              expect(
-                l(
-                  StandardMaterialApp.globalNavigatorContext!,
-                  'test.title',
-                  {
-                    'param': 'test',
-                  },
-                ),
-                equals('TestMessage:test'),
-              );
-            },
-          );
+      await tApp.runProcess(() async {
+        await tester.pumpAndSettle();
 
-          tApp.dispose();
-        },
-      );
+        expect(
+          L10n.containsKey(
+            context: StandardMaterialApp.globalNavigatorContext!,
+            key: 'home.title',
+          ),
+          isTrue,
+        );
+        expect(
+          L10n.containsKey(
+            context: StandardMaterialApp.globalNavigatorContext!,
+            key: 'test2.title',
+          ),
+          isFalse,
+        );
+      });
 
-      testWidgets(
-        'L10n.containsKey process correctly.',
-        (WidgetTester tester) async {
-          tApp.run();
-
-          await tApp.runProcess(
-            () async {
-              await tester.pumpAndSettle();
-
-              expect(
-                L10n.containsKey(
-                  context: StandardMaterialApp.globalNavigatorContext!,
-                  key: 'home.title',
-                ),
-                isTrue,
-              );
-              expect(
-                L10n.containsKey(
-                  context: StandardMaterialApp.globalNavigatorContext!,
-                  key: 'test2.title',
-                ),
-                isFalse,
-              );
-            },
-          );
-
-          tApp.dispose();
-        },
-      );
-    },
-  );
+      tApp.dispose();
+    });
+  });
 }

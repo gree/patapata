@@ -6,8 +6,9 @@ homepage: https://github.com/gree/patapata
 repository: https://github.com/gree/patapata/tree/main/packages/patapata_karte_core
 
 environment:
-  sdk: ">=3.0.0 <4.0.0"
+  sdk: ">=3.5.0 <4.0.0"
   flutter: ">=3.24.0"
+resolution: workspace
 
 dependencies:
   flutter:
@@ -21,7 +22,7 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_lints: ^3.0.2
+  flutter_lints: ^6.0.0
 
 flutter:
   plugin:

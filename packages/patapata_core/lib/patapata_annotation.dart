@@ -14,9 +14,7 @@ import 'package:meta/meta_meta.dart';
 /// It is also possible to impart the concept of sets to the data model by specifying a 'set'.
 @Target({TargetKind.classType})
 class RepositoryClass {
-  const RepositoryClass({
-    required this.sets,
-  });
+  const RepositoryClass({required this.sets});
 
   final Set<Type> sets;
 }
@@ -32,9 +30,7 @@ class RepositoryId {
 /// Fields annotated with this are treated as data included in a parameter set in the Repository.
 @Target({TargetKind.field})
 class RepositoryField {
-  const RepositoryField({
-    this.sets = const {},
-  });
+  const RepositoryField({this.sets = const {}});
 
   final Set<Type> sets;
 }

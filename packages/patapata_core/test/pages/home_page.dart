@@ -11,11 +11,7 @@ class HomePage extends StandardPage<void> {
   @override
   Widget buildPage(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          l(context, "home.title"),
-        ),
-      ),
+      appBar: AppBar(title: Text(l(context, "home.title"))),
       body: const SizedBox.shrink(),
     );
   }

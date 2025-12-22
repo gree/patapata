@@ -31,11 +31,7 @@ void main() {
       createRemoteConfig: () => mockRemoteConfig,
     );
 
-    app = createApp(
-      plugins: [
-        tPlugin,
-      ],
-    );
+    app = createApp(plugins: [tPlugin]);
   });
 
   tearDown(() {
@@ -44,34 +40,22 @@ void main() {
 
   Future<void> runApp() async {
     app.run();
-    await App.appStageChangeStream.firstWhere(
-      (element) {
-        return element.stage == AppStage.running;
-      },
-    );
+    await App.appStageChangeStream.firstWhere((element) {
+      return element.stage == AppStage.running;
+    });
   }
 
   // test('Function hasKey.', () async {
   testWidgets('Function hasKey.', (WidgetTester tester) async {
     await runApp();
 
-    expect(
-      app.remoteConfig.hasKey(kBoolValueKey),
-      false,
-    );
+    expect(app.remoteConfig.hasKey(kBoolValueKey), false);
 
-    mockRemoteConfig.testSetMockFetchValues({
-      kBoolValueKey: true,
-    });
+    mockRemoteConfig.testSetMockFetchValues({kBoolValueKey: true});
 
-    await app.remoteConfig.fetch(
-      force: true,
-    );
+    await app.remoteConfig.fetch(force: true);
 
-    expect(
-      app.remoteConfig.hasKey(kBoolValueKey),
-      true,
-    );
+    expect(app.remoteConfig.hasKey(kBoolValueKey), true);
   });
 
   testWidgets('Function setDefaults.', (WidgetTester tester) async {
@@ -104,9 +88,7 @@ void main() {
       kStringValueKey: '1',
     });
 
-    await app.remoteConfig.fetch(
-      force: true,
-    );
+    await app.remoteConfig.fetch(force: true);
 
     expect(app.remoteConfig.hasKey(kBoolValueKey), true);
     expect(app.remoteConfig.hasKey(kDoubleValueKey), true);
@@ -133,9 +115,7 @@ void main() {
       kStringValueKey: '1',
     });
 
-    await app.remoteConfig.fetch(
-      force: true,
-    );
+    await app.remoteConfig.fetch(force: true);
 
     expect(app.remoteConfig.hasKey(kBoolValueKey), true);
     expect(app.remoteConfig.hasKey(kDoubleValueKey), true);
@@ -159,9 +139,7 @@ void main() {
       kStringValueKey: '1',
     });
 
-    await app.remoteConfig.fetch(
-      force: true,
-    );
+    await app.remoteConfig.fetch(force: true);
 
     expect(app.remoteConfig.hasKey(kBoolValueKey), true);
     expect(app.remoteConfig.hasKey(kDoubleValueKey), true);
@@ -193,24 +171,15 @@ void main() {
   testWidgets('Check bool value.', (WidgetTester tester) async {
     await runApp();
 
-    await app.remoteConfig.setDefaults({
-      kDefaultBoolKey: true,
-    });
+    await app.remoteConfig.setDefaults({kDefaultBoolKey: true});
     expect(app.remoteConfig.getBool(kDefaultBoolKey), true);
 
     expect(app.remoteConfig.hasKey(kBoolValueKey), isFalse);
-    expect(
-      app.remoteConfig.getBool(kBoolValueKey),
-      Config.defaultValueForBool,
-    );
+    expect(app.remoteConfig.getBool(kBoolValueKey), Config.defaultValueForBool);
 
-    mockRemoteConfig.testSetMockFetchValues({
-      kBoolValueKey: true,
-    });
+    mockRemoteConfig.testSetMockFetchValues({kBoolValueKey: true});
 
-    await app.remoteConfig.fetch(
-      force: true,
-    );
+    await app.remoteConfig.fetch(force: true);
 
     expect(app.remoteConfig.hasKey(kBoolValueKey), isTrue);
     expect(app.remoteConfig.getBool(kBoolValueKey), true);
@@ -222,9 +191,7 @@ void main() {
   testWidgets('Check double value.', (WidgetTester tester) async {
     await runApp();
 
-    await app.remoteConfig.setDefaults({
-      kDefaultDoubleKey: 1.0,
-    });
+    await app.remoteConfig.setDefaults({kDefaultDoubleKey: 1.0});
     expect(app.remoteConfig.getDouble(kDefaultDoubleKey), 1.0);
 
     expect(app.remoteConfig.hasKey(kDoubleValueKey), isFalse);
@@ -233,13 +200,9 @@ void main() {
       Config.defaultValueForDouble,
     );
 
-    mockRemoteConfig.testSetMockFetchValues({
-      kDoubleValueKey: 1.0,
-    });
+    mockRemoteConfig.testSetMockFetchValues({kDoubleValueKey: 1.0});
 
-    await app.remoteConfig.fetch(
-      force: true,
-    );
+    await app.remoteConfig.fetch(force: true);
 
     expect(app.remoteConfig.hasKey(kDoubleValueKey), isTrue);
     expect(app.remoteConfig.getDouble(kDoubleValueKey), 1.0);
@@ -250,24 +213,15 @@ void main() {
   testWidgets('Check int value.', (WidgetTester tester) async {
     await runApp();
 
-    await app.remoteConfig.setDefaults({
-      kDefaultIntKey: 1,
-    });
+    await app.remoteConfig.setDefaults({kDefaultIntKey: 1});
     expect(app.remoteConfig.getInt(kDefaultIntKey), 1);
 
     expect(app.remoteConfig.hasKey(kIntValueKey), isFalse);
-    expect(
-      app.remoteConfig.getInt(kIntValueKey),
-      Config.defaultValueForInt,
-    );
+    expect(app.remoteConfig.getInt(kIntValueKey), Config.defaultValueForInt);
 
-    mockRemoteConfig.testSetMockFetchValues({
-      kIntValueKey: 1,
-    });
+    mockRemoteConfig.testSetMockFetchValues({kIntValueKey: 1});
 
-    await app.remoteConfig.fetch(
-      force: true,
-    );
+    await app.remoteConfig.fetch(force: true);
 
     expect(app.remoteConfig.hasKey(kIntValueKey), isTrue);
     expect(app.remoteConfig.getInt(kIntValueKey), 1);
@@ -279,9 +233,7 @@ void main() {
   testWidgets('Check String value.', (WidgetTester tester) async {
     await runApp();
 
-    await app.remoteConfig.setDefaults({
-      kDefaultStringKey: '1',
-    });
+    await app.remoteConfig.setDefaults({kDefaultStringKey: '1'});
     expect(app.remoteConfig.getString(kDefaultStringKey), '1');
 
     expect(app.remoteConfig.hasKey(kStringValueKey), isFalse);
@@ -290,13 +242,9 @@ void main() {
       Config.defaultValueForString,
     );
 
-    mockRemoteConfig.testSetMockFetchValues({
-      kStringValueKey: '1',
-    });
+    mockRemoteConfig.testSetMockFetchValues({kStringValueKey: '1'});
 
-    await app.remoteConfig.fetch(
-      force: true,
-    );
+    await app.remoteConfig.fetch(force: true);
 
     expect(app.remoteConfig.hasKey(kStringValueKey), isTrue);
     expect(app.remoteConfig.getString(kStringValueKey), '1');

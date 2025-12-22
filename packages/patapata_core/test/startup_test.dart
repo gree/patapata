@@ -48,20 +48,12 @@ void main() {
       appWidget: StandardMaterialApp(
         onGenerateTitle: (context) => 'StartupSequence Test Title',
         pages: [
-          SplashPageFactory<SplashPage>(
-            create: (data) => SplashPage(),
-          ),
-          StartupPageFactory<StartupPageA>(
-            create: (data) => StartupPageA(),
-          ),
-          StartupPageFactory<StartupPageB>(
-            create: (data) => StartupPageB(),
-          ),
+          SplashPageFactory<SplashPage>(create: (data) => SplashPage()),
+          StartupPageFactory<StartupPageA>(create: (data) => StartupPageA()),
+          StartupPageFactory<StartupPageB>(create: (data) => StartupPageB()),
           StandardPageFactory<TestHomePage, void>(
             create: (data) => TestHomePage(),
-            links: {
-              r'': (match, uri) => TestHomePage(),
-            },
+            links: {r'': (match, uri) => TestHomePage()},
             linkGenerator: (pageData) => r'',
           ),
         ],
@@ -71,21 +63,15 @@ void main() {
         startupStateFactories: [
           StartupStateFactory<StateA>(
             (startupSequence) => tStateA = StateA(startupSequence),
-            [
-              LogicStateTransition<StateB>(),
-            ],
+            [LogicStateTransition<StateB>()],
           ),
           StartupStateFactory<StateB>(
             (startupSequence) => tStateB = StateB(startupSequence),
-            [
-              LogicStateTransition<StateC>(),
-            ],
+            [LogicStateTransition<StateC>()],
           ),
           StartupStateFactory<StateC>(
             (startupSequence) => tStateC = StateC(startupSequence),
-            [
-              LogicStateTransition<StateD>(),
-            ],
+            [LogicStateTransition<StateD>()],
           ),
           StartupStateFactory<StateD>(
             (startupSequence) => tStateD = StateD(startupSequence),
@@ -142,22 +128,19 @@ void main() {
     tApp.dispose();
   });
 
-  testWidgets("waitForComplete and onSuccess test",
-      (WidgetTester tester) async {
+  testWidgets("waitForComplete and onSuccess test", (
+    WidgetTester tester,
+  ) async {
     bool tOnSuccess = false;
 
     final tApp = createApp(
       appWidget: StandardMaterialApp(
         onGenerateTitle: (context) => 'StartupSequence Test Title',
         pages: [
-          SplashPageFactory<SplashPage>(
-            create: (data) => SplashPage(),
-          ),
+          SplashPageFactory<SplashPage>(create: (data) => SplashPage()),
           StandardPageFactory<TestHomePage, void>(
             create: (data) => TestHomePage(),
-            links: {
-              r'': (match, uri) => TestHomePage(),
-            },
+            links: {r'': (match, uri) => TestHomePage()},
             linkGenerator: (pageData) => r'',
           ),
         ],
@@ -177,9 +160,9 @@ void main() {
 
     await tApp.runProcess(() async {
       final tWaitForComplete = Completer<void>();
-      tApp.startupSequence!
-          .waitForComplete()
-          .then((value) => tWaitForComplete.complete());
+      tApp.startupSequence!.waitForComplete().then(
+        (value) => tWaitForComplete.complete(),
+      );
 
       await tester.pumpAndSettle(const Duration(milliseconds: 1000));
 
@@ -204,17 +187,11 @@ void main() {
       appWidget: StandardMaterialApp(
         onGenerateTitle: (context) => 'StartupSequence Test Title',
         pages: [
-          SplashPageFactory<SplashPage>(
-            create: (data) => SplashPage(),
-          ),
-          StartupPageFactory<StartupPageA>(
-            create: (data) => StartupPageA(),
-          ),
+          SplashPageFactory<SplashPage>(create: (data) => SplashPage()),
+          StartupPageFactory<StartupPageA>(create: (data) => StartupPageA()),
           StandardPageFactory<TestHomePage, void>(
             create: (data) => TestHomePage(),
-            links: {
-              r'': (match, uri) => TestHomePage(),
-            },
+            links: {r'': (match, uri) => TestHomePage()},
             linkGenerator: (pageData) => r'',
           ),
         ],
@@ -223,9 +200,7 @@ void main() {
         startupStateFactories: [
           StartupStateFactory<StateA>(
             (startupSequence) => tStateA = StateA(startupSequence),
-            [
-              LogicStateTransition<StateB>(),
-            ],
+            [LogicStateTransition<StateB>()],
           ),
           StartupStateFactory<StateB>(
             (startupSequence) => tStateB = StateB(startupSequence),
@@ -283,17 +258,11 @@ void main() {
       appWidget: StandardMaterialApp(
         onGenerateTitle: (context) => 'StartupSequence Test Title',
         pages: [
-          SplashPageFactory<SplashPage>(
-            create: (data) => SplashPage(),
-          ),
-          StartupPageFactory<StartupPageA>(
-            create: (data) => StartupPageA(),
-          ),
+          SplashPageFactory<SplashPage>(create: (data) => SplashPage()),
+          StartupPageFactory<StartupPageA>(create: (data) => StartupPageA()),
           StandardPageFactory<TestHomePage, void>(
             create: (data) => TestHomePage(),
-            links: {
-              r'': (match, uri) => TestHomePage(),
-            },
+            links: {r'': (match, uri) => TestHomePage()},
             linkGenerator: (pageData) => r'',
           ),
         ],
@@ -302,15 +271,11 @@ void main() {
         startupStateFactories: [
           StartupStateFactory<StateA>(
             (startupSequence) => StateA(startupSequence),
-            [
-              LogicStateTransition<StateXB>(),
-            ],
+            [LogicStateTransition<StateXB>()],
           ),
           StartupStateFactory<StateXB>(
             (startupSequence) => StateXB(startupSequence),
-            [
-              LogicStateTransition<StateC>(),
-            ],
+            [LogicStateTransition<StateC>()],
           ),
           StartupStateFactory<StateC>(
             (startupSequence) => StateC(startupSequence),
@@ -324,8 +289,9 @@ void main() {
 
     await tApp.runProcess(() async {
       Object? tError;
-      StreamSubscription<ReportRecord> tLogLester =
-          tApp.log.reports.listen((event) {
+      StreamSubscription<ReportRecord> tLogLester = tApp.log.reports.listen((
+        event,
+      ) {
         tError = event.error;
       });
 
@@ -349,17 +315,11 @@ void main() {
       appWidget: StandardMaterialApp(
         onGenerateTitle: (context) => 'StartupSequence Test Title',
         pages: [
-          SplashPageFactory<SplashPage>(
-            create: (data) => SplashPage(),
-          ),
-          StartupPageFactory<StartupPageA>(
-            create: (data) => StartupPageA(),
-          ),
+          SplashPageFactory<SplashPage>(create: (data) => SplashPage()),
+          StartupPageFactory<StartupPageA>(create: (data) => StartupPageA()),
           StandardPageFactory<TestHomePage, void>(
             create: (data) => TestHomePage(),
-            links: {
-              r'': (match, uri) => TestHomePage(),
-            },
+            links: {r'': (match, uri) => TestHomePage()},
             linkGenerator: (pageData) => r'',
           ),
         ],
@@ -368,15 +328,11 @@ void main() {
         startupStateFactories: [
           StartupStateFactory<StateA>(
             (startupSequence) => StateA(startupSequence),
-            [
-              LogicStateTransition<StateXB>(),
-            ],
+            [LogicStateTransition<StateXB>()],
           ),
           StartupStateFactory<StateXB>(
             (startupSequence) => StateXB(startupSequence),
-            [
-              LogicStateTransition<StateC>(),
-            ],
+            [LogicStateTransition<StateC>()],
           ),
           StartupStateFactory<StateC>(
             (startupSequence) => StateC(startupSequence),
@@ -390,9 +346,10 @@ void main() {
 
     await tApp.runProcess(() async {
       Object? tException;
-      final tWaitFuture = tApp.startupSequence!
-          .waitForComplete()
-          .catchError((error, stackTrace) {
+      final tWaitFuture = tApp.startupSequence!.waitForComplete().catchError((
+        error,
+        stackTrace,
+      ) {
         tException = error;
       });
 
@@ -409,9 +366,10 @@ void main() {
 
       // Already Complete. To achieve 100% test coverage.
       tException = null;
-      await tApp.startupSequence!
-          .waitForComplete()
-          .catchError((error, stackTrace) {
+      await tApp.startupSequence!.waitForComplete().catchError((
+        error,
+        stackTrace,
+      ) {
         tException = error;
       });
       expect(tException, equals('StateXB'));
@@ -426,17 +384,11 @@ void main() {
       appWidget: StandardMaterialApp(
         onGenerateTitle: (context) => 'StartupSequence Test Title',
         pages: [
-          SplashPageFactory<SplashPage>(
-            create: (data) => SplashPage(),
-          ),
-          StartupPageFactory<StartupPageA>(
-            create: (data) => StartupPageA(),
-          ),
+          SplashPageFactory<SplashPage>(create: (data) => SplashPage()),
+          StartupPageFactory<StartupPageA>(create: (data) => StartupPageA()),
           StandardPageFactory<TestHomePage, void>(
             create: (data) => TestHomePage(),
-            links: {
-              r'': (match, uri) => TestHomePage(),
-            },
+            links: {r'': (match, uri) => TestHomePage()},
             linkGenerator: (pageData) => r'',
           ),
         ],
@@ -445,15 +397,11 @@ void main() {
         startupStateFactories: [
           StartupStateFactory<StateA>(
             (startupSequence) => StateA(startupSequence),
-            [
-              LogicStateTransition<StateXB>(),
-            ],
+            [LogicStateTransition<StateXB>()],
           ),
           StartupStateFactory<StateXB>(
             (startupSequence) => StateXB(startupSequence),
-            [
-              LogicStateTransition<StateC>(),
-            ],
+            [LogicStateTransition<StateC>()],
           ),
           StartupStateFactory<StateC>(
             (startupSequence) => StateC(startupSequence),
@@ -470,8 +418,9 @@ void main() {
 
     await tApp.runProcess(() async {
       Object? tErrorFromLogger;
-      StreamSubscription<ReportRecord> tLogLester =
-          tApp.log.reports.listen((event) {
+      StreamSubscription<ReportRecord> tLogLester = tApp.log.reports.listen((
+        event,
+      ) {
         tErrorFromLogger = event.error;
       });
 
@@ -495,14 +444,10 @@ void main() {
       appWidget: StandardMaterialApp(
         onGenerateTitle: (context) => 'StartupSequence Test Title',
         pages: [
-          SplashPageFactory<SplashPage>(
-            create: (data) => SplashPage(),
-          ),
+          SplashPageFactory<SplashPage>(create: (data) => SplashPage()),
           StandardPageFactory<TestHomePage, void>(
             create: (data) => TestHomePage(),
-            links: {
-              r'': (match, uri) => TestHomePage(),
-            },
+            links: {r'': (match, uri) => TestHomePage()},
             linkGenerator: (pageData) => r'',
           ),
         ],
@@ -511,9 +456,7 @@ void main() {
         startupStateFactories: [
           StartupStateFactory<StateA>(
             (startupSequence) => StateA(startupSequence),
-            [
-              LogicStateTransition<StateXB>(),
-            ],
+            [LogicStateTransition<StateXB>()],
           ),
           StartupStateFactory<StateXB>(
             (startupSequence) => StateXB(startupSequence),
@@ -549,28 +492,21 @@ void main() {
     tApp.dispose();
   });
 
-  testWidgets("navigateToPage throw LogicStateNotCurrent test",
-      (WidgetTester tester) async {
+  testWidgets("navigateToPage throw LogicStateNotCurrent test", (
+    WidgetTester tester,
+  ) async {
     StateB? tStateB;
 
     final tApp = createApp(
       appWidget: StandardMaterialApp(
         onGenerateTitle: (context) => 'StartupSequence Test Title',
         pages: [
-          SplashPageFactory<SplashPage>(
-            create: (data) => SplashPage(),
-          ),
-          StartupPageFactory<StartupPageA>(
-            create: (data) => StartupPageA(),
-          ),
-          StartupPageFactory<StartupPageB>(
-            create: (data) => StartupPageB(),
-          ),
+          SplashPageFactory<SplashPage>(create: (data) => SplashPage()),
+          StartupPageFactory<StartupPageA>(create: (data) => StartupPageA()),
+          StartupPageFactory<StartupPageB>(create: (data) => StartupPageB()),
           StandardPageFactory<TestHomePage, void>(
             create: (data) => TestHomePage(),
-            links: {
-              r'': (match, uri) => TestHomePage(),
-            },
+            links: {r'': (match, uri) => TestHomePage()},
             linkGenerator: (pageData) => r'',
           ),
         ],
@@ -579,15 +515,11 @@ void main() {
         startupStateFactories: [
           StartupStateFactory<StateA>(
             (startupSequence) => StateA(startupSequence),
-            [
-              LogicStateTransition<StateB>(),
-            ],
+            [LogicStateTransition<StateB>()],
           ),
           StartupStateFactory<StateB>(
             (startupSequence) => tStateB = StateB(startupSequence),
-            [
-              LogicStateTransition<StateC>(),
-            ],
+            [LogicStateTransition<StateC>()],
           ),
           StartupStateFactory<StateC>(
             (startupSequence) => StateC(startupSequence),
@@ -613,20 +545,17 @@ void main() {
     tApp.dispose();
   });
 
-  testWidgets("resetMachine with splash timer active",
-      (WidgetTester tester) async {
+  testWidgets("resetMachine with splash timer active", (
+    WidgetTester tester,
+  ) async {
     final tApp = createApp(
       appWidget: StandardMaterialApp(
         onGenerateTitle: (context) => 'StartupSequence Test Title',
         pages: [
-          SplashPageFactory<SplashPage>(
-            create: (data) => SplashPage(),
-          ),
+          SplashPageFactory<SplashPage>(create: (data) => SplashPage()),
           StandardPageFactory<TestHomePage, void>(
             create: (data) => TestHomePage(),
-            links: {
-              r'': (match, uri) => TestHomePage(),
-            },
+            links: {r'': (match, uri) => TestHomePage()},
             linkGenerator: (pageData) => r'',
           ),
         ],
@@ -668,14 +597,10 @@ void main() {
       appWidget: StandardMaterialApp(
         onGenerateTitle: (context) => 'StartupSequence Test Title',
         pages: [
-          SplashPageFactory<SplashPage>(
-            create: (data) => SplashPage(),
-          ),
+          SplashPageFactory<SplashPage>(create: (data) => SplashPage()),
           StandardPageFactory<TestHomePage, void>(
             create: (data) => TestHomePage(),
-            links: {
-              r'': (match, uri) => TestHomePage(),
-            },
+            links: {r'': (match, uri) => TestHomePage()},
             linkGenerator: (pageData) => r'',
           ),
         ],
@@ -683,14 +608,11 @@ void main() {
       startupSequence: StartupSequence(
         waitSplashScreenDuration: const Duration(milliseconds: 16),
         startupStateFactories: [
-          StartupStateFactory<StateDelayed2000ms>(
-            (startupSequence) {
-              final tS = StateDelayed2000ms(startupSequence);
-              tState ??= tS;
-              return tS;
-            },
-            [],
-          ),
+          StartupStateFactory<StateDelayed2000ms>((startupSequence) {
+            final tS = StateDelayed2000ms(startupSequence);
+            tState ??= tS;
+            return tS;
+          }, []),
         ],
       ),
     );
@@ -711,20 +633,17 @@ void main() {
     tApp.dispose();
   });
 
-  testWidgets("complete before process completion",
-      (WidgetTester tester) async {
+  testWidgets("complete before process completion", (
+    WidgetTester tester,
+  ) async {
     final tApp = createApp(
       appWidget: StandardMaterialApp(
         onGenerateTitle: (context) => 'StartupSequence Test Title',
         pages: [
-          SplashPageFactory<SplashPage>(
-            create: (data) => SplashPage(),
-          ),
+          SplashPageFactory<SplashPage>(create: (data) => SplashPage()),
           StandardPageFactory<TestHomePage, void>(
             create: (data) => TestHomePage(),
-            links: {
-              r'': (match, uri) => TestHomePage(),
-            },
+            links: {r'': (match, uri) => TestHomePage()},
             linkGenerator: (pageData) => r'',
           ),
         ],
@@ -749,20 +668,17 @@ void main() {
     tApp.dispose();
   });
 
-  testWidgets("completeError before process completion",
-      (WidgetTester tester) async {
+  testWidgets("completeError before process completion", (
+    WidgetTester tester,
+  ) async {
     final tApp = createApp(
       appWidget: StandardMaterialApp(
         onGenerateTitle: (context) => 'StartupSequence Test Title',
         pages: [
-          SplashPageFactory<SplashPage>(
-            create: (data) => SplashPage(),
-          ),
+          SplashPageFactory<SplashPage>(create: (data) => SplashPage()),
           StandardPageFactory<TestHomePage, void>(
             create: (data) => TestHomePage(),
-            links: {
-              r'': (match, uri) => TestHomePage(),
-            },
+            links: {r'': (match, uri) => TestHomePage()},
             linkGenerator: (pageData) => r'',
           ),
         ],
@@ -783,10 +699,14 @@ void main() {
     await tApp.runProcess(() async {
       await tester.pumpAndSettle(const Duration(milliseconds: 3000));
 
-      expect(() => tApp.startupSequence!.waitForComplete(),
-          throwsA(isA<String>()));
-      expect(tApp.startupSequence!.error?.error,
-          'StateCompleteErrorBeforeProcess');
+      expect(
+        () => tApp.startupSequence!.waitForComplete(),
+        throwsA(isA<String>()),
+      );
+      expect(
+        tApp.startupSequence!.error?.error,
+        'StateCompleteErrorBeforeProcess',
+      );
     });
 
     tApp.dispose();
@@ -800,20 +720,12 @@ void main() {
       appWidget: StandardMaterialApp(
         onGenerateTitle: (context) => 'StartupSequence Test Title',
         pages: [
-          SplashPageFactory<SplashPage>(
-            create: (data) => SplashPage(),
-          ),
-          StartupPageFactory<StartupPageA>(
-            create: (data) => StartupPageA(),
-          ),
-          StartupPageFactory<StartupPageB>(
-            create: (data) => StartupPageB(),
-          ),
+          SplashPageFactory<SplashPage>(create: (data) => SplashPage()),
+          StartupPageFactory<StartupPageA>(create: (data) => StartupPageA()),
+          StartupPageFactory<StartupPageB>(create: (data) => StartupPageB()),
           StandardPageFactory<TestHomePage, void>(
             create: (data) => TestHomePage(),
-            links: {
-              r'': (match, uri) => TestHomePage(),
-            },
+            links: {r'': (match, uri) => TestHomePage()},
             linkGenerator: (pageData) => r'',
           ),
         ],
@@ -822,26 +734,17 @@ void main() {
         startupStateFactories: [
           StartupStateFactory<StateA>(
             (startupSequence) => tCurrentState = StateA(startupSequence),
-            [
-              LogicStateTransition<StateB>(),
-            ],
+            [LogicStateTransition<StateB>()],
           ),
           StartupStateFactory<StateB>(
             (startupSequence) => tCurrentState = StateB(startupSequence),
-            [
-              LogicStateTransition<StateC>(),
-            ],
+            [LogicStateTransition<StateC>()],
           ),
-          StartupStateFactory<StateC>(
-            (startupSequence) {
-              final tState = StateC(startupSequence);
-              tFirstStateC ??= tState;
-              return tCurrentState = tState;
-            },
-            [
-              LogicStateTransition<StateD>(),
-            ],
-          ),
+          StartupStateFactory<StateC>((startupSequence) {
+            final tState = StateC(startupSequence);
+            tFirstStateC ??= tState;
+            return tCurrentState = tState;
+          }, [LogicStateTransition<StateD>()]),
           StartupStateFactory<StateD>(
             (startupSequence) => tCurrentState = StateD(startupSequence),
             [],
@@ -897,17 +800,11 @@ void main() {
       appWidget: StandardMaterialApp(
         onGenerateTitle: (context) => 'StartupSequence Test Title',
         pages: [
-          SplashPageFactory<SplashPage>(
-            create: (data) => SplashPage(),
-          ),
-          StartupPageFactory<StartupPageA>(
-            create: (data) => StartupPageA(),
-          ),
+          SplashPageFactory<SplashPage>(create: (data) => SplashPage()),
+          StartupPageFactory<StartupPageA>(create: (data) => StartupPageA()),
           StandardPageFactory<TestHomePage, void>(
             create: (data) => TestHomePage(),
-            links: {
-              r'': (match, uri) => TestHomePage(),
-            },
+            links: {r'': (match, uri) => TestHomePage()},
             linkGenerator: (pageData) => r'',
           ),
         ],
@@ -916,20 +813,13 @@ void main() {
         startupStateFactories: [
           StartupStateFactory<StateA>(
             (startupSequence) => tCurrentState = StateA(startupSequence),
-            [
-              LogicStateTransition<StateB>(),
-            ],
+            [LogicStateTransition<StateB>()],
           ),
-          StartupStateFactory<StateB>(
-            (startupSequence) {
-              final tState = StateB(startupSequence);
-              tFirstStateB ??= tState;
-              return tCurrentState = tState;
-            },
-            [
-              LogicStateTransition<StateDelayed2000ms>(),
-            ],
-          ),
+          StartupStateFactory<StateB>((startupSequence) {
+            final tState = StateB(startupSequence);
+            tFirstStateB ??= tState;
+            return tCurrentState = tState;
+          }, [LogicStateTransition<StateDelayed2000ms>()]),
           StartupStateFactory<StateDelayed2000ms>(
             (startupSequence) =>
                 tCurrentState = StateDelayed2000ms(startupSequence),
@@ -995,17 +885,11 @@ void main() {
       appWidget: StandardMaterialApp(
         onGenerateTitle: (context) => 'StartupSequence Test Title',
         pages: [
-          SplashPageFactory<SplashPage>(
-            create: (data) => SplashPage(),
-          ),
-          StartupPageFactory<StartupPageA>(
-            create: (data) => StartupPageA(),
-          ),
+          SplashPageFactory<SplashPage>(create: (data) => SplashPage()),
+          StartupPageFactory<StartupPageA>(create: (data) => StartupPageA()),
           StandardPageFactory<TestHomePage, void>(
             create: (data) => TestHomePage(),
-            links: {
-              r'': (match, uri) => TestHomePage(),
-            },
+            links: {r'': (match, uri) => TestHomePage()},
             linkGenerator: (pageData) => r'',
           ),
         ],
@@ -1014,20 +898,13 @@ void main() {
         startupStateFactories: [
           StartupStateFactory<StateA>(
             (startupSequence) => tCurrentState = StateA(startupSequence),
-            [
-              LogicStateTransition<StateB>(),
-            ],
+            [LogicStateTransition<StateB>()],
           ),
-          StartupStateFactory<StateB>(
-            (startupSequence) {
-              final tState = StateB(startupSequence);
-              tFirstStateB ??= tState;
-              return tCurrentState = tState;
-            },
-            [
-              LogicStateTransition<StateDelayed2000ms>(),
-            ],
-          ),
+          StartupStateFactory<StateB>((startupSequence) {
+            final tState = StateB(startupSequence);
+            tFirstStateB ??= tState;
+            return tCurrentState = tState;
+          }, [LogicStateTransition<StateDelayed2000ms>()]),
           StartupStateFactory<StateDelayed2000ms>(
             (startupSequence) =>
                 tCurrentState = StateDelayed2000ms(startupSequence),

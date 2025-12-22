@@ -26,10 +26,7 @@ void main() {
     final App tApp = createApp(environment: _EmptyEnvironment());
     final bool tResult = await tNotificationsPlugin.init(tApp);
 
-    expect(
-      tResult,
-      isTrue,
-    );
+    expect(tResult, isTrue);
   });
 
   test('check init success using environment', () async {
@@ -39,118 +36,82 @@ void main() {
 
     final bool tResult = await tNotificationsPlugin.init(tApp);
 
+    expect(tResult, isTrue);
+  });
+
+  test('check notifications', () async {
+    final NotificationsPlugin tNotificationsPlugin = NotificationsPlugin();
+
+    expectLater(
+      tNotificationsPlugin.notifications.asyncMap((event) => event.payload),
+      emitsInOrder(["notification/"]),
+    );
+
+    final App tApp = createApp();
+
+    await tNotificationsPlugin.init(tApp);
+
+    tNotificationsPlugin.enableStandardAppIntegration();
+
+    tNotificationsPlugin.mockRecieveNotificationResponse(notificationResponse);
+  });
+
+  test('check locationFromPayload', () async {
+    final NotificationsPlugin tNotificationsPlugin = NotificationsPlugin();
+    final App tApp = createApp();
+    await tNotificationsPlugin.init(tApp);
+
+    expect(tNotificationsPlugin.uriFromPayload(null), isNull);
+
     expect(
-      tResult,
-      isTrue,
+      tNotificationsPlugin.uriFromPayload("notification/"),
+      Uri.parse("notification/"),
+    );
+
+    expect(
+      tNotificationsPlugin.uriFromPayload('{"location": "notification/"}'),
+      Uri.parse("notification/"),
     );
   });
 
-  test(
-    'check notifications',
-    () async {
-      final NotificationsPlugin tNotificationsPlugin = NotificationsPlugin();
+  testWidgets('check getInitialRouteData', (WidgetTester tester) async {
+    notificationAppLaunchDetailsMap = {
+      "notificationLaunchedApp": true,
+      'notificationResponse': {
+        'notificationResponseType': 0,
+        'payload': "notification/",
+      },
+    };
 
-      expectLater(
-        tNotificationsPlugin.notifications.asyncMap((event) => event.payload),
-        emitsInOrder(
-          [
-            "notification/",
-          ],
-        ),
-      );
+    final App tApp = createApp();
+    tApp.run();
 
-      final App tApp = createApp();
+    await tApp.runProcess(() async {
+      final tNotificationsPlugin = tApp.getPlugin<NotificationsPlugin>();
 
-      await tNotificationsPlugin.init(tApp);
+      tApp.getPlugin<NotificationsPlugin>()?.enableStandardAppIntegration();
 
-      tNotificationsPlugin.enableStandardAppIntegration();
+      await tester.pumpAndSettle();
 
-      tNotificationsPlugin.mockRecieveNotificationResponse(
-        notificationResponse,
-      );
-    },
-  );
+      final tStandardRouteData = await tNotificationsPlugin
+          ?.getInitialRouteData();
 
-  test(
-    'check locationFromPayload',
-    () async {
-      final NotificationsPlugin tNotificationsPlugin = NotificationsPlugin();
-      final App tApp = createApp();
-      await tNotificationsPlugin.init(tApp);
-
-      expect(
-        tNotificationsPlugin.uriFromPayload(
-          null,
-        ),
-        isNull,
-      );
-
-      expect(
-        tNotificationsPlugin.uriFromPayload(
-          "notification/",
-        ),
-        Uri.parse("notification/"),
-      );
-
-      expect(
-        tNotificationsPlugin.uriFromPayload(
-          '{"location": "notification/"}',
-        ),
-        Uri.parse("notification/"),
-      );
-    },
-  );
-
-  testWidgets(
-    'check getInitialRouteData',
-    (WidgetTester tester) async {
-      notificationAppLaunchDetailsMap = {
-        "notificationLaunchedApp": true,
-        'notificationResponse': {
-          'notificationResponseType': 0,
-          'payload': "notification/",
-        }
-      };
-
-      final App tApp = createApp();
-      tApp.run();
-
-      await tApp.runProcess(() async {
-        final tNotificationsPlugin = tApp.getPlugin<NotificationsPlugin>();
-
-        tApp.getPlugin<NotificationsPlugin>()?.enableStandardAppIntegration();
-
-        await tester.pumpAndSettle();
-
-        final tStandardRouteData =
-            await tNotificationsPlugin?.getInitialRouteData();
-
-        expect(
-          tStandardRouteData?.factory?.pageType,
-          NotificationPage,
-        );
-      });
-    },
-  );
+      expect(tStandardRouteData?.factory?.pageType, NotificationPage);
+    });
+  });
 
   test('check dispose', () async {
     final NotificationsPlugin tNotificationsPlugin = NotificationsPlugin();
 
     tNotificationsPlugin.dispose();
 
-    expect(
-      tNotificationsPlugin.disposed,
-      isTrue,
-    );
+    expect(tNotificationsPlugin.disposed, isTrue);
   });
 
   test('NotificationsInitializationException test', () async {
     // ignore: prefer_const_constructors
     final tException = NotificationsInitializationException();
 
-    expect(
-      tException.code,
-      equals(PatapataCoreExceptionCode.PPE501.name),
-    );
+    expect(tException.code, equals(PatapataCoreExceptionCode.PPE501.name));
   });
 }

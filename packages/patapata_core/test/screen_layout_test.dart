@@ -47,9 +47,7 @@ class _TestRow extends StatelessWidget {
         SizedBox(
           width: 37.5,
           height: 300,
-          child: ColoredBox(
-            color: Colors.blue.shade100,
-          ),
+          child: ColoredBox(color: Colors.blue.shade100),
         ),
         SizedBox(
           width: 300,
@@ -57,20 +55,14 @@ class _TestRow extends StatelessWidget {
           child: ColoredBox(
             color: Colors.deepOrange.shade100,
             child: Center(
-              child: SvgPicture.memory(
-                _svgBytes,
-                width: 200,
-                height: 200,
-              ),
+              child: SvgPicture.memory(_svgBytes, width: 200, height: 200),
             ),
           ),
         ),
         SizedBox(
           width: 37.5,
           height: 300,
-          child: ColoredBox(
-            color: Colors.blue.shade100,
-          ),
+          child: ColoredBox(color: Colors.blue.shade100),
         ),
       ],
     );
@@ -86,11 +78,7 @@ class _TestApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       home: Scaffold(
         backgroundColor: Colors.white,
-        body: SizedBox.expand(
-          child: Center(
-            child: _TestScreenLayout(),
-          ),
-        ),
+        body: SizedBox.expand(child: Center(child: _TestScreenLayout())),
       ),
     );
   }
@@ -155,9 +143,7 @@ class _TestTransformScreenLayout extends StatelessWidget {
             SizedBox(
               width: 37.5,
               height: 300,
-              child: ColoredBox(
-                color: Colors.blue.shade100,
-              ),
+              child: ColoredBox(color: Colors.blue.shade100),
             ),
             SizedBox(
               width: 300,
@@ -165,20 +151,14 @@ class _TestTransformScreenLayout extends StatelessWidget {
               child: ColoredBox(
                 color: Colors.deepOrange.shade100,
                 child: Center(
-                  child: SvgPicture.memory(
-                    _svgBytes,
-                    width: 200,
-                    height: 200,
-                  ),
+                  child: SvgPicture.memory(_svgBytes, width: 200, height: 200),
                 ),
               ),
             ),
             SizedBox(
               width: 37.5,
               height: 300,
-              child: ColoredBox(
-                color: Colors.blue.shade100,
-              ),
+              child: ColoredBox(color: Colors.blue.shade100),
             ),
           ],
         ),
@@ -251,15 +231,15 @@ class _ScreenLayoutEnvironment extends Environment
   const _ScreenLayoutEnvironment();
   @override
   Map<String, ScreenLayoutBreakpoints> get screenLayoutBreakpoints => {
-        'testBreakPoints': const ScreenLayoutBreakpoints(
-          name: 'normal',
-          portraitStandardBreakpoint: 375.0,
-          portraitConstrainedWidth: double.infinity,
-          landscapeStandardBreakpoint: 375.0,
-          landscapeConstrainedWidth: double.infinity,
-          maxScale: 1.2,
-        ),
-      };
+    'testBreakPoints': const ScreenLayoutBreakpoints(
+      name: 'normal',
+      portraitStandardBreakpoint: 375.0,
+      portraitConstrainedWidth: double.infinity,
+      landscapeStandardBreakpoint: 375.0,
+      landscapeConstrainedWidth: double.infinity,
+      maxScale: 1.2,
+    ),
+  };
 }
 
 class _ScreenLayoutBreakpointsModel extends ChangeNotifier {
@@ -274,9 +254,7 @@ class _ScreenLayoutBreakpointsModel extends ChangeNotifier {
 }
 
 class _ScaleListenableBuilder extends StatelessWidget {
-  const _ScaleListenableBuilder({
-    required this.tScaleNotifier,
-  });
+  const _ScaleListenableBuilder({required this.tScaleNotifier});
 
   final ValueNotifier<double> tScaleNotifier;
 
@@ -305,9 +283,7 @@ class _ScaleListenableBuilder extends StatelessWidget {
             SizedBox(
               width: 37.5,
               height: 300,
-              child: ColoredBox(
-                color: Colors.blue.shade100,
-              ),
+              child: ColoredBox(color: Colors.blue.shade100),
             ),
             SizedBox(
               width: 300,
@@ -315,20 +291,14 @@ class _ScaleListenableBuilder extends StatelessWidget {
               child: ColoredBox(
                 color: Colors.deepOrange.shade100,
                 child: Center(
-                  child: SvgPicture.memory(
-                    _svgBytes,
-                    width: 200,
-                    height: 200,
-                  ),
+                  child: SvgPicture.memory(_svgBytes, width: 200, height: 200),
                 ),
               ),
             ),
             SizedBox(
               width: 37.5,
               height: 300,
-              child: ColoredBox(
-                color: Colors.blue.shade100,
-              ),
+              child: ColoredBox(color: Colors.blue.shade100),
             ),
           ],
         ),
@@ -364,11 +334,7 @@ void main() {
           home: Scaffold(
             backgroundColor: Colors.white,
             body: SizedBox.expand(
-              child: Center(
-                child: _TestScreenLayout(
-                  name: 'testBreakPoints',
-                ),
-              ),
+              child: Center(child: _TestScreenLayout(name: 'testBreakPoints')),
             ),
           ),
         ),
@@ -387,8 +353,9 @@ void main() {
       tApp.dispose();
     });
 
-    testGoldens("ScreenLayoutAppFactoryMethodTest",
-        (WidgetTester tester) async {
+    testGoldens("ScreenLayoutAppFactoryMethodTest", (
+      WidgetTester tester,
+    ) async {
       await loadAppFonts();
 
       var tTestDeviceSize = _testDeviceSizes[0];
@@ -451,9 +418,7 @@ void main() {
             backgroundColor: Colors.white,
             body: SizedBox.expand(
               child: Center(
-                child: _TestScreenLayout(
-                  breakpoints: tModifiedBreakpoints,
-                ),
+                child: _TestScreenLayout(breakpoints: tModifiedBreakpoints),
               ),
             ),
           ),
@@ -484,11 +449,7 @@ void main() {
           debugShowCheckedModeBanner: false,
           home: Scaffold(
             backgroundColor: Colors.white,
-            body: SizedBox.expand(
-              child: Center(
-                child: _TestScreenLayout(),
-              ),
-            ),
+            body: SizedBox.expand(child: Center(child: _TestScreenLayout())),
           ),
         ),
       );
@@ -514,8 +475,9 @@ void main() {
       tApp.dispose();
     });
 
-    testGoldens("ScreenLayoutUpdateBreakpointsTest",
-        (WidgetTester tester) async {
+    testGoldens("ScreenLayoutUpdateBreakpointsTest", (
+      WidgetTester tester,
+    ) async {
       await loadAppFonts();
 
       late _ScreenLayoutBreakpointsModel tProvider =
@@ -565,7 +527,9 @@ void main() {
           await setTestDeviceSize(tester, size);
 
           await screenMatchesGolden(
-              tester, 'ScreenLayout_ChangeBreakPoint_$size');
+            tester,
+            'ScreenLayout_ChangeBreakPoint_$size',
+          );
         }
       });
 
@@ -583,9 +547,7 @@ void main() {
             backgroundColor: Colors.white,
             body: SizedBox.expand(
               child: Center(
-                child: _TestScreenLayout(
-                  disableScreenLayout: true,
-                ),
+                child: _TestScreenLayout(disableScreenLayout: true),
               ),
             ),
           ),
@@ -607,8 +569,9 @@ void main() {
       tApp.dispose();
     });
 
-    testGoldens("ScreenLayoutApplyPaintTransformTest",
-        (WidgetTester tester) async {
+    testGoldens("ScreenLayoutApplyPaintTransformTest", (
+      WidgetTester tester,
+    ) async {
       await loadAppFonts();
       var tTestDeviceSize = _testDeviceSizes[1];
       final App tApp = createApp(
@@ -628,7 +591,9 @@ void main() {
         await tester.tapAt(const Offset(40, 565));
 
         await screenMatchesGolden(
-            tester, 'ScreenLayout_Transform_$tTestDeviceSize');
+          tester,
+          'ScreenLayout_Transform_$tTestDeviceSize',
+        );
 
         expect(find.byKey(const ValueKey(kBlueContainer)), findsOneWidget);
       });
@@ -636,8 +601,9 @@ void main() {
       tApp.dispose();
     });
 
-    testGoldens("ScreenLayoutDisableApplyPaintTransformTest",
-        (WidgetTester tester) async {
+    testGoldens("ScreenLayoutDisableApplyPaintTransformTest", (
+      WidgetTester tester,
+    ) async {
       await loadAppFonts();
       var tTestDeviceSize = _testDeviceSizes[1];
       final App tApp = createApp(
@@ -660,7 +626,9 @@ void main() {
         await tester.tapAt(const Offset(58, 567));
 
         await screenMatchesGolden(
-            tester, 'ScreenLayout_Transform_Disable_$tTestDeviceSize');
+          tester,
+          'ScreenLayout_Transform_Disable_$tTestDeviceSize',
+        );
 
         expect(find.byKey(const ValueKey(kBlueContainer)), findsOneWidget);
       });
@@ -670,8 +638,9 @@ void main() {
   });
 
   group('ScreenLayoutWidgetTests', () {
-    testWidgets("ScreenLayoutGetScreenLayoutScaleTest",
-        (WidgetTester tester) async {
+    testWidgets("ScreenLayoutGetScreenLayoutScaleTest", (
+      WidgetTester tester,
+    ) async {
       final ValueNotifier<double> tScaleNotifier = ValueNotifier(-1.0);
 
       await loadAppFonts();
@@ -704,8 +673,9 @@ void main() {
 
         await tester.pumpAndSettle();
 
-        await tester
-            .tap(find.byKey(const ValueKey(kGetScreenLayoutScaleButton)));
+        await tester.tap(
+          find.byKey(const ValueKey(kGetScreenLayoutScaleButton)),
+        );
 
         await tester.pumpAndSettle();
 
@@ -715,8 +685,9 @@ void main() {
       tApp.dispose();
     });
 
-    testWidgets("ScreenLayoutDisableGetScreenLayoutScaleTest",
-        (WidgetTester tester) async {
+    testWidgets("ScreenLayoutDisableGetScreenLayoutScaleTest", (
+      WidgetTester tester,
+    ) async {
       final ValueNotifier<double> tScaleNotifier = ValueNotifier(-1.0);
 
       await loadAppFonts();
@@ -749,8 +720,9 @@ void main() {
 
         await tester.pumpAndSettle();
 
-        await tester
-            .tap(find.byKey(const ValueKey(kGetScreenLayoutScaleButton)));
+        await tester.tap(
+          find.byKey(const ValueKey(kGetScreenLayoutScaleButton)),
+        );
 
         await tester.pumpAndSettle();
 
@@ -760,8 +732,9 @@ void main() {
       tApp.dispose();
     });
 
-    testWidgets('ScreenLayout ConstrainedWidth Zero',
-        (WidgetTester tester) async {
+    testWidgets('ScreenLayout ConstrainedWidth Zero', (
+      WidgetTester tester,
+    ) async {
       final ValueNotifier<double> tScaleNotifier = ValueNotifier(-1.0);
 
       await loadAppFonts();
@@ -802,8 +775,9 @@ void main() {
 
         await tester.pumpAndSettle();
 
-        await tester
-            .tap(find.byKey(const ValueKey(kGetScreenLayoutScaleButton)));
+        await tester.tap(
+          find.byKey(const ValueKey(kGetScreenLayoutScaleButton)),
+        );
 
         await tester.pumpAndSettle();
 

@@ -64,10 +64,10 @@ class LogicStateMachine with ChangeNotifier {
   /// Creates a new [LogicStateMachine].
   /// Starts processing immediately from the top of [factories] upon creation.
   LogicStateMachine(List<LogicStateFactory> factories, [Object? initialData])
-      : assert(factories.isNotEmpty),
-        _factories = factories,
-        _currentFactory = factories.first,
-        __currentState = factories.first.create() {
+    : assert(factories.isNotEmpty),
+      _factories = factories,
+      _currentFactory = factories.first,
+      __currentState = factories.first.create() {
     _stateHistories.add((
       stateType: __currentState.runtimeType,
       backAllowed: __currentState.backAllowed,
@@ -124,7 +124,7 @@ class LogicStateMachine with ChangeNotifier {
 /// Thrown when LogicStateTransition is not found.
 class LogicStateTransitionNotFound extends PatapataCoreException {
   LogicStateTransitionNotFound()
-      : super(code: PatapataCoreExceptionCode.PPE101);
+    : super(code: PatapataCoreExceptionCode.PPE101);
 }
 
 /// Thrown when [current] is not allowed to transition to [next].
@@ -132,10 +132,8 @@ class LogicStateTransitionNotAllowed extends PatapataCoreException {
   final LogicState current;
   final LogicState next;
 
-  LogicStateTransitionNotAllowed(
-    this.current,
-    this.next,
-  ) : super(code: PatapataCoreExceptionCode.PPE102);
+  LogicStateTransitionNotAllowed(this.current, this.next)
+    : super(code: PatapataCoreExceptionCode.PPE102);
 
   @override
   String toString() =>
@@ -146,9 +144,8 @@ class LogicStateTransitionNotAllowed extends PatapataCoreException {
 class LogicStateAllTransitionsNotAllowed extends PatapataCoreException {
   final LogicState current;
 
-  LogicStateAllTransitionsNotAllowed(
-    this.current,
-  ) : super(code: PatapataCoreExceptionCode.PPE103);
+  LogicStateAllTransitionsNotAllowed(this.current)
+    : super(code: PatapataCoreExceptionCode.PPE103);
 
   @override
   String toString() =>
@@ -159,9 +156,8 @@ class LogicStateAllTransitionsNotAllowed extends PatapataCoreException {
 class LogicStateNotCurrent extends PatapataCoreException {
   final LogicState current;
 
-  LogicStateNotCurrent(
-    this.current,
-  ) : super(code: PatapataCoreExceptionCode.PPE104);
+  LogicStateNotCurrent(this.current)
+    : super(code: PatapataCoreExceptionCode.PPE104);
 
   @override
   String toString() => 'LogicStateNotCurrent: $current is not current.';
@@ -259,14 +255,16 @@ abstract class LogicState {
       throw LogicStateNotCurrent(this);
     }
 
-    final tHistoryIndex = _machine._stateHistories
-        .lastIndexWhere((v) => v.stateType == stateType && v.backAllowed);
+    final tHistoryIndex = _machine._stateHistories.lastIndexWhere(
+      (v) => v.stateType == stateType && v.backAllowed,
+    );
 
     if (tHistoryIndex < 0) {
       _complete(LogicStateTransitionNotFound());
     } else {
-      final tNextFactory =
-          _machine._factories.firstWhereOrNull((v) => v.type == stateType);
+      final tNextFactory = _machine._factories.firstWhereOrNull(
+        (v) => v.type == stateType,
+      );
 
       if (tNextFactory == null) {
         // This process will not be executed if the value of _machine._stateHistories is normal.
@@ -275,8 +273,10 @@ abstract class LogicState {
         final tNextState = tNextFactory.create();
 
         _complete();
-        _machine._stateHistories
-            .removeRange(tHistoryIndex, _machine._stateHistories.length);
+        _machine._stateHistories.removeRange(
+          tHistoryIndex,
+          _machine._stateHistories.length,
+        );
         _machine._currentFactory = tNextFactory;
         _machine._currentState = tNextState;
         _machine._initState(data);
@@ -299,14 +299,16 @@ abstract class LogicState {
       throw LogicStateNotCurrent(this);
     }
 
-    final tTransition = _machine._currentFactory._transitions
-        .firstWhereOrNull((v) => v.nextType == stateType);
+    final tTransition = _machine._currentFactory._transitions.firstWhereOrNull(
+      (v) => v.nextType == stateType,
+    );
 
     if (tTransition == null) {
       _complete(LogicStateTransitionNotFound());
     } else {
-      final tNextFactory =
-          _machine._factories.firstWhereOrNull((v) => v.type == stateType);
+      final tNextFactory = _machine._factories.firstWhereOrNull(
+        (v) => v.type == stateType,
+      );
 
       if (tNextFactory == null) {
         _complete(LogicStateTransitionNotFound());
@@ -314,8 +316,12 @@ abstract class LogicState {
         final tNextState = tNextFactory.create();
 
         if (!tTransition._predicate(this, tNextState)) {
-          _complete(LogicStateTransitionNotAllowed(
-              this, tNextState.._machine = _machine));
+          _complete(
+            LogicStateTransitionNotAllowed(
+              this,
+              tNextState.._machine = _machine,
+            ),
+          );
         } else {
           _complete();
           _machine._currentFactory = tNextFactory;
@@ -341,11 +347,14 @@ abstract class LogicState {
   void _complete([Object? error, StackTrace? stackTrace]) {
     try {
       dispose();
-      final tHistoryIndex = _machine._stateHistories
-          .lastIndexWhere((e) => e.stateType == runtimeType);
+      final tHistoryIndex = _machine._stateHistories.lastIndexWhere(
+        (e) => e.stateType == runtimeType,
+      );
       if (tHistoryIndex >= 0) {
-        _machine._stateHistories[tHistoryIndex] =
-            (stateType: runtimeType, backAllowed: backAllowed);
+        _machine._stateHistories[tHistoryIndex] = (
+          stateType: runtimeType,
+          backAllowed: backAllowed,
+        );
       }
     } finally {
       if (error != null) {
@@ -418,11 +427,11 @@ class LogicStateTransition<R extends LogicState> {
   /// When a [LogicState] is completed, the next state to execute will be the
   /// first state for which [predicate] returns true.
   LogicStateTransition([TransitionPredicate? predicate])
-      : _predicate = predicate ?? ((c, n) => true);
+    : _predicate = predicate ?? ((c, n) => true);
 }
 
-typedef TransitionPredicate = bool Function(
-    LogicState current, LogicState next);
+typedef TransitionPredicate =
+    bool Function(LogicState current, LogicState next);
 
 /// The state in which [LogicStateMachine] terminated with an error.
 class LogicStateError extends LogicState {

@@ -11,23 +11,24 @@ import 'package:flutter/foundation.dart';
 final String _nativeLibDirectory = kIsWeb
     ? ''
     : defaultTargetPlatform == TargetPlatform.android
-        ? (() {
-            // TODO: This path is hardcoding. so cannot use App
-            final tNativeLibDirTempFile =
-                File('${Directory.systemTemp.path}/patapataNativeLib');
+    ? (() {
+        // TODO: This path is hardcoding. so cannot use App
+        final tNativeLibDirTempFile = File(
+          '${Directory.systemTemp.path}/patapataNativeLib',
+        );
 
-            if (tNativeLibDirTempFile.existsSync()) {
-              try {
-                return tNativeLibDirTempFile.readAsStringSync();
-              } catch (_) {
-                // ignore
-                return '';
-              }
-            } else {
-              return '';
-            }
-          })()
-        : '';
+        if (tNativeLibDirTempFile.existsSync()) {
+          try {
+            return tNativeLibDirTempFile.readAsStringSync();
+          } catch (_) {
+            // ignore
+            return '';
+          }
+        } else {
+          return '';
+        }
+      })()
+    : '';
 
 DynamicLibrary safeLoadDynamicLibrary(String library) {
   if (_nativeLibDirectory.isNotEmpty) {
@@ -47,8 +48,9 @@ DynamicLibrary safeLoadDynamicLibrary(String library) {
 
         // app id ends with the first \0 character in here.
         final tEndOfAppId = max(tAppIdAsBytes.indexOf(0), 0);
-        final tAppId =
-            String.fromCharCodes(tAppIdAsBytes.sublist(0, tEndOfAppId));
+        final tAppId = String.fromCharCodes(
+          tAppIdAsBytes.sublist(0, tEndOfAppId),
+        );
 
         return DynamicLibrary.open('/data/data/$tAppId/lib/lib$library.so');
       }

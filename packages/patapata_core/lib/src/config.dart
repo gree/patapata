@@ -86,16 +86,10 @@ mixin ReadableConfig on Config {
   });
 
   /// Returns the value corresponding to the given [key] as a Boolean.
-  bool getBool(
-    String key, {
-    bool defaultValue = Config.defaultValueForBool,
-  });
+  bool getBool(String key, {bool defaultValue = Config.defaultValueForBool});
 
   /// Returns the value corresponding to the given [key] as an Integer.
-  int getInt(
-    String key, {
-    int defaultValue = Config.defaultValueForInt,
-  });
+  int getInt(String key, {int defaultValue = Config.defaultValueForInt});
 
   /// Returns the value corresponding to the given [key] as a Double.
   double getDouble(

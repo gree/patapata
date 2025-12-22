@@ -155,21 +155,20 @@ class SequentialWorkQueue {
                 if (tResult is Future<T>) {
                   _runInSafeZone(() {
                     final tSafeZone = Zone.current;
-                    final fOnResult = tSafeZone.bindUnaryCallback<void, T>(
-                      (value) {
-                        fFinish(false, value);
-                      },
-                    );
-                    final tOnError = tSafeZone
-                        .bindBinaryCallback<void, Object?, StackTrace>(
-                            (error, stackTrace) {
-                      fFinish(false, null, error, stackTrace);
+                    final fOnResult = tSafeZone.bindUnaryCallback<void, T>((
+                      value,
+                    ) {
+                      fFinish(false, value);
                     });
+                    final tOnError = tSafeZone
+                        .bindBinaryCallback<void, Object?, StackTrace>((
+                          error,
+                          stackTrace,
+                        ) {
+                          fFinish(false, null, error, stackTrace);
+                        });
 
-                    tResult.then<void>(
-                      fOnResult,
-                      onError: tOnError,
-                    );
+                    tResult.then<void>(fOnResult, onError: tOnError);
                   });
                 } else {
                   fFinish(false, tResult);
@@ -187,17 +186,13 @@ class SequentialWorkQueue {
           },
           zoneSpecification: ZoneSpecification(
             fork: (self, parent, zone, specification, zoneValues) {
-              return parent.fork(
-                zone,
-                specification,
-                {
-                  ...?zoneValues,
-                  // Keep this so we know if we are inside this queue.
-                  #sequentialWorkQueue: hashCode,
-                  // Reset this so we don't cancel code in this new Zone.
-                  #sequentialWorkQueueItem: 0,
-                },
-              );
+              return parent.fork(zone, specification, {
+                ...?zoneValues,
+                // Keep this so we know if we are inside this queue.
+                #sequentialWorkQueue: hashCode,
+                // Reset this so we don't cancel code in this new Zone.
+                #sequentialWorkQueueItem: 0,
+              });
             },
             scheduleMicrotask: (self, parent, zone, f) {
               if (!waitForMicrotasks ||
@@ -235,8 +230,9 @@ class SequentialWorkQueue {
                   if (!tQueueItem.cancelled) {
                     if (tQueueItem.cancellingCompleter != null) {
                       _runInSafeZone(() {
-                        tQueueItem.cancellingCompleter!.future
-                            .then((cancelled) {
+                        tQueueItem.cancellingCompleter!.future.then((
+                          cancelled,
+                        ) {
                           fCompleteAsync();
 
                           if (!cancelled) {
@@ -281,8 +277,9 @@ class SequentialWorkQueue {
                   if (!tQueueItem.cancelled) {
                     if (tQueueItem.cancellingCompleter != null) {
                       _runInSafeZone(() {
-                        tQueueItem.cancellingCompleter!.future
-                            .then((cancelled) {
+                        tQueueItem.cancellingCompleter!.future.then((
+                          cancelled,
+                        ) {
                           fCompleteAsync();
 
                           if (!cancelled) {
@@ -341,13 +338,15 @@ class SequentialWorkQueue {
 
                 late final _TimerWithCancelCallback tTimer;
 
-                final tBackingTimer =
-                    Zone.current.createPeriodicTimer(period, (timer) {
+                final tBackingTimer = Zone.current.createPeriodicTimer(period, (
+                  timer,
+                ) {
                   if (!tQueueItem.cancelled) {
                     if (tQueueItem.cancellingCompleter != null) {
                       _runInSafeZone(() {
-                        tQueueItem.cancellingCompleter!.future
-                            .then((cancelled) {
+                        tQueueItem.cancellingCompleter!.future.then((
+                          cancelled,
+                        ) {
                           if (!cancelled) {
                             tUnsafeZone.runUnary(f, tTimer);
                           } else {

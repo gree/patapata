@@ -17,25 +17,25 @@ import 'utils/patapata_core_test_utils.dart';
 class _ErrorTestEnvironment extends Environment with ErrorEnvironment {
   @override
   Future<void> Function(BuildContext context, PatapataException error)?
-      get errorDefaultShowDialog => (context, error) {
-            return PlatformDialog.show<void>(
-              context: context,
-              title: 'custom:${error.localizedTitle}',
-              message: 'custom:${error.localizedMessage}',
-              actions: [
-                PlatformDialogAction<void>(
-                  result: () {},
-                  isDefault: true,
-                  text: 'custom:${error.localizedFix}',
-                ),
-              ],
-            );
-          };
+  get errorDefaultShowDialog => (context, error) {
+    return PlatformDialog.show<void>(
+      context: context,
+      title: 'custom:${error.localizedTitle}',
+      message: 'custom:${error.localizedMessage}',
+      actions: [
+        PlatformDialogAction<void>(
+          result: () {},
+          isDefault: true,
+          text: 'custom:${error.localizedFix}',
+        ),
+      ],
+    );
+  };
 
   @override
   Widget Function(PatapataException p1)? get errorDefaultWidget => (error) {
-        return Text('custom:${error.localizedMessage}');
-      };
+    return Text('custom:${error.localizedMessage}');
+  };
 
   @override
   Map<String, String>? get errorReplacePrefixMap => {'test': 'CST'};
@@ -78,31 +78,31 @@ class _TestExceptionWithFix extends _TestException {
 
 class _TestInfoException extends _TestException {
   _TestInfoException()
-      : super(
-          app: null,
-          message: null,
-          original: null,
-          fingerprint: null,
-          localeTitleData: null,
-          localeMessageData: null,
-          localeFixData: null,
-          logLevel: Level.INFO,
-        );
+    : super(
+        app: null,
+        message: null,
+        original: null,
+        fingerprint: null,
+        localeTitleData: null,
+        localeMessageData: null,
+        localeFixData: null,
+        logLevel: Level.INFO,
+      );
 }
 
 class _TestShoutException extends _TestException {
   _TestShoutException()
-      : super(
-          app: null,
-          message: null,
-          original: null,
-          fingerprint: null,
-          localeTitleData: null,
-          localeMessageData: null,
-          localeFixData: null,
-          logLevel: Level.INFO,
-          userLogLevel: Level.SHOUT,
-        );
+    : super(
+        app: null,
+        message: null,
+        original: null,
+        fingerprint: null,
+        localeTitleData: null,
+        localeMessageData: null,
+        localeFixData: null,
+        logLevel: Level.INFO,
+        userLogLevel: Level.SHOUT,
+      );
 
   @override
   String get defaultPrefix => 'TSS';
@@ -121,12 +121,8 @@ class TestPageLocalizationKey extends StandardPage<void> {
   @override
   Widget buildPage(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('title'),
-      ),
-      body: const Center(
-        child: Text('message'),
-      ),
+      appBar: AppBar(title: const Text('title')),
+      body: const Center(child: Text('message')),
     );
   }
 }
@@ -136,85 +132,81 @@ class _TestPatapataCoreException extends PatapataCoreException {
 }
 
 void main() {
-  testWidgets(
-    'Error test.',
-    (WidgetTester tTester) async {
-      debugDefaultTargetPlatformOverride = TargetPlatform.android;
+  testWidgets('Error test.', (WidgetTester tTester) async {
+    debugDefaultTargetPlatformOverride = TargetPlatform.android;
 
-      final App tApp = createApp();
-      tApp.run();
+    final App tApp = createApp();
+    tApp.run();
 
-      await tApp.runProcess(() async {
-        await tTester.pumpAndSettle();
+    await tApp.runProcess(() async {
+      await tTester.pumpAndSettle();
 
-        final tException = _TestException(
-          message: 'TestError',
-          original: 'OriginalError',
-          localeTitleData: {'data': '111'},
-          localeMessageData: {'data': '222'},
-          localeFixData: {'data': '333'},
-          fingerprint: ['A', 'B', 'C'],
-        );
-        expect(tException.code, 'TST000');
-        expect(tException.message, 'TestError');
-        expect(tException.original, 'OriginalError');
-        expect(tException.logLevel, null);
-        expect(tException.userLogLevel, null);
-        expect(
-          tException.localizedTitle,
-          l(
-            StandardMaterialApp.globalNavigatorContext!,
-            'errors.test.000.title',
-            {'prefix': 'TST', 'data': '111'},
-          ),
-        );
-        expect(
-          tException.localizedMessage,
-          l(
-            StandardMaterialApp.globalNavigatorContext!,
-            'errors.test.000.message',
-            {'prefix': 'TST', 'data': '222'},
-          ),
-        );
-        expect(
-          tException.localizedFix,
-          l(
-            StandardMaterialApp.globalNavigatorContext!,
-            'errors.test.000.fix',
-            {'prefix': 'TST', 'data': '333'},
-          ),
-        );
-        expect(tException.hasFix, false);
-        expect(tException.fingerprint, ['A', 'B', 'C']);
+      final tException = _TestException(
+        message: 'TestError',
+        original: 'OriginalError',
+        localeTitleData: {'data': '111'},
+        localeMessageData: {'data': '222'},
+        localeFixData: {'data': '333'},
+        fingerprint: ['A', 'B', 'C'],
+      );
+      expect(tException.code, 'TST000');
+      expect(tException.message, 'TestError');
+      expect(tException.original, 'OriginalError');
+      expect(tException.logLevel, null);
+      expect(tException.userLogLevel, null);
+      expect(
+        tException.localizedTitle,
+        l(
+          StandardMaterialApp.globalNavigatorContext!,
+          'errors.test.000.title',
+          {'prefix': 'TST', 'data': '111'},
+        ),
+      );
+      expect(
+        tException.localizedMessage,
+        l(
+          StandardMaterialApp.globalNavigatorContext!,
+          'errors.test.000.message',
+          {'prefix': 'TST', 'data': '222'},
+        ),
+      );
+      expect(
+        tException.localizedFix,
+        l(StandardMaterialApp.globalNavigatorContext!, 'errors.test.000.fix', {
+          'prefix': 'TST',
+          'data': '333',
+        }),
+      );
+      expect(tException.hasFix, false);
+      expect(tException.fingerprint, ['A', 'B', 'C']);
 
-        tException.showDialog(StandardMaterialApp.globalNavigatorContext!);
-        await tTester.pumpAndSettle();
-        expect(find.byType(AlertDialog), findsOneWidget);
-        expect(find.text(tException.localizedTitle), findsOneWidget);
-        expect(find.text(tException.localizedMessage), findsOneWidget);
-        expect(find.text('OK'), findsOneWidget);
-        await tTester.tap(find.text('OK'));
+      tException.showDialog(StandardMaterialApp.globalNavigatorContext!);
+      await tTester.pumpAndSettle();
+      expect(find.byType(AlertDialog), findsOneWidget);
+      expect(find.text(tException.localizedTitle), findsOneWidget);
+      expect(find.text(tException.localizedMessage), findsOneWidget);
+      expect(find.text('OK'), findsOneWidget);
+      await tTester.tap(find.text('OK'));
 
-        await tTester.pumpWidget(
-          MaterialApp(
-            home: tException.widget,
-          ),
-        );
-        expect(find.text(tException.localizedMessage), findsOneWidget);
+      await tTester.pumpWidget(MaterialApp(home: tException.widget));
+      expect(find.text(tException.localizedMessage), findsOneWidget);
 
-        expect(tException.toString(),
-            '_TestException: code=TST000, message=TestError, original=OriginalError');
+      expect(
+        tException.toString(),
+        '_TestException: code=TST000, message=TestError, original=OriginalError',
+      );
 
-        final tExceptionNoMessage = _TestException();
-        expect(tExceptionNoMessage.toString(),
-            '_TestException: code=TST000, message=null');
-      });
+      final tExceptionNoMessage = _TestException();
+      expect(
+        tExceptionNoMessage.toString(),
+        '_TestException: code=TST000, message=null',
+      );
+    });
 
-      tApp.dispose();
+    tApp.dispose();
 
-      debugDefaultTargetPlatformOverride = null;
-    },
-  );
+    debugDefaultTargetPlatformOverride = null;
+  });
 
   test(
     'Tests log level. if userLogLevel is null, then logLevel is the value of logLevel.',
@@ -230,15 +222,11 @@ void main() {
       expect(tExceptionB.logLevel, Level.FINE);
       expect(tExceptionB.userLogLevel, Level.SHOUT);
 
-      final tExceptionC = _TestException(
-        userLogLevel: Level.INFO,
-      );
+      final tExceptionC = _TestException(userLogLevel: Level.INFO);
       expect(tExceptionC.logLevel, null);
       expect(tExceptionC.userLogLevel, Level.INFO);
 
-      final tExceptionD = _TestException(
-        logLevel: Level.SEVERE,
-      );
+      final tExceptionD = _TestException(logLevel: Level.SEVERE);
       expect(tExceptionD.logLevel, Level.SEVERE);
       expect(tExceptionD.userLogLevel, Level.SEVERE);
     },
@@ -254,20 +242,20 @@ void main() {
       await tTester.pumpAndSettle();
 
       final tException = _TestExceptionWithFix(
-          localeTitleData: {'data': '111'},
-          localeMessageData: {'data': '222'},
-          localeFixData: {'data': '333'},
-          fix: () async {
-            tFixed = true;
-          });
+        localeTitleData: {'data': '111'},
+        localeMessageData: {'data': '222'},
+        localeFixData: {'data': '333'},
+        fix: () async {
+          tFixed = true;
+        },
+      );
 
       expect(
         tException.localizedFix,
-        l(
-          StandardMaterialApp.globalNavigatorContext!,
-          'errors.test.000.fix',
-          {'prefix': 'TST', 'data': '333'},
-        ),
+        l(StandardMaterialApp.globalNavigatorContext!, 'errors.test.000.fix', {
+          'prefix': 'TST',
+          'data': '333',
+        }),
       );
       expect(tException.hasFix, true);
       expect(tFixed, false);
@@ -281,9 +269,7 @@ void main() {
   testWidgets('Error Environment test.', (WidgetTester tTester) async {
     debugDefaultTargetPlatformOverride = TargetPlatform.android;
 
-    final App tApp = createApp(
-      environment: _ErrorTestEnvironment(),
-    );
+    final App tApp = createApp(environment: _ErrorTestEnvironment());
     tApp.run();
 
     await tApp.runProcess(() async {
@@ -313,11 +299,10 @@ void main() {
       );
       expect(
         tException.localizedFix,
-        l(
-          StandardMaterialApp.globalNavigatorContext!,
-          'errors.test.000.fix',
-          {'prefix': 'CST', 'data': '333'},
-        ),
+        l(StandardMaterialApp.globalNavigatorContext!, 'errors.test.000.fix', {
+          'prefix': 'CST',
+          'data': '333',
+        }),
       );
 
       tException.showDialog(StandardMaterialApp.globalNavigatorContext!);
@@ -325,17 +310,17 @@ void main() {
       expect(find.byType(AlertDialog), findsOneWidget);
       expect(find.text('custom:${tException.localizedTitle}'), findsOneWidget);
       expect(
-          find.text('custom:${tException.localizedMessage}'), findsOneWidget);
+        find.text('custom:${tException.localizedMessage}'),
+        findsOneWidget,
+      );
       expect(find.text('custom:${tException.localizedFix}'), findsOneWidget);
       await tTester.tap(find.text('custom:${tException.localizedFix}'));
 
-      await tTester.pumpWidget(
-        MaterialApp(
-          home: tException.widget,
-        ),
-      );
+      await tTester.pumpWidget(MaterialApp(home: tException.widget));
       expect(
-          find.text('custom:${tException.localizedMessage}'), findsOneWidget);
+        find.text('custom:${tException.localizedMessage}'),
+        findsOneWidget,
+      );
     });
 
     tApp.dispose();
@@ -345,9 +330,7 @@ void main() {
 
   testWidgets('Error log and navigate test.', (WidgetTester tTester) async {
     final tLogger = Logger('errorTest');
-    final App tApp = createApp(
-      environment: _ErrorTestEnvironment(),
-    );
+    final App tApp = createApp(environment: _ErrorTestEnvironment());
     tApp.run();
 
     await tApp.runProcess(() async {
@@ -379,67 +362,53 @@ void main() {
     tApp.dispose();
   });
 
-  testWidgets(
-    'Error test.(no app zone)',
-    (WidgetTester tTester) async {
-      final App tApp = createApp();
-      tApp.run();
-      await tApp.runProcess(() async {
-        await tTester.pumpAndSettle();
-      });
+  testWidgets('Error test.(no app zone)', (WidgetTester tTester) async {
+    final App tApp = createApp();
+    tApp.run();
+    await tApp.runProcess(() async {
+      await tTester.pumpAndSettle();
+    });
 
-      final tException = _TestException(
-        localeTitleData: {'data': '111'},
-        localeMessageData: {'data': '222'},
-        localeFixData: {'data': '333'},
-      );
-      expect(
-        tException.localizedTitle,
-        'Error: TST000',
-      );
-      expect(
-        tException.localizedMessage,
-        '_TestException: code=TST000',
-      );
-      expect(
-        tException.localizedFix,
-        'OK',
-      );
+    final tException = _TestException(
+      localeTitleData: {'data': '111'},
+      localeMessageData: {'data': '222'},
+      localeFixData: {'data': '333'},
+    );
+    expect(tException.localizedTitle, 'Error: TST000');
+    expect(tException.localizedMessage, '_TestException: code=TST000');
+    expect(tException.localizedFix, 'OK');
 
-      final tExceptionWithApp = _TestException(
-        app: tApp,
-        localeTitleData: {'data': '111'},
-        localeMessageData: {'data': '222'},
-        localeFixData: {'data': '333'},
-      );
-      expect(
-        tExceptionWithApp.localizedTitle,
-        l(
-          StandardMaterialApp.globalNavigatorContext!,
-          'errors.test.000.title',
-          {'prefix': 'TST', 'data': '111'},
-        ),
-      );
-      expect(
-        tExceptionWithApp.localizedMessage,
-        l(
-          StandardMaterialApp.globalNavigatorContext!,
-          'errors.test.000.message',
-          {'prefix': 'TST', 'data': '222'},
-        ),
-      );
-      expect(
-        tExceptionWithApp.localizedFix,
-        l(
-          StandardMaterialApp.globalNavigatorContext!,
-          'errors.test.000.fix',
-          {'prefix': 'TST', 'data': '333'},
-        ),
-      );
+    final tExceptionWithApp = _TestException(
+      app: tApp,
+      localeTitleData: {'data': '111'},
+      localeMessageData: {'data': '222'},
+      localeFixData: {'data': '333'},
+    );
+    expect(
+      tExceptionWithApp.localizedTitle,
+      l(StandardMaterialApp.globalNavigatorContext!, 'errors.test.000.title', {
+        'prefix': 'TST',
+        'data': '111',
+      }),
+    );
+    expect(
+      tExceptionWithApp.localizedMessage,
+      l(
+        StandardMaterialApp.globalNavigatorContext!,
+        'errors.test.000.message',
+        {'prefix': 'TST', 'data': '222'},
+      ),
+    );
+    expect(
+      tExceptionWithApp.localizedFix,
+      l(StandardMaterialApp.globalNavigatorContext!, 'errors.test.000.fix', {
+        'prefix': 'TST',
+        'data': '333',
+      }),
+    );
 
-      tApp.dispose();
-    },
-  );
+    tApp.dispose();
+  });
 
   test('TestPatapataCoreException test.', () {
     final tException = _TestPatapataCoreException(
@@ -478,27 +447,24 @@ void main() {
       );
       expect(
         tException.localizedTitle,
-        l(
-          tContext,
-          'test.pl.errors.pl.000.title',
-          {'prefix': 'TST', 'data': '111'},
-        ),
+        l(tContext, 'test.pl.errors.pl.000.title', {
+          'prefix': 'TST',
+          'data': '111',
+        }),
       );
       expect(
         tException.localizedMessage,
-        l(
-          tContext,
-          'test.pl.errors.pl.000.message',
-          {'prefix': 'TST', 'data': '222'},
-        ),
+        l(tContext, 'test.pl.errors.pl.000.message', {
+          'prefix': 'TST',
+          'data': '222',
+        }),
       );
       expect(
         tException.localizedFix,
-        l(
-          tContext,
-          'test.pl.errors.pl.000.fix',
-          {'prefix': 'TST', 'data': '333'},
-        ),
+        l(tContext, 'test.pl.errors.pl.000.fix', {
+          'prefix': 'TST',
+          'data': '333',
+        }),
       );
 
       // internalCode `111` is not overridden
@@ -511,27 +477,15 @@ void main() {
       );
       expect(
         tException2.localizedTitle,
-        l(
-          tContext,
-          'errors.pl.111.title',
-          {'prefix': 'TST', 'data': '111'},
-        ),
+        l(tContext, 'errors.pl.111.title', {'prefix': 'TST', 'data': '111'}),
       );
       expect(
         tException2.localizedMessage,
-        l(
-          tContext,
-          'errors.pl.111.message',
-          {'prefix': 'TST', 'data': '222'},
-        ),
+        l(tContext, 'errors.pl.111.message', {'prefix': 'TST', 'data': '222'}),
       );
       expect(
         tException2.localizedFix,
-        l(
-          tContext,
-          'errors.pl.111.fix',
-          {'prefix': 'TST', 'data': '333'},
-        ),
+        l(tContext, 'errors.pl.111.fix', {'prefix': 'TST', 'data': '333'}),
       );
 
       // namespace `test` is not overridden
@@ -542,27 +496,18 @@ void main() {
       );
       expect(
         tException3.localizedTitle,
-        l(
-          tContext,
-          'errors.test.000.title',
-          {'prefix': 'TST', 'data': '111'},
-        ),
+        l(tContext, 'errors.test.000.title', {'prefix': 'TST', 'data': '111'}),
       );
       expect(
         tException3.localizedMessage,
-        l(
-          tContext,
-          'errors.test.000.message',
-          {'prefix': 'TST', 'data': '222'},
-        ),
+        l(tContext, 'errors.test.000.message', {
+          'prefix': 'TST',
+          'data': '222',
+        }),
       );
       expect(
         tException3.localizedFix,
-        l(
-          tContext,
-          'errors.test.000.fix',
-          {'prefix': 'TST', 'data': '333'},
-        ),
+        l(tContext, 'errors.test.000.fix', {'prefix': 'TST', 'data': '333'}),
       );
     });
 

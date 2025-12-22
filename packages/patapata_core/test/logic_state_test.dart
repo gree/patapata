@@ -23,13 +23,17 @@ void main() {
     ]);
     tMachine.current.onComplete.ignore();
 
-    expect(tMachine.toString(),
-        'LogicStateMachine: complete=false, error=null, current=${tMachine.current.runtimeType}: initialized=true, active=true');
+    expect(
+      tMachine.toString(),
+      'LogicStateMachine: complete=false, error=null, current=${tMachine.current.runtimeType}: initialized=true, active=true',
+    );
 
     tMachine.current.complete();
 
-    expect(tMachine.toString(),
-        'LogicStateMachine: complete=true, error=null, current=${tMachine.current.runtimeType}: initialized=true, active=false');
+    expect(
+      tMachine.toString(),
+      'LogicStateMachine: complete=true, error=null, current=${tMachine.current.runtimeType}: initialized=true, active=false',
+    );
   });
 
   test('A state can transition to another instance of itself', () {
@@ -42,10 +46,7 @@ void main() {
     final tFirstInstance = tMachine.current;
     tMachine.current.complete();
 
-    expect(
-      tMachine.current,
-      isInstanceOf<StateA>(),
-    );
+    expect(tMachine.current, isInstanceOf<StateA>());
 
     expect(tMachine.current, isNot(equals(tFirstInstance)));
   });
@@ -57,28 +58,26 @@ void main() {
 
     tMachine.current.complete();
 
-    expect(
-      tMachine.current,
-      isInstanceOf<LogicStateComplete>(),
-    );
+    expect(tMachine.current, isInstanceOf<LogicStateComplete>());
 
     expect(tMachine.complete, isTrue);
   });
 
   test(
-      'A LogicStateTransitionNotFound should be thrown when a state class in a transition is attempted to transition to, where that state does not exist in the machine',
-      () {
-    final tMachine = LogicStateMachine([
-      LogicStateFactory<StateA>(() => StateA(), [
-        LogicStateTransition<StateB>(),
-      ]),
-    ]);
+    'A LogicStateTransitionNotFound should be thrown when a state class in a transition is attempted to transition to, where that state does not exist in the machine',
+    () {
+      final tMachine = LogicStateMachine([
+        LogicStateFactory<StateA>(() => StateA(), [
+          LogicStateTransition<StateB>(),
+        ]),
+      ]);
 
-    expect(
-      () => tMachine.current.complete(),
-      throwsA(isA<LogicStateTransitionNotFound>()),
-    );
-  });
+      expect(
+        () => tMachine.current.complete(),
+        throwsA(isA<LogicStateTransitionNotFound>()),
+      );
+    },
+  );
 
   test('A state can transition to another state', () {
     final tMachine = LogicStateMachine([
@@ -90,10 +89,7 @@ void main() {
 
     tMachine.current.complete();
 
-    expect(
-      tMachine.current,
-      isInstanceOf<StateB>(),
-    );
+    expect(tMachine.current, isInstanceOf<StateB>());
   });
 
   test('A state can transition to another state, and then another', () {
@@ -112,17 +108,15 @@ void main() {
     tMachine.current.complete();
     tMachine.current.complete();
 
-    expect(
-      tMachine.current,
-      isInstanceOf<StateC>(),
-    );
+    expect(tMachine.current, isInstanceOf<StateC>());
   });
 
   test('A state can fail to transition via delegate failure', () {
     final tMachine = LogicStateMachine([
       LogicStateFactory<StateA>(() => StateA(), [
         LogicStateTransition<StateB>(
-            ((LogicState current, LogicState next) => false)),
+          ((LogicState current, LogicState next) => false),
+        ),
       ]),
       LogicStateFactory<StateB>(() => StateB(), []),
     ]);
@@ -137,7 +131,8 @@ void main() {
     final tMachine = LogicStateMachine([
       LogicStateFactory<StateA>(() => StateA(), [
         LogicStateTransition<StateB>(
-            ((LogicState current, LogicState next) => false)),
+          ((LogicState current, LogicState next) => false),
+        ),
       ]),
       LogicStateFactory<StateB>(() => StateB(), []),
     ]);
@@ -152,7 +147,8 @@ void main() {
     expect(
       tError.toString(),
       equals(
-          'LogicStateAllTransitionsNotAllowed: ${tError.current.toString()} is not allowed to transition to anything.'),
+        'LogicStateAllTransitionsNotAllowed: ${tError.current.toString()} is not allowed to transition to anything.',
+      ),
     );
   });
 
@@ -206,31 +202,28 @@ void main() {
     expect(
       tError.toString(),
       equals(
-          'LogicStateNotCurrent: ${tError.current.toString()} is not current.'),
+        'LogicStateNotCurrent: ${tError.current.toString()} is not current.',
+      ),
     );
   });
 
   testWidgets(
     'A state can asynchronously transition itself to itself',
     (tester) async {
-      final tMachine = LogicStateMachine(
-        [
-          LogicStateFactory<StateZToZAsync>(() => StateZToZAsync(), [
-            LogicStateTransition<StateInstantComplete>(),
-            LogicStateTransition<StateZToZAsync>(),
-          ]),
-          LogicStateFactory<StateInstantComplete>(
-              () => StateInstantComplete(), []),
-        ],
-        0,
-      );
+      final tMachine = LogicStateMachine([
+        LogicStateFactory<StateZToZAsync>(() => StateZToZAsync(), [
+          LogicStateTransition<StateInstantComplete>(),
+          LogicStateTransition<StateZToZAsync>(),
+        ]),
+        LogicStateFactory<StateInstantComplete>(
+          () => StateInstantComplete(),
+          [],
+        ),
+      ], 0);
 
       await tester.pump(const Duration(milliseconds: 5));
 
-      expect(
-        tMachine.complete,
-        isTrue,
-      );
+      expect(tMachine.complete, isTrue);
     },
     timeout: const Timeout(Duration(milliseconds: 10)),
   );
@@ -246,10 +239,7 @@ void main() {
     });
     tMachine.current.complete();
 
-    expect(
-      cComplete,
-      isTrue,
-    );
+    expect(cComplete, isTrue);
   });
 
   test('complete. not current state', () {
@@ -261,95 +251,71 @@ void main() {
     final tState = tMachine.current;
     tMachine.current.complete();
 
-    expect(
-      () => tState.complete(),
-      throwsA(isA<LogicStateNotCurrent>()),
-    );
+    expect(() => tState.complete(), throwsA(isA<LogicStateNotCurrent>()));
   });
 
   test('Transitions to the state of Type.', () {
-    final tMachine = LogicStateMachine(
-      [
-        LogicStateFactory<StateA>(() => StateA(), [
-          LogicStateTransition<StateB>(),
-        ]),
-        LogicStateFactory<StateB>(() => StateB(), []),
-      ],
-    );
+    final tMachine = LogicStateMachine([
+      LogicStateFactory<StateA>(() => StateA(), [
+        LogicStateTransition<StateB>(),
+      ]),
+      LogicStateFactory<StateB>(() => StateB(), []),
+    ]);
 
     tMachine.current.toByType(StateB);
 
-    expect(
-      tMachine.current,
-      isInstanceOf<StateB>(),
-    );
+    expect(tMachine.current, isInstanceOf<StateB>());
   });
 
   test('Transitions to the state of Type. not current state.', () {
-    final tMachine = LogicStateMachine(
-      [
-        LogicStateFactory<StateA>(() => StateA(), [
-          LogicStateTransition<StateB>(),
-        ]),
-        LogicStateFactory<StateB>(() => StateB(), []),
-      ],
-    );
+    final tMachine = LogicStateMachine([
+      LogicStateFactory<StateA>(() => StateA(), [
+        LogicStateTransition<StateB>(),
+      ]),
+      LogicStateFactory<StateB>(() => StateB(), []),
+    ]);
 
     final tState = tMachine.current;
     tMachine.current.toByType(StateB);
 
-    expect(
-      () => tState.toByType(StateA),
-      throwsA(isA<LogicStateNotCurrent>()),
-    );
+    expect(() => tState.toByType(StateA), throwsA(isA<LogicStateNotCurrent>()));
   });
 
   test('Transitions to the state of Type. Transition not found.', () {
-    final tMachine = LogicStateMachine(
-      [
-        LogicStateFactory<StateA>(() => StateA(), [
-          LogicStateTransition<StateB>(),
-        ]),
-        LogicStateFactory<StateB>(() => StateB(), []),
-      ],
-    );
+    final tMachine = LogicStateMachine([
+      LogicStateFactory<StateA>(() => StateA(), [
+        LogicStateTransition<StateB>(),
+      ]),
+      LogicStateFactory<StateB>(() => StateB(), []),
+    ]);
     tMachine.current.onComplete.ignore();
     tMachine.current.toByType(StateC);
 
-    expect(
-      tMachine.error?.error,
-      isInstanceOf<LogicStateTransitionNotFound>(),
-    );
+    expect(tMachine.error?.error, isInstanceOf<LogicStateTransitionNotFound>());
   });
 
   test('Transitions to the state of Type. Factory not found.', () {
-    final tMachine = LogicStateMachine(
-      [
-        LogicStateFactory<StateA>(() => StateA(), [
-          LogicStateTransition<StateC>(),
-        ]),
-        LogicStateFactory<StateB>(() => StateB(), []),
-      ],
-    );
+    final tMachine = LogicStateMachine([
+      LogicStateFactory<StateA>(() => StateA(), [
+        LogicStateTransition<StateC>(),
+      ]),
+      LogicStateFactory<StateB>(() => StateB(), []),
+    ]);
     tMachine.current.onComplete.ignore();
     tMachine.current.toByType(StateC);
 
-    expect(
-      tMachine.error?.error,
-      isInstanceOf<LogicStateTransitionNotFound>(),
-    );
+    expect(tMachine.error?.error, isInstanceOf<LogicStateTransitionNotFound>());
   });
 
   test('Transitions to the state of Type. not allowed.', () {
-    final tMachine = LogicStateMachine(
-      [
-        LogicStateFactory<StateA>(() => StateA(), [
-          LogicStateTransition<StateB>(
-              (LogicState current, LogicState next) => false),
-        ]),
-        LogicStateFactory<StateB>(() => StateB(), []),
-      ],
-    );
+    final tMachine = LogicStateMachine([
+      LogicStateFactory<StateA>(() => StateA(), [
+        LogicStateTransition<StateB>(
+          (LogicState current, LogicState next) => false,
+        ),
+      ]),
+      LogicStateFactory<StateB>(() => StateB(), []),
+    ]);
     tMachine.current.onComplete.ignore();
     tMachine.current.toByType(StateB);
 
@@ -362,7 +328,8 @@ void main() {
     expect(
       tError.toString(),
       equals(
-          'LogicStateTransitionNotAllowed: ${tError.current.toString()} is not allowed to transition to ${tError.next.toString()}.'),
+        'LogicStateTransitionNotAllowed: ${tError.current.toString()} is not allowed to transition to ${tError.next.toString()}.',
+      ),
     );
   });
 
@@ -378,10 +345,7 @@ void main() {
     tMachine.current.onComplete.ignore();
     tMachine.current.completeError('FakeError');
 
-    expect(
-      cError,
-      equals('FakeError'),
-    );
+    expect(cError, equals('FakeError'));
   });
 
   test('completeError. not current state', () {
@@ -412,10 +376,7 @@ void main() {
     tMachine.current.complete();
     tMachine.current.complete();
 
-    expect(
-      tMachine.current,
-      isInstanceOf<StateA>(),
-    );
+    expect(tMachine.current, isInstanceOf<StateA>());
   });
 
   test('A state can not transition to back state', () {
@@ -431,10 +392,7 @@ void main() {
     tMachine.current.complete();
     tMachine.current.complete();
 
-    expect(
-      tMachine.error?.error,
-      isInstanceOf<LogicStateTransitionNotFound>(),
-    );
+    expect(tMachine.error?.error, isInstanceOf<LogicStateTransitionNotFound>());
   });
 
   test('backByType. not current state.', () {
@@ -462,10 +420,7 @@ void main() {
     // ignore: prefer_const_constructors
     final tError = LogicStateTransitionNotFound();
 
-    expect(
-      tError.code,
-      equals(PatapataCoreExceptionCode.PPE101.name),
-    );
+    expect(tError.code, equals(PatapataCoreExceptionCode.PPE101.name));
   });
 }
 

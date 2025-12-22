@@ -14,10 +14,7 @@ import './model/test_model2.dart';
 import 'test_data.dart';
 
 class TestApp {
-  Widget createMyApp(
-    TestData testData,
-    TestRepository repository,
-  ) {
+  Widget createMyApp(TestData testData, TestRepository repository) {
     return MaterialApp(
       home: Provider<TestRepository>(
         create: (context) => repository,
@@ -46,15 +43,13 @@ class TestSingleDataRepository extends TestRepository {
         },
         Filter1: (id) {
           final tData = testData.data[id];
-          return Future.value(
-            TestModel.init(id, v2: tData?.$2, v3: tData?.$3),
-          );
+          return Future.value(TestModel.init(id, v2: tData?.$2, v3: tData?.$3));
         },
       };
 
   @override
   Map<Type, Future<List<TestModel?>> Function(List<int> ids)>
-      get multiSetFetchers => {};
+  get multiSetFetchers => {};
 }
 
 class TestMultiDataRepository extends TestRepository {
@@ -65,34 +60,32 @@ class TestMultiDataRepository extends TestRepository {
 
   @override
   Map<Type, Future<List<TestModel?>> Function(List<int> ids)>
-      get multiSetFetchers =>
-          <Type, Future<List<TestModel?>> Function(List<int> ids)>{
-            TestModel: (ids) {
-              return Future.value(
-                List.generate(
-                  ids.length,
-                  (i) {
-                    final tId = ids[i];
-                    final tData = testData.data[tId];
-                    return TestModel.init(tId,
-                        v1: tData?.$1, v2: tData?.$2, v3: tData?.$3);
-                  },
-                ),
+  get multiSetFetchers =>
+      <Type, Future<List<TestModel?>> Function(List<int> ids)>{
+        TestModel: (ids) {
+          return Future.value(
+            List.generate(ids.length, (i) {
+              final tId = ids[i];
+              final tData = testData.data[tId];
+              return TestModel.init(
+                tId,
+                v1: tData?.$1,
+                v2: tData?.$2,
+                v3: tData?.$3,
               );
-            },
-            Filter1: (ids) {
-              return Future.value(
-                List.generate(
-                  ids.length,
-                  (i) {
-                    final tId = ids[i];
-                    final tData = testData.data[tId];
-                    return TestModel.init(tId, v2: tData?.$2, v3: tData?.$3);
-                  },
-                ),
-              );
-            },
-          };
+            }),
+          );
+        },
+        Filter1: (ids) {
+          return Future.value(
+            List.generate(ids.length, (i) {
+              final tId = ids[i];
+              final tData = testData.data[tId];
+              return TestModel.init(tId, v2: tData?.$2, v3: tData?.$3);
+            }),
+          );
+        },
+      };
 }
 
 class TestRepositoryForOtherPurposes extends TestRepository {
@@ -117,42 +110,45 @@ class TestRepositoryForOtherPurposes extends TestRepository {
   @override
   Map<Type, Future<TestModel?> Function(int id)> get singleSetFetchers =>
       singleMode
-          ? <Type, Future<TestModel?> Function(int id)>{
-              TestModel: (id) {
-                final tData = testData.data[id];
-                return Future.value(
-                  TestModelWithNotifier.init(id,
-                      v1: tData?.$1, v2: tData?.$2, v3: tData?.$3),
-                );
-              },
-            }
-          : {};
+      ? <Type, Future<TestModel?> Function(int id)>{
+          TestModel: (id) {
+            final tData = testData.data[id];
+            return Future.value(
+              TestModelWithNotifier.init(
+                id,
+                v1: tData?.$1,
+                v2: tData?.$2,
+                v3: tData?.$3,
+              ),
+            );
+          },
+        }
+      : {};
 
   @override
   Map<Type, Future<List<TestModel?>> Function(List<int> ids)>
-      get multiSetFetchers => !singleMode
-          ? <Type, Future<List<TestModel?>> Function(List<int> ids)>{
-              TestModel: (ids) {
-                return Future.value(
-                  List.generate(
-                    ids.length,
-                    (i) {
-                      final tId = ids[i];
-                      final tData = testData.data[tId];
-                      return TestModelWithNotifier.init(tId,
-                          v1: tData?.$1, v2: tData?.$2, v3: tData?.$3);
-                    },
-                  ),
+  get multiSetFetchers => !singleMode
+      ? <Type, Future<List<TestModel?>> Function(List<int> ids)>{
+          TestModel: (ids) {
+            return Future.value(
+              List.generate(ids.length, (i) {
+                final tId = ids[i];
+                final tData = testData.data[tId];
+                return TestModelWithNotifier.init(
+                  tId,
+                  v1: tData?.$1,
+                  v2: tData?.$2,
+                  v3: tData?.$3,
                 );
-              },
-            }
-          : {};
+              }),
+            );
+          },
+        }
+      : {};
 }
 
 class Anchor extends StatelessWidget {
-  const Anchor({
-    super.key,
-  });
+  const Anchor({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -161,9 +157,7 @@ class Anchor extends StatelessWidget {
 }
 
 class TestProvider extends StatefulWidget {
-  const TestProvider({
-    super.key,
-  });
+  const TestProvider({super.key});
 
   @override
   TestProviderState createState() => TestProviderState();
@@ -190,9 +184,7 @@ class TestProviderState extends State<TestProvider> {
               return Column(
                 children: [
                   if (dataList != null)
-                    for (final data in dataList) ...[
-                      Text(data?.text ?? ''),
-                    ],
+                    for (final data in dataList) ...[Text(data?.text ?? '')],
                   child ?? const Anchor(),
                 ],
               );
@@ -210,10 +202,7 @@ class TestProviderState extends State<TestProvider> {
           builder: (context, child, data) {
             receiver?.call(data);
             return Column(
-              children: [
-                Text(data?.text ?? ''),
-                child ?? const Anchor(),
-              ],
+              children: [Text(data?.text ?? ''), child ?? const Anchor()],
             );
           },
           child: const Anchor(),
@@ -258,9 +247,7 @@ void main() {
   });
 
   group('Test object repository', () {
-    testWidgets('Test single set and fetch.', (
-      WidgetTester tester,
-    ) async {
+    testWidgets('Test single set and fetch.', (WidgetTester tester) async {
       await tester.pumpWidget(
         testApp.createMyApp(testData, TestSingleDataRepository(testData)),
       );
@@ -271,19 +258,22 @@ void main() {
 
       // Test for the occurrence of an error when using sets is not allowed.
       bool tErrorCalled = false;
-      await runZonedGuarded(() async {
-        tProvider.change<Filter1>([1], null);
-        await tester.pumpAndSettle();
-      }, (error, stack) {
-        if (error is AssertionError) {
-          if (error.message == repositorySetCannotUsedAssertionMessage) {
-            tErrorCalled = true;
-            return;
+      await runZonedGuarded(
+        () async {
+          tProvider.change<Filter1>([1], null);
+          await tester.pumpAndSettle();
+        },
+        (error, stack) {
+          if (error is AssertionError) {
+            if (error.message == repositorySetCannotUsedAssertionMessage) {
+              tErrorCalled = true;
+              return;
+            }
           }
-        }
 
-        throw error;
-      });
+          throw error;
+        },
+      );
       expect(tErrorCalled, isTrue);
 
       fCompare(int id, bool checkNull) async {
@@ -315,8 +305,9 @@ void main() {
       }
 
       // default fetch cache
-      Future<TestModel?> tCacheFuture =
-          tRepository.fetch(1, TestModel).then(fCacheThen);
+      Future<TestModel?> tCacheFuture = tRepository
+          .fetch(1, TestModel)
+          .then(fCacheThen);
       expect(tCacheFetchCalled, isFalse);
       await tCacheFuture;
       expect(tCacheFetchCalled, isTrue);
@@ -363,9 +354,7 @@ void main() {
       await fCompare(2, false);
     });
 
-    testWidgets('Test multi set and fetch.', (
-      WidgetTester tester,
-    ) async {
+    testWidgets('Test multi set and fetch.', (WidgetTester tester) async {
       await tester.pumpWidget(
         testApp.createMyApp(testData, TestMultiDataRepository(testData)),
       );
@@ -376,19 +365,22 @@ void main() {
 
       // Test for the occurrence of an error when using sets is not allowed.
       bool tErrorCalled = false;
-      await runZonedGuarded(() async {
-        tProvider.change<Filter1>([1, 2, 3], null);
-        await tester.pumpAndSettle();
-      }, (error, stack) {
-        if (error is AssertionError) {
-          if (error.message == repositorySetCannotUsedAssertionMessage) {
-            tErrorCalled = true;
-            return;
+      await runZonedGuarded(
+        () async {
+          tProvider.change<Filter1>([1, 2, 3], null);
+          await tester.pumpAndSettle();
+        },
+        (error, stack) {
+          if (error is AssertionError) {
+            if (error.message == repositorySetCannotUsedAssertionMessage) {
+              tErrorCalled = true;
+              return;
+            }
           }
-        }
 
-        throw error;
-      });
+          throw error;
+        },
+      );
       expect(tErrorCalled, isTrue);
 
       fCompare(List<int> ids) async {
@@ -430,21 +422,24 @@ void main() {
       }
 
       // default fetch cache
-      Future<List<TestModel?>> tCacheFuture =
-          tRepository.fetchMany([1, 2, 3], TestModel).then(fCacheThen);
+      Future<List<TestModel?>> tCacheFuture = tRepository
+          .fetchMany([1, 2, 3], TestModel)
+          .then(fCacheThen);
       expect(tCacheFetchCalled, isFalse);
       await tCacheFuture;
       expect(tCacheFetchCalled, isTrue);
       // synchronous fetch cache
       tCacheFetchCalled = false;
-      tCacheFuture = tRepository.fetchMany([1, 2, 3], TestModel,
-          synchronousCache: true).then(fCacheThen);
+      tCacheFuture = tRepository
+          .fetchMany([1, 2, 3], TestModel, synchronousCache: true)
+          .then(fCacheThen);
       expect(tCacheFetchCalled, isTrue);
       await tCacheFuture;
       // asynchronous fetch cache
       tCacheFetchCalled = false;
-      tCacheFuture = tRepository.fetchMany([1, 2, 3], TestModel,
-          synchronousCache: false).then(fCacheThen);
+      tCacheFuture = tRepository
+          .fetchMany([1, 2, 3], TestModel, synchronousCache: false)
+          .then(fCacheThen);
       expect(tCacheFetchCalled, isFalse);
       await tCacheFuture;
       expect(tCacheFetchCalled, isTrue);
@@ -483,9 +478,7 @@ void main() {
       await tester.pumpAndSettle();
     });
 
-    testWidgets('Test single set and store.', (
-      WidgetTester tester,
-    ) async {
+    testWidgets('Test single set and store.', (WidgetTester tester) async {
       await tester.pumpWidget(
         testApp.createMyApp(testData, TestSingleDataRepository(testData)),
       );
@@ -533,9 +526,7 @@ void main() {
       await fCompare(1);
     });
 
-    testWidgets('Test multi set and store.', (
-      WidgetTester tester,
-    ) async {
+    testWidgets('Test multi set and store.', (WidgetTester tester) async {
       await tester.pumpWidget(
         testApp.createMyApp(testData, TestMultiDataRepository(testData)),
       );
@@ -562,8 +553,10 @@ void main() {
         }
 
         // In store after fetch, is the value overwritten or not?
-        final tOtherRecords = Map.fromIterables(ids,
-            ids.map((e) => (42 + e, 0.42 + e, 'id / $e test store')).toList());
+        final tOtherRecords = Map.fromIterables(
+          ids,
+          ids.map((e) => (42 + e, 0.42 + e, 'id / $e test store')).toList(),
+        );
         tProvider.change<TestModel>(ids, null);
         await tester.pumpAndSettle();
         await tRepository.storeMany(
@@ -603,9 +596,7 @@ void main() {
       await fCompare([4, 5, 6], false);
     });
 
-    testWidgets('Other test.', (
-      WidgetTester tester,
-    ) async {
+    testWidgets('Other test.', (WidgetTester tester) async {
       await tester.pumpWidget(
         testApp.createMyApp(testData, TestRepositoryForOtherPurposes(testData)),
       );
@@ -641,8 +632,11 @@ void main() {
       final tExpectStrings = <String>[];
       List<TestModel?>? tModels;
       tRepository.setEnv({'singleMode': false});
-      tProvider
-          .change<TestModel>([4, 5, 6], (data) => tModels = data, notify: true);
+      tProvider.change<TestModel>(
+        [4, 5, 6],
+        (data) => tModels = data,
+        notify: true,
+      );
       await tester.pumpAndSettle();
       expect(tModels, isNotNull);
       expect(tModels!.any((e) => e is TestModelWithNotifier), isTrue);

@@ -35,23 +35,13 @@ extension RepositoryExtensionFilter3 on Filter3 {
 
 class TestModel extends _TestModel
     with RepositoryModel<TestModel, int>, Filter1, Filter2, Filter3 {
-  TestModel({
-    required super.id,
-  });
+  TestModel({required super.id});
 
-  TestModel.init(
-    super.id, {
-    super.v1,
-    super.v2,
-    super.v3,
-    super.cacheDuration,
-  }) : super.init();
+  TestModel.init(super.id, {super.v1, super.v2, super.v3, super.cacheDuration})
+    : super.init();
 
-  TestModel.fromRecord(
-    super.id,
-    super.v, {
-    super.cacheDuration,
-  }) : super.fromRecord();
+  TestModel.fromRecord(super.id, super.v, {super.cacheDuration})
+    : super.fromRecord();
 
   @override
   int get value1 => _value1.unsafeValue;
@@ -113,9 +103,9 @@ class TestModel extends _TestModel
 
   @override
   Map<Type, Set<ProviderModelVariable>> get repositorySetVariables => {
-        TestModel: {_value1, _value2, _text, _deepModel},
-        Filter1: {_value2, _text},
-        Filter2: {_text},
-        Filter3: {_text},
-      };
+    TestModel: {_value1, _value2, _text, _deepModel},
+    Filter1: {_value2, _text},
+    Filter2: {_text},
+    Filter3: {_text},
+  };
 }

@@ -36,7 +36,7 @@ VoidCallback? onPostFrameCallback;
 /// If you use the [createApp] function defined in patapata_core_test_utils.dart this is done for you.
 @visibleForTesting
 void Function(MethodChannel, Future<Object?>? Function(MethodCall)?)
-    testSetMockMethodCallHandler = (channel, handler) {
+testSetMockMethodCallHandler = (channel, handler) {
   // Do nothing by default.
 };
 
@@ -53,8 +53,8 @@ void Function(MethodChannel, Future<Object?>? Function(MethodCall)?)
 @visibleForTesting
 void Function(EventChannel, TestMockStreamHandler?) testSetMockStreamHandler =
     (channel, handler) {
-  // Do nothing by default.
-};
+      // Do nothing by default.
+    };
 // coverage:ignore-end
 
 /// [compute] doesn't work in a test environment or on the web.
@@ -67,11 +67,7 @@ FutureOr<R> platformCompute<Q, R>(
 }) {
   if (kIsWeb || !Platform.environment.containsKey('FLUTTER_TEST')) {
     // coverage:ignore-start
-    return compute(
-      callback,
-      message,
-      debugLabel: debugLabel,
-    );
+    return compute(callback, message, debugLabel: debugLabel);
     // coverage:ignore-end
   } else {
     final Completer<R> tCompleter = Completer();
@@ -158,11 +154,7 @@ final _fakeTimeElapsedSince = Stopwatch();
 /// will result in only [fakeNow] being persisted, causing the value
 /// loaded on app restart to be exactly [fakeNow] and not any time that
 /// has elapsed after it was saved.
-void setFakeNow(
-  DateTime? fakeNow, {
-  bool persist = true,
-  bool elapse = false,
-}) {
+void setFakeNow(DateTime? fakeNow, {bool persist = true, bool elapse = false}) {
   _now = fakeNow;
 
   if (elapse) {
@@ -178,7 +170,9 @@ void setFakeNow(
       getApp().localConfig.reset(_kFakeNowLocalConfigKey);
     } else {
       getApp().localConfig.setString(
-          _kFakeNowLocalConfigKey, fakeNow.toUTCIso8601StringNoMSUS());
+        _kFakeNowLocalConfigKey,
+        fakeNow.toUTCIso8601StringNoMSUS(),
+      );
     }
   }
 
@@ -187,8 +181,9 @@ void setFakeNow(
 
 /// Load the saved fake time from [LocalConfig], previously set by [setFakeNow].
 void loadFakeNow() {
-  final tFakeNowString =
-      getApp().localConfig.getString(_kFakeNowLocalConfigKey);
+  final tFakeNowString = getApp().localConfig.getString(
+    _kFakeNowLocalConfigKey,
+  );
 
   if (tFakeNowString.isEmpty) {
     return;
@@ -222,13 +217,13 @@ DateTime get now =>
 
 /// Typedef for the inline onCancel callback.
 @visibleForTesting
-typedef TestMockStreamHandlerOnCancelCallback = void Function(
-    Object? arguments);
+typedef TestMockStreamHandlerOnCancelCallback =
+    void Function(Object? arguments);
 
 /// Typedef for the inline onListen callback.
 @visibleForTesting
-typedef TestMockStreamHandlerOnListenCallback = void Function(
-    Object? arguments, TestMockStreamHandlerEventSink events);
+typedef TestMockStreamHandlerOnListenCallback =
+    void Function(Object? arguments, TestMockStreamHandlerEventSink events);
 
 /// Test class for testing stream handlers.
 /// The app does not reference this class.
@@ -242,8 +237,7 @@ abstract class TestMockStreamHandler {
   factory TestMockStreamHandler.inline({
     required TestMockStreamHandlerOnListenCallback onListen,
     TestMockStreamHandlerOnCancelCallback? onCancel,
-  }) =>
-      _InlineMockStreamHandler(onListen: onListen, onCancel: onCancel);
+  }) => _InlineMockStreamHandler(onListen: onListen, onCancel: onCancel);
 
   /// Handler for the listen event.
   void onListen(Object? arguments, TestMockStreamHandlerEventSink events);
@@ -256,8 +250,8 @@ class _InlineMockStreamHandler extends TestMockStreamHandler {
   _InlineMockStreamHandler({
     required TestMockStreamHandlerOnListenCallback onListen,
     TestMockStreamHandlerOnCancelCallback? onCancel,
-  })  : _onListenInline = onListen,
-        _onCancelInline = onCancel;
+  }) : _onListenInline = onListen,
+       _onCancelInline = onCancel;
 
   final TestMockStreamHandlerOnListenCallback _onListenInline;
   final TestMockStreamHandlerOnCancelCallback? _onCancelInline;
@@ -278,11 +272,7 @@ abstract class TestMockStreamHandlerEventSink {
   void success(Object? event);
 
   /// Send an error event.
-  void error({
-    required String code,
-    String? message,
-    Object? details,
-  });
+  void error({required String code, String? message, Object? details});
 
   /// Send an end of stream event.
   void endOfStream();

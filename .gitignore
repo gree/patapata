@@ -1,4 +1,4 @@
-.vscode/*
+.vscode/
 .DS_Store
 **/coverage
 pubspec_overrides.yaml
@@ -8,7 +8,7 @@ pubspec_overrides.yaml
 .idea
 .packages
 .pub
+build/
 .symlinks
+*.iml
 pubspec.lock
-
-! .vscode/launch.json

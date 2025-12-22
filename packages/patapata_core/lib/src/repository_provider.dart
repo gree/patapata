@@ -10,18 +10,26 @@ class _SynchronousTracker {
   bool calledFinished = false;
 }
 
-typedef _RepositoryDataHolderBuilder<T> = Widget Function(
-    BuildContext context, T? data);
+typedef _RepositoryDataHolderBuilder<T> =
+    Widget Function(BuildContext context, T? data);
 
-class _RepositoryCore<T extends RepositoryModelBase<T, I>, I extends Object,
-    R extends Repository<T, I>> extends StatefulWidget {
+class _RepositoryCore<
+  T extends RepositoryModelBase<T, I>,
+  I extends Object,
+  R extends Repository<T, I>
+>
+    extends StatefulWidget {
   final I id;
   final Future<T?> Function(R repository) fetcher;
   final R repository;
   final _RepositoryDataHolderBuilder<T> holderBuilder;
   final Widget? loading;
   final Widget Function(
-      BuildContext context, Object error, StackTrace? stackTrace)? errorBuilder;
+    BuildContext context,
+    Object error,
+    StackTrace? stackTrace,
+  )?
+  errorBuilder;
 
   const _RepositoryCore({
     super.key,
@@ -39,9 +47,11 @@ class _RepositoryCore<T extends RepositoryModelBase<T, I>, I extends Object,
 }
 
 class _RepositoryCoreState<
-    T extends RepositoryModelBase<T, I>,
-    I extends Object,
-    R extends Repository<T, I>> extends State<_RepositoryCore<T, I, R>> {
+  T extends RepositoryModelBase<T, I>,
+  I extends Object,
+  R extends Repository<T, I>
+>
+    extends State<_RepositoryCore<T, I, R>> {
   bool? _loading;
   Object? _error;
   StackTrace? _stackTrace;
@@ -54,28 +64,30 @@ class _RepositoryCoreState<
     _stackTrace = null;
 
     runZoned(() {
-      widget.fetcher(widget.repository).then((data) {
-        _data = data;
+      widget
+          .fetcher(widget.repository)
+          .then((data) {
+            _data = data;
 
-        return data;
-      }).catchError((e, stackTrace) {
-        _error = e;
-        _stackTrace = stackTrace;
+            return data;
+          })
+          .catchError((e, stackTrace) {
+            _error = e;
+            _stackTrace = stackTrace;
 
-        throw e;
-      }).whenComplete(() {
-        _loading = false;
-        tracker.calledFinished = true;
+            throw e;
+          })
+          .whenComplete(() {
+            _loading = false;
+            tracker.calledFinished = true;
 
-        if (tracker.callerFinished) {
-          if (mounted) {
-            setState(() {});
-          }
-        }
-      });
-    }, zoneValues: {
-      #repositorySynchronousCache: true,
-    });
+            if (tracker.callerFinished) {
+              if (mounted) {
+                setState(() {});
+              }
+            }
+          });
+    }, zoneValues: {#repositorySynchronousCache: true});
   }
 
   @override
@@ -94,12 +106,17 @@ class _RepositoryCoreState<
       tWidget = widget.loading ?? const SizedBox.shrink();
     } else if (_error != null) {
       tKey = const ValueKey('error');
-      tWidget = widget.errorBuilder?.call(context, _error!, _stackTrace) ??
+      tWidget =
+          widget.errorBuilder?.call(context, _error!, _stackTrace) ??
           const SizedBox.shrink();
     } else if (_data == null) {
       tKey = const ValueKey('error');
-      tWidget = widget.errorBuilder?.call(
-              context, ProviderNullException(null.runtimeType, T), null) ??
+      tWidget =
+          widget.errorBuilder?.call(
+            context,
+            ProviderNullException(null.runtimeType, T),
+            null,
+          ) ??
           const SizedBox.shrink();
     } else {
       if (_data is Listenable) {
@@ -111,21 +128,26 @@ class _RepositoryCoreState<
       }
     }
 
-    return KeyedSubtree(
-      key: tKey,
-      child: tWidget,
-    );
+    return KeyedSubtree(key: tKey, child: tWidget);
   }
 }
 
-class _RepositoryMultiCore<T extends RepositoryModelBase<T, I>,
-    I extends Object, R extends Repository<T, I>> extends StatefulWidget {
+class _RepositoryMultiCore<
+  T extends RepositoryModelBase<T, I>,
+  I extends Object,
+  R extends Repository<T, I>
+>
+    extends StatefulWidget {
   final Future<List<T?>> Function(R repository) fetcher;
   final R repository;
   final _RepositoryDataHolderBuilder<List<T?>> holderBuilder;
   final Widget? loading;
   final Widget Function(
-      BuildContext context, Object error, StackTrace? stackTrace)? errorBuilder;
+    BuildContext context,
+    Object error,
+    StackTrace? stackTrace,
+  )?
+  errorBuilder;
 
   const _RepositoryMultiCore({
     super.key,
@@ -142,9 +164,11 @@ class _RepositoryMultiCore<T extends RepositoryModelBase<T, I>,
 }
 
 class _RepositoryMultiCoreState<
-    T extends RepositoryModelBase<T, I>,
-    I extends Object,
-    R extends Repository<T, I>> extends State<_RepositoryMultiCore<T, I, R>> {
+  T extends RepositoryModelBase<T, I>,
+  I extends Object,
+  R extends Repository<T, I>
+>
+    extends State<_RepositoryMultiCore<T, I, R>> {
   bool? _loading;
   Object? _error;
   StackTrace? _stackTrace;
@@ -157,28 +181,30 @@ class _RepositoryMultiCoreState<
     _stackTrace = null;
 
     runZoned(() {
-      widget.fetcher(widget.repository).then((data) {
-        _data = data;
+      widget
+          .fetcher(widget.repository)
+          .then((data) {
+            _data = data;
 
-        return data;
-      }).catchError((e, stackTrace) {
-        _error = e;
-        _stackTrace = stackTrace;
+            return data;
+          })
+          .catchError((e, stackTrace) {
+            _error = e;
+            _stackTrace = stackTrace;
 
-        throw e;
-      }).whenComplete(() {
-        _loading = false;
-        tracker.calledFinished = true;
+            throw e;
+          })
+          .whenComplete(() {
+            _loading = false;
+            tracker.calledFinished = true;
 
-        if (tracker.callerFinished) {
-          if (mounted) {
-            setState(() {});
-          }
-        }
-      });
-    }, zoneValues: {
-      #repositorySynchronousCache: true,
-    });
+            if (tracker.callerFinished) {
+              if (mounted) {
+                setState(() {});
+              }
+            }
+          });
+    }, zoneValues: {#repositorySynchronousCache: true});
   }
 
   @override
@@ -197,7 +223,8 @@ class _RepositoryMultiCoreState<
       tWidget = widget.loading ?? const SizedBox.shrink();
     } else if (_error != null) {
       tKey = const ValueKey('error');
-      tWidget = widget.errorBuilder?.call(context, _error!, _stackTrace) ??
+      tWidget =
+          widget.errorBuilder?.call(context, _error!, _stackTrace) ??
           const SizedBox.shrink();
     } else {
       assert(_data != null);
@@ -206,10 +233,7 @@ class _RepositoryMultiCoreState<
       tWidget = widget.holderBuilder(context, _data);
     }
 
-    return KeyedSubtree(
-      key: tKey,
-      child: tWidget,
-    );
+    return KeyedSubtree(key: tKey, child: tWidget);
   }
 }
 
@@ -223,15 +247,23 @@ class _RepositoryMultiCoreState<
 /// Please pass the means to access [Repository] to [reader].
 /// For example, when obtaining it through [BuildContext] and with the library provider,
 /// it would be `() => context.read<Repository>()`.
-class RepositoryProvider<T extends RepositoryModelBase<T, I>, I extends Object,
-    R extends Repository<T, I>> extends StatelessWidget {
+class RepositoryProvider<
+  T extends RepositoryModelBase<T, I>,
+  I extends Object,
+  R extends Repository<T, I>
+>
+    extends StatelessWidget {
   final I id;
   final Future<T?> Function(R repository) fetcher;
   final R repository;
   final WidgetBuilder builder;
   final Widget? loading;
   final Widget Function(
-      BuildContext context, Object error, StackTrace? stackTrace)? errorBuilder;
+    BuildContext context,
+    Object error,
+    StackTrace? stackTrace,
+  )?
+  errorBuilder;
 
   const RepositoryProvider({
     super.key,
@@ -261,16 +293,22 @@ class RepositoryProvider<T extends RepositoryModelBase<T, I>, I extends Object,
 /// A version of [RepositoryProvider] that supports multiple items.
 /// For details, please refer to [RepositoryProvider].
 class RepositoryMultiProvider<
-    T extends RepositoryModelBase<T, I>,
-    I extends Object,
-    R extends Repository<T, I>,
-    S extends Object> extends StatelessWidget {
+  T extends RepositoryModelBase<T, I>,
+  I extends Object,
+  R extends Repository<T, I>,
+  S extends Object
+>
+    extends StatelessWidget {
   final Future<List<T?>> Function(R repository) fetcher;
   final R repository;
   final WidgetBuilder builder;
   final Widget? loading;
   final Widget Function(
-      BuildContext context, Object error, StackTrace? stackTrace)? errorBuilder;
+    BuildContext context,
+    Object error,
+    StackTrace? stackTrace,
+  )?
+  errorBuilder;
 
   const RepositoryMultiProvider({
     super.key,
@@ -298,14 +336,18 @@ class RepositoryMultiProvider<
   }
 }
 
-typedef RepositoryObserverBuilder<T> = Widget Function(
-    BuildContext context, Widget? child, T? data);
+typedef RepositoryObserverBuilder<T> =
+    Widget Function(BuildContext context, Widget? child, T? data);
 
 /// The basic functionality is the same as [RepositoryProvider].
 /// The difference is that it is used when change notifications are not needed, such as in the case of [SimpleRepositoryModel],
 /// or when dealing with simple data models.
-class RepositoryObserver<T extends RepositoryModelBase<T, I>, I extends Object,
-    R extends Repository<T, I>> extends StatelessWidget {
+class RepositoryObserver<
+  T extends RepositoryModelBase<T, I>,
+  I extends Object,
+  R extends Repository<T, I>
+>
+    extends StatelessWidget {
   final I id;
   final Future<T?> Function(R repository) fetcher;
   final R repository;
@@ -313,7 +355,11 @@ class RepositoryObserver<T extends RepositoryModelBase<T, I>, I extends Object,
   final bool notify;
   final Widget? loading;
   final Widget Function(
-      BuildContext context, Object error, StackTrace? stackTrace)? errorBuilder;
+    BuildContext context,
+    Object error,
+    StackTrace? stackTrace,
+  )?
+  errorBuilder;
   final Widget? child;
 
   const RepositoryObserver({
@@ -358,15 +404,23 @@ class RepositoryObserver<T extends RepositoryModelBase<T, I>, I extends Object,
 
 /// A version of [RepositoryObserver] that supports multiple items.
 /// For details, please refer to [RepositoryObserver].
-class RepositoryMultiObserver<T extends RepositoryModelBase<T, I>,
-    I extends Object, R extends Repository<T, I>> extends StatelessWidget {
+class RepositoryMultiObserver<
+  T extends RepositoryModelBase<T, I>,
+  I extends Object,
+  R extends Repository<T, I>
+>
+    extends StatelessWidget {
   final Future<List<T?>> Function(R repository) fetcher;
   final R repository;
   final RepositoryObserverBuilder<List<T?>> builder;
   final bool notify;
   final Widget? loading;
   final Widget Function(
-      BuildContext context, Object error, StackTrace? stackTrace)? errorBuilder;
+    BuildContext context,
+    Object error,
+    StackTrace? stackTrace,
+  )?
+  errorBuilder;
   final Widget? child;
 
   const RepositoryMultiObserver({
@@ -437,9 +491,7 @@ class _ObjectListenableState extends State<_ObjectListenable> {
   Widget build(BuildContext context) {
     _notifier?.dispose();
     return ListenableBuilder(
-      listenable: _notifier = _ObjectNotifier(
-        listenables: widget.listenables,
-      ),
+      listenable: _notifier = _ObjectNotifier(listenables: widget.listenables),
       builder: widget.builder,
       child: widget.child,
     );
@@ -447,9 +499,7 @@ class _ObjectListenableState extends State<_ObjectListenable> {
 }
 
 class _ObjectNotifier extends ChangeNotifier {
-  _ObjectNotifier({
-    required this.listenables,
-  }) {
+  _ObjectNotifier({required this.listenables}) {
     for (final v in listenables) {
       v.addListener(notifyListeners);
     }

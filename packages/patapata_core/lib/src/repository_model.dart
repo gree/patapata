@@ -7,8 +7,10 @@ part of 'repository.dart';
 
 /// Base class that serves as the foundation for the repository model.
 /// [RepositoryModel] and [SimpleRepositoryModel] inherit from this class.
-mixin RepositoryModelBase<T extends RepositoryModelBase<T, I>,
-    I extends Object> {
+mixin RepositoryModelBase<
+  T extends RepositoryModelBase<T, I>,
+  I extends Object
+> {
   /// The unique ID in the repository.
   I get repositoryId;
 
@@ -128,14 +130,16 @@ mixin RepositoryModelBase<T extends RepositoryModelBase<T, I>,
 /// When creating a repository model that requires change notifications, mix-in this class.
 /// The inheriting class must be a [ProviderModel].
 mixin RepositoryModel<T extends RepositoryModelBase<T, I>, I extends Object>
-    on ProviderModel<T> implements RepositoryModelBase<T, I> {
+    on ProviderModel<T>
+    implements RepositoryModelBase<T, I> {
   /// Updates the variables held by the repository.
   /// The data is copied from [object].
   /// Using [batch] allows for bulk updates and simultaneous change notifications.
   void update(ProviderModelBatch batch, T object) {
     final tVariables = repositorySetVariables[T]!;
-    final tObjectVariables =
-        object.repositorySetVariables[T]!.toList(growable: false);
+    final tObjectVariables = object.repositorySetVariables[T]!.toList(
+      growable: false,
+    );
 
     for (final v in tObjectVariables.where((e) => e.set)) {
       final i = tObjectVariables.indexOf(v);
@@ -145,9 +149,9 @@ mixin RepositoryModel<T extends RepositoryModelBase<T, I>, I extends Object>
 
   @override
   Set<Type> get repositorySets => {
-        for (var i in repositorySetVariables.entries)
-          if (i.value.every((e) => e.set)) i.key,
-      };
+    for (var i in repositorySetVariables.entries)
+      if (i.value.every((e) => e.set)) i.key,
+  };
 
   @override
   bool repositoryHasSet(Type set) =>
@@ -195,8 +199,11 @@ mixin RepositoryModel<T extends RepositoryModelBase<T, I>, I extends Object>
 /// Mix-in when creating a simple repository model that does not require change notifications.
 /// It is possible to have change notifications, but it is often preferable to use [RepositoryModel].
 /// Use this when, due to the structure of the data model, [RepositoryModel] cannot be used.
-mixin SimpleRepositoryModel<T extends RepositoryModelBase<T, I>,
-    I extends Object> implements RepositoryModelBase<T, I> {
+mixin SimpleRepositoryModel<
+  T extends RepositoryModelBase<T, I>,
+  I extends Object
+>
+    implements RepositoryModelBase<T, I> {
   /// Updates the variables held by the repository.
   /// The specifics of the update are left to the derived class.
   void update(T object);
@@ -205,9 +212,7 @@ mixin SimpleRepositoryModel<T extends RepositoryModelBase<T, I>,
   Set<Type> get repositorySets => {T};
 
   @override
-  Map<Type, Set<ProviderModelVariable>> get repositorySetVariables => {
-        T: {},
-      };
+  Map<Type, Set<ProviderModelVariable>> get repositorySetVariables => {T: {}};
 
   // coverage:ignore-start
   // This method is not used in SimpleRepositoryModel.

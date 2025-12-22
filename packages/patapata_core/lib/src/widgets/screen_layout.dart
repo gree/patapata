@@ -5,6 +5,7 @@
 
 import 'dart:math';
 
+import 'package:vector_math/vector_math_64.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 import 'package:patapata_core/patapata_core.dart';
@@ -94,22 +95,22 @@ class ScreenLayoutBreakpoints {
   @override
   operator ==(Object other) => other is ScreenLayoutBreakpoints
       ? name == other.name &&
-          portraitStandardBreakpoint == other.portraitStandardBreakpoint &&
-          portraitConstrainedWidth == other.portraitConstrainedWidth &&
-          landscapeStandardBreakpoint == other.landscapeStandardBreakpoint &&
-          landscapeConstrainedWidth == other.landscapeConstrainedWidth &&
-          maxScale == other.maxScale
+            portraitStandardBreakpoint == other.portraitStandardBreakpoint &&
+            portraitConstrainedWidth == other.portraitConstrainedWidth &&
+            landscapeStandardBreakpoint == other.landscapeStandardBreakpoint &&
+            landscapeConstrainedWidth == other.landscapeConstrainedWidth &&
+            maxScale == other.maxScale
       : false;
 
   @override
   int get hashCode => Object.hash(
-        name,
-        portraitStandardBreakpoint,
-        portraitConstrainedWidth,
-        landscapeStandardBreakpoint,
-        landscapeConstrainedWidth,
-        maxScale,
-      );
+    name,
+    portraitStandardBreakpoint,
+    portraitConstrainedWidth,
+    landscapeStandardBreakpoint,
+    landscapeConstrainedWidth,
+    maxScale,
+  );
 }
 
 /// A class that defines default screen layout breakpoints.
@@ -142,10 +143,7 @@ class ScreenLayoutDefaultBreakpoints {
 
   /// The Map of default screen layout breakpoints.
   static Map<String, ScreenLayoutBreakpoints> toMap() {
-    return {
-      'normal': normal,
-      'large': large,
-    };
+    return {'normal': normal, 'large': large};
   }
 }
 
@@ -176,24 +174,11 @@ class ScreenLayoutDefaultBreakpoints {
 /// ```
 class ScreenLayout extends SingleChildRenderObjectWidget {
   /// Creates a [ScreenLayout] with the name [name] that adjusts the size of the widget specified in [child] based on the configuration in [breakpoints].
-  const ScreenLayout({
-    super.key,
-    super.child,
-    this.breakpoints,
-    this.name,
-  });
+  const ScreenLayout({super.key, super.child, this.breakpoints, this.name});
 
   /// Creates a [ScreenLayout] with the name [name] that adjusts the size of the widget specified in [child].
-  factory ScreenLayout.named({
-    Key? key,
-    Widget? child,
-    required String name,
-  }) {
-    return ScreenLayout(
-      key: key,
-      name: name,
-      child: child,
-    );
+  factory ScreenLayout.named({Key? key, Widget? child, required String name}) {
+    return ScreenLayout(key: key, name: name, child: child);
   }
 
   /// Breakpoints for adjusting the size of the widget.
@@ -264,8 +249,8 @@ class _ScreenLayoutRenderObject extends RenderBox
   _ScreenLayoutRenderObject({
     required ScreenLayoutBreakpoints breakpoints,
     required Orientation orientation,
-  })  : _breakpoints = breakpoints,
-        _orientation = orientation;
+  }) : _breakpoints = breakpoints,
+       _orientation = orientation;
 
   double get standardBreakpoint {
     switch (_orientation) {
@@ -303,7 +288,8 @@ class _ScreenLayoutRenderObject extends RenderBox
       _scale = 1.0;
     } else {
       _scale = min(_breakpoints.maxScale, tWidth / standardBreakpoint);
-      _transform = Matrix4.identity()..scale(_scale, _scale, _scale);
+      _transform = Matrix4.identity()
+        ..scaleByVector3(Vector3(_scale, _scale, _scale));
     }
 
     if (tChild != null) {
@@ -324,9 +310,11 @@ class _ScreenLayoutRenderObject extends RenderBox
 
     if (tChild is RenderBox) {
       size = constraints.constrain(Size(tWidth, tChild.size.height * _scale));
-      _transform.translate(
+      _transform.translateByDouble(
         (tWidth - tChild.size.width * _scale) / 2,
         (size.height - tChild.size.height * _scale) / 2,
+        0.0,
+        1.0,
       );
     } else {
       // coverage:ignore-start
@@ -405,10 +393,7 @@ class _ScreenLayoutRenderObject extends RenderBox
 class ScreenLayoutDisable extends SingleChildRenderObjectWidget {
   /// Create a [ScreenLayoutDisable]
   /// [child] is the widget for which the screen layout is to be disabled.
-  const ScreenLayoutDisable({
-    super.key,
-    super.child,
-  });
+  const ScreenLayoutDisable({super.key, super.child});
 
   @override
   RenderObject createRenderObject(BuildContext context) =>
@@ -444,7 +429,8 @@ class _ScreenLayoutDisableRenderObject extends RenderBox
 
     final tChild = child;
     _scale = tParentScale;
-    _transform = Matrix4.identity()..scale(_scale, _scale, _scale);
+    _transform = Matrix4.identity()
+      ..scaleByVector3(Vector3(_scale, _scale, _scale));
 
     if (tChild != null) {
       tChild.layout(
@@ -460,10 +446,13 @@ class _ScreenLayoutDisableRenderObject extends RenderBox
 
     if (tChild is RenderBox) {
       size = constraints.constrain(
-          Size(tChild.size.width * _scale, tChild.size.height * _scale));
-      _transform.translate(
+        Size(tChild.size.width * _scale, tChild.size.height * _scale),
+      );
+      _transform.translateByDouble(
         (size.width - tChild.size.width * _scale) / 2,
         (size.height - tChild.size.height * _scale) / 2,
+        0.0,
+        1.0,
       );
     } else {
       // coverage:ignore-start

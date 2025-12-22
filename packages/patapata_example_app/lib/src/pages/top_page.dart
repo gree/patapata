@@ -9,6 +9,7 @@ import 'package:patapata_example_app/src/pages/device_and_package_info_page.dart
 import 'package:patapata_example_app/src/pages/error_page.dart';
 import 'package:patapata_example_app/src/pages/standard_page_example_page.dart';
 import 'package:patapata_example_app/src/repository/repository_example1.dart';
+// import 'package:url_launcher/link.dart';
 
 import 'config_page.dart';
 import 'screen_layout_example_page.dart';
@@ -69,7 +70,7 @@ class TopPage extends StandardPage<void> {
           ),
           TextButton(
             onPressed: () {
-              context.go<HomePage, void>(null);
+              context.go<HomePageParent, void>(null);
             },
             child: Text(context.pl('go_to_tab')),
           ),

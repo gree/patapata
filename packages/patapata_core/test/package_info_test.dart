@@ -26,14 +26,8 @@ void main() {
     final tApp = createApp();
     final bool tResult = await tPackageInfo.init(tApp);
 
-    expect(
-      tResult,
-      isTrue,
-    );
+    expect(tResult, isTrue);
 
-    expect(
-      tPackageInfo.info.appName == 'mock_patapata_core',
-      isTrue,
-    );
+    expect(tPackageInfo.info.appName == 'mock_patapata_core', isTrue);
   });
 }

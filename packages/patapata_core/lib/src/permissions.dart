@@ -28,11 +28,7 @@ enum PermissionTrackingResult {
 }
 
 /// Result of [Permissions.requestNotifications].
-enum PermissionNotificationResult {
-  authorized,
-  denied,
-  notDetermined,
-}
+enum PermissionNotificationResult { authorized, denied, notDetermined }
 
 const _kLocalConfigTrackingRequested = 'patapata.Permissions:trackingRequested';
 const _kLocalConfigNotificationsRequested =
@@ -46,9 +42,7 @@ class Permissions with MethodChannelTestMixin {
   /// The [App] passed in the constructor.
   final App app;
 
-  Permissions({
-    required this.app,
-  });
+  Permissions({required this.app});
 
   final _trackingStreamController =
       StreamController<PermissionTrackingResult>.broadcast();
@@ -88,16 +82,13 @@ class Permissions with MethodChannelTestMixin {
   @visibleForTesting
   void setMockMethodCallHandler() {
     // ignore: invalid_use_of_visible_for_testing_member
-    testSetMockMethodCallHandler(
-      _methodChannel,
-      (methodCall) async {
-        switch (methodCall.method) {
-          case 'Permissions:requestTracking':
-            return _mockPermissionTrackingResult?.name;
-        }
-        return null;
-      },
-    );
+    testSetMockMethodCallHandler(_methodChannel, (methodCall) async {
+      switch (methodCall.method) {
+        case 'Permissions:requestTracking':
+          return _mockPermissionTrackingResult?.name;
+      }
+      return null;
+    });
 
     // ignore: invalid_use_of_visible_for_testing_member
     testSetMockMethodCallHandler(
@@ -160,14 +151,16 @@ class Permissions with MethodChannelTestMixin {
     await app.localConfig.setBool(_kLocalConfigTrackingRequested, true);
 
     try {
-      final tResult = await _methodChannel
-          .invokeMethod<String?>('Permissions:requestTracking');
+      final tResult = await _methodChannel.invokeMethod<String?>(
+        'Permissions:requestTracking',
+      );
 
       if (tResult == null) {
         tTrackingResult = PermissionTrackingResult.notSupported;
       } else {
-        tTrackingResult = PermissionTrackingResult.values
-            .firstWhere((element) => element.name == tResult);
+        tTrackingResult = PermissionTrackingResult.values.firstWhere(
+          (element) => element.name == tResult,
+        );
       }
       // coverage:ignore-start
     } catch (e, stackTrace) {
@@ -201,16 +194,19 @@ class Permissions with MethodChannelTestMixin {
       if (defaultTargetPlatform == TargetPlatform.android) {
         final tPlatform = FlutterLocalNotificationsPlugin()
             .resolvePlatformSpecificImplementation<
-                AndroidFlutterLocalNotificationsPlugin>()!;
+              AndroidFlutterLocalNotificationsPlugin
+            >()!;
         tNotificationResult =
             (await tPlatform.requestNotificationsPermission() ?? true)
-                ? PermissionNotificationResult.authorized
-                : PermissionNotificationResult.denied;
+            ? PermissionNotificationResult.authorized
+            : PermissionNotificationResult.denied;
       } else if (defaultTargetPlatform == TargetPlatform.iOS) {
         final tPlatform = FlutterLocalNotificationsPlugin()
             .resolvePlatformSpecificImplementation<
-                IOSFlutterLocalNotificationsPlugin>()!;
-        tNotificationResult = (await tPlatform.requestPermissions(
+              IOSFlutterLocalNotificationsPlugin
+            >()!;
+        tNotificationResult =
+            (await tPlatform.requestPermissions(
                   sound: sound,
                   alert: alert,
                   badge: badge,
@@ -222,8 +218,10 @@ class Permissions with MethodChannelTestMixin {
       } else if (defaultTargetPlatform == TargetPlatform.macOS) {
         final tPlatform = FlutterLocalNotificationsPlugin()
             .resolvePlatformSpecificImplementation<
-                MacOSFlutterLocalNotificationsPlugin>()!;
-        tNotificationResult = (await tPlatform.requestPermissions(
+              MacOSFlutterLocalNotificationsPlugin
+            >()!;
+        tNotificationResult =
+            (await tPlatform.requestPermissions(
                   sound: sound,
                   alert: alert,
                   badge: badge,

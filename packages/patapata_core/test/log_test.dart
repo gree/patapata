@@ -18,11 +18,9 @@ import 'utils/patapata_core_test_utils.dart';
 final _logger = Logger('test.log');
 
 class TestLogEnvironment with LogEnvironment {
-  const TestLogEnvironment({
-    int? logLevel,
-    bool? printLog,
-  })  : _logLevel = logLevel,
-        _printLog = printLog;
+  const TestLogEnvironment({int? logLevel, bool? printLog})
+    : _logLevel = logLevel,
+      _printLog = printLog;
 
   final int? _logLevel;
   final bool? _printLog;
@@ -161,9 +159,7 @@ void main() {
 
   testWidgets('level and logPrinting setter', (WidgetTester tester) async {
     final App tApp = createApp(
-      environment: TestLogEnvironment(
-        logLevel: Level.SEVERE.value,
-      ),
+      environment: TestLogEnvironment(logLevel: Level.SEVERE.value),
     );
 
     await tApp.run();
@@ -190,9 +186,7 @@ void main() {
 
   testWidgets('report test', (WidgetTester tester) async {
     final App tApp = createApp(
-      environment: TestLogEnvironment(
-        logLevel: Level.SEVERE.value,
-      ),
+      environment: TestLogEnvironment(logLevel: Level.SEVERE.value),
     );
 
     await tApp.run();
@@ -200,18 +194,16 @@ void main() {
     await tApp.runProcess(() async {
       await tester.pumpAndSettle();
 
-      final tReportedRecord =
-          ReportRecord(level: Level.SEVERE, message: 'test');
-      final tNotReportedRecord =
-          ReportRecord(level: Level.INFO, message: 'test');
-      expectLater(
-        tApp.log.reports,
-        emits(tReportedRecord),
+      final tReportedRecord = ReportRecord(
+        level: Level.SEVERE,
+        message: 'test',
       );
-      expectLater(
-        tApp.log.reports,
-        neverEmits(tNotReportedRecord),
+      final tNotReportedRecord = ReportRecord(
+        level: Level.INFO,
+        message: 'test',
       );
+      expectLater(tApp.log.reports, emits(tReportedRecord));
+      expectLater(tApp.log.reports, neverEmits(tNotReportedRecord));
 
       tApp.log.report(tReportedRecord);
       tApp.log.report(tNotReportedRecord);
@@ -222,9 +214,7 @@ void main() {
 
   testWidgets('Logger test', (WidgetTester tester) async {
     final App tApp = createApp(
-      environment: TestLogEnvironment(
-        logLevel: Level.SEVERE.value,
-      ),
+      environment: TestLogEnvironment(logLevel: Level.SEVERE.value),
     );
 
     await tApp.run();
@@ -234,14 +224,8 @@ void main() {
 
       final tStream = tApp.log.reports.asyncMap((event) => event.message);
 
-      expectLater(
-        tStream,
-        emits(equals('severe')),
-      );
-      expectLater(
-        tStream,
-        neverEmits(equals('info')),
-      );
+      expectLater(tStream, emits(equals('severe')));
+      expectLater(tStream, neverEmits(equals('info')));
 
       _logger.severe('severe');
       _logger.info('info');
@@ -254,9 +238,7 @@ void main() {
 
   testWidgets('Logger object test', (WidgetTester tester) async {
     final App tApp = createApp(
-      environment: TestLogEnvironment(
-        logLevel: Level.SEVERE.value,
-      ),
+      environment: TestLogEnvironment(logLevel: Level.SEVERE.value),
     );
 
     await tApp.run();
@@ -267,13 +249,11 @@ void main() {
       final tObject = Object();
       final tStream = tApp.log.reports.asyncMap((event) => event.object);
 
-      expectLater(
-        tStream,
-        emits(equals(tObject)),
-      );
+      expectLater(tStream, emits(equals(tObject)));
 
       _logger.severe(
-          ReportRecord(level: Level.SEVERE, message: 'test', object: tObject));
+        ReportRecord(level: Level.SEVERE, message: 'test', object: tObject),
+      );
     });
 
     tApp.dispose();
@@ -293,10 +273,7 @@ void main() {
     await tApp.runProcess(() async {
       await tester.pumpAndSettle();
       final tStream = tApp.log.reports.asyncMap((event) => event.message);
-      expectLater(
-        tStream,
-        emits(equals('test')),
-      );
+      expectLater(tStream, emits(equals('test')));
 
       tApp.log.logPrinting = true;
       _logger.severe('test');
@@ -331,11 +308,7 @@ void main() {
       final tStream = tApp.log.reports.asyncMap((event) => event.message);
       expectLater(
         tStream,
-        emitsInOrder([
-          'duplicateObject',
-          tExceptionB.toString(),
-          emitsDone,
-        ]),
+        emitsInOrder(['duplicateObject', tExceptionB.toString(), emitsDone]),
       );
 
       try {
@@ -378,17 +351,8 @@ void main() {
       await tester.pumpAndSettle();
 
       final tStream = tApp.log.reports.asyncMap((event) => event.message);
-      expectLater(
-        tStream,
-        emitsInOrder([
-          'severe',
-          'removeIgnore',
-        ]),
-      );
-      expectLater(
-        tStream,
-        neverEmits(equals('ignore')),
-      );
+      expectLater(tStream, emitsInOrder(['severe', 'removeIgnore']));
+      expectLater(tStream, neverEmits(equals('ignore')));
 
       fFilter(ReportRecord record) {
         if (record.message == 'ignore' || record.message == 'removeIgnore') {
@@ -400,8 +364,10 @@ void main() {
       tApp.log.addFilter(fFilter);
 
       final tRecord = ReportRecord(level: Level.SEVERE, message: 'severe');
-      final tRecordIgnore =
-          ReportRecord(level: Level.SEVERE, message: 'ignore');
+      final tRecordIgnore = ReportRecord(
+        level: Level.SEVERE,
+        message: 'ignore',
+      );
       expect(tApp.log.filter(tRecord), equals(tRecord));
       expect(tApp.log.filter(tRecordIgnore), isNull);
 
@@ -431,24 +397,21 @@ void main() {
       await tester.pumpAndSettle();
 
       final tStream = tApp.log.reports.asyncMap((event) => event.message);
-      expectLater(
-        tStream,
-        emitsInOrder([
-          'severe',
-          'removeIgnore',
-        ]),
-      );
-      expectLater(
-        tStream,
-        neverEmits(equals('ignore')),
-      );
+      expectLater(tStream, emitsInOrder(['severe', 'removeIgnore']));
+      expectLater(tStream, neverEmits(equals('ignore')));
 
       tApp.log.ignoreType(int);
 
-      final tRecord =
-          ReportRecord(level: Level.SEVERE, message: 'severe', error: '1');
-      final tRecordIgnore =
-          ReportRecord(level: Level.SEVERE, message: 'ignore', error: 1);
+      final tRecord = ReportRecord(
+        level: Level.SEVERE,
+        message: 'severe',
+        error: '1',
+      );
+      final tRecordIgnore = ReportRecord(
+        level: Level.SEVERE,
+        message: 'ignore',
+        error: 1,
+      );
       expect(tApp.log.filter(tRecord), equals(tRecord));
       expect(tApp.log.filter(tRecordIgnore), isNull);
 
@@ -478,10 +441,7 @@ void main() {
       await tester.pumpAndSettle();
 
       final tStream = tApp.log.reports.asyncMap((event) => event.message);
-      expectLater(
-        tStream,
-        emits(equals('patapataException')),
-      );
+      expectLater(tStream, emits(equals('patapataException')));
 
       bool tOnReportedCalled = false;
 
@@ -527,11 +487,7 @@ void main() {
       final tStream = tApp.log.reports.asyncMap((event) => event.level);
       expectLater(
         tStream,
-        emitsInOrder([
-          Level.INFO,
-          Level.SEVERE,
-          Level.SEVERE,
-        ]),
+        emitsInOrder([Level.INFO, Level.SEVERE, Level.SEVERE]),
       );
 
       // throw FlutterError
@@ -585,79 +541,64 @@ void main() {
   });
 
   testWidgets(
-      'UnhandledError is handled by PlatformDispatcher. The LogLevel for UnhandledError is SEVERE or higher.',
-      (WidgetTester tester) async {
-    if (kIsWeb) {
-      // PlatformDispatcher is not supported on the Web.
-      return;
-    }
+    'UnhandledError is handled by PlatformDispatcher. The LogLevel for UnhandledError is SEVERE or higher.',
+    (WidgetTester tester) async {
+      if (kIsWeb) {
+        // PlatformDispatcher is not supported on the Web.
+        return;
+      }
 
-    final App tApp = createApp(
-      environment: TestLogEnvironment(
-        logLevel: Level.SEVERE.value,
-        printLog: true,
-      ),
-    );
-
-    await tApp.run();
-
-    await tApp.runProcess(() async {
-      await tester.pumpAndSettle();
-      // Check log levels processed within the App zone.
-      final tStream = tApp.log.reports.asyncMap((event) => event.level);
-      expectLater(
-        tStream,
-        emitsInOrder([
-          Level.SHOUT,
-          Level.SEVERE,
-          Level.SEVERE,
-          Level.SEVERE,
-        ]),
-      );
-
-      // Since PlatformDispatcher is not called during tests, call it directly.
-
-      tester.binding.platformDispatcher.onError?.call(
-        TestPatapataException(
-          onReported: (_) {},
-          logLevel: Level.SHOUT,
+      final App tApp = createApp(
+        environment: TestLogEnvironment(
+          logLevel: Level.SEVERE.value,
+          printLog: true,
         ),
-        StackTrace.empty,
       );
-      tester.binding.platformDispatcher.onError?.call(
-        TestPatapataException(
-          onReported: (_) {},
-          logLevel: Level.INFO,
-        ),
-        StackTrace.empty,
-      );
-      // If logLevel is null, it is processed as Level.SEVERE in App zone.
-      tester.binding.platformDispatcher.onError?.call(
-        TestPatapataException(
-          onReported: (_) {},
-          logLevel: null,
-        ),
-        StackTrace.empty,
-      );
-      // If it is not a PatapataException, it is handled as Level.SEVERE in the App zone.
-      tester.binding.platformDispatcher.onError?.call(
-        'not PatapataException',
-        StackTrace.empty,
-      );
-    });
 
-    tApp.dispose();
-  });
+      await tApp.run();
+
+      await tApp.runProcess(() async {
+        await tester.pumpAndSettle();
+        // Check log levels processed within the App zone.
+        final tStream = tApp.log.reports.asyncMap((event) => event.level);
+        expectLater(
+          tStream,
+          emitsInOrder([Level.SHOUT, Level.SEVERE, Level.SEVERE, Level.SEVERE]),
+        );
+
+        // Since PlatformDispatcher is not called during tests, call it directly.
+
+        tester.binding.platformDispatcher.onError?.call(
+          TestPatapataException(onReported: (_) {}, logLevel: Level.SHOUT),
+          StackTrace.empty,
+        );
+        tester.binding.platformDispatcher.onError?.call(
+          TestPatapataException(onReported: (_) {}, logLevel: Level.INFO),
+          StackTrace.empty,
+        );
+        // If logLevel is null, it is processed as Level.SEVERE in App zone.
+        tester.binding.platformDispatcher.onError?.call(
+          TestPatapataException(onReported: (_) {}, logLevel: null),
+          StackTrace.empty,
+        );
+        // If it is not a PatapataException, it is handled as Level.SEVERE in the App zone.
+        tester.binding.platformDispatcher.onError?.call(
+          'not PatapataException',
+          StackTrace.empty,
+        );
+      });
+
+      tApp.dispose();
+    },
+  );
 
   testWidgets('RemoteConfig LogLevel test.', (WidgetTester tester) async {
     final Map<String, Object> tStore = {};
     final tMockRemoteConfig = MockRemoteConfig(tStore);
 
-    final App tApp = createApp(plugins: [
-      Plugin.inline(
-        createRemoteConfig: () => tMockRemoteConfig,
-      ),
-    ]);
+    final App tApp = createApp(
+      plugins: [Plugin.inline(createRemoteConfig: () => tMockRemoteConfig)],
+    );
 
     await tApp.run();
 
@@ -677,25 +618,27 @@ void main() {
     final Map<String, Object> tStore = {};
     final tMockRemoteConfig = MockRemoteConfig(tStore);
 
-    final App tApp = createApp(plugins: [
-      Plugin.inline(
-        createRemoteConfig: () => tMockRemoteConfig,
-      ),
-    ]);
+    final App tApp = createApp(
+      plugins: [Plugin.inline(createRemoteConfig: () => tMockRemoteConfig)],
+    );
 
     await tApp.run();
 
     await tApp.runProcess(() async {
       await tester.pumpAndSettle();
 
-      await tMockRemoteConfig.setString(Log.kRemoteConfigLevelFilters,
-          '{"info":888, "severe":1111, "fine":500}');
+      await tMockRemoteConfig.setString(
+        Log.kRemoteConfigLevelFilters,
+        '{"info":888, "severe":1111, "fine":500}',
+      );
       await tMockRemoteConfig.fetch(force: true);
 
       final tReportInfo = ReportRecord(level: Level.INFO, message: 'info');
       final tReportSever = ReportRecord(level: Level.INFO, message: 'severe');
-      final tReportInfoToFine =
-          ReportRecord(level: Level.INFO, message: 'fine');
+      final tReportInfoToFine = ReportRecord(
+        level: Level.INFO,
+        message: 'fine',
+      );
 
       final tInfo = tApp.log.filter(tReportInfo);
       final tSever = tApp.log.filter(tReportSever);
@@ -704,10 +647,16 @@ void main() {
       expect(tSever?.level.value, equals(1111));
       expect(tInfoToFine?.level, equals(Level.FINE));
 
-      final tReportObjectInfo =
-          ReportRecord(level: Level.INFO, message: 'test', error: 'info');
-      final tReportErrorInfo =
-          ReportRecord(level: Level.INFO, message: 'test', object: 'info');
+      final tReportObjectInfo = ReportRecord(
+        level: Level.INFO,
+        message: 'test',
+        error: 'info',
+      );
+      final tReportErrorInfo = ReportRecord(
+        level: Level.INFO,
+        message: 'test',
+        object: 'info',
+      );
 
       final tObjectInfo = tApp.log.filter(tReportObjectInfo);
       final tErrorInfo = tApp.log.filter(tReportErrorInfo);
@@ -718,8 +667,9 @@ void main() {
     tApp.dispose();
   });
 
-  testWidgets('RemoteConfig levelFilter parsing failed.',
-      (WidgetTester tester) async {
+  testWidgets('RemoteConfig levelFilter parsing failed.', (
+    WidgetTester tester,
+  ) async {
     final tOriginalDebugPrint = debugPrint;
 
     bool tPrintParsingError = false;
@@ -733,11 +683,9 @@ void main() {
     final Map<String, Object> tStore = {};
     final tMockRemoteConfig = MockRemoteConfig(tStore);
 
-    final App tApp = createApp(plugins: [
-      Plugin.inline(
-        createRemoteConfig: () => tMockRemoteConfig,
-      ),
-    ]);
+    final App tApp = createApp(
+      plugins: [Plugin.inline(createRemoteConfig: () => tMockRemoteConfig)],
+    );
 
     await tApp.run();
 
@@ -747,7 +695,9 @@ void main() {
       tApp.log.logPrinting = true;
 
       await tMockRemoteConfig.setString(
-          Log.kRemoteConfigLevelFilters, '{"info":888,');
+        Log.kRemoteConfigLevelFilters,
+        '{"info":888,',
+      );
       await tMockRemoteConfig.fetch(force: true);
     });
 
@@ -773,9 +723,7 @@ void main() {
     };
 
     final App tApp = createApp(
-      environment: TestLogEnvironment(
-        logLevel: Level.SEVERE.value,
-      ),
+      environment: TestLogEnvironment(logLevel: Level.SEVERE.value),
     );
 
     await tApp.run();
@@ -839,194 +787,154 @@ void main() {
       },
     };
     final tExpectTraces = [
-      Trace(
-        [
-          Frame(
-            Uri.file(
-              'java.lang/Integer.java',
-              windows: false,
-            ),
-            797,
-            null,
-            'Integer.parseInt',
+      Trace([
+        Frame(
+          Uri.file('java.lang/Integer.java', windows: false),
+          797,
+          null,
+          'Integer.parseInt',
+        ),
+        Frame(
+          Uri.file('java.lang/Integer.java', windows: false),
+          915,
+          null,
+          'Integer.parseInt',
+        ),
+        Frame(
+          Uri.file(
+            'dev.patapata.patapata_core_example/MainActivity.kt',
+            windows: false,
           ),
-          Frame(
-            Uri.file(
-              'java.lang/Integer.java',
-              windows: false,
-            ),
-            915,
-            null,
-            'Integer.parseInt',
+          27,
+          null,
+          'MainActivity.configureFlutterEngine\$lambda-1\$lambda-0',
+        ),
+        Frame(
+          Uri.file(
+            'dev.patapata.patapata_core_example/Unknown<space>Source',
+            windows: false,
           ),
-          Frame(
-            Uri.file(
-              'dev.patapata.patapata_core_example/MainActivity.kt',
-              windows: false,
-            ),
-            27,
-            null,
-            'MainActivity.configureFlutterEngine\$lambda-1\$lambda-0',
+          0,
+          null,
+          'MainActivity.\$r8\$lambda\$mgziiATvBKRngKgviCJADp8PLSA',
+        ),
+        Frame(
+          Uri.file(
+            'dev.patapata.patapata_core_example/Unknown<space>Source',
+            windows: false,
           ),
-          Frame(
-            Uri.file(
-              'dev.patapata.patapata_core_example/Unknown<space>Source',
-              windows: false,
-            ),
-            0,
-            null,
-            'MainActivity.\$r8\$lambda\$mgziiATvBKRngKgviCJADp8PLSA',
+          2,
+          null,
+          'MainActivity\$\$ExternalSyntheticLambda0.onMethodCall',
+        ),
+        Frame(
+          Uri.file(
+            'io.flutter.plugin.common/MethodChannel.java',
+            windows: false,
           ),
-          Frame(
-            Uri.file(
-              'dev.patapata.patapata_core_example/Unknown<space>Source',
-              windows: false,
-            ),
-            2,
-            null,
-            'MainActivity\$\$ExternalSyntheticLambda0.onMethodCall',
+          258,
+          null,
+          'MethodChannel\$IncomingMethodCallHandler.onMessage',
+        ),
+        Frame(
+          Uri.file(
+            'io.flutter.embedding.engine.dart/DartMessenger.java',
+            windows: false,
           ),
-          Frame(
-            Uri.file(
-              'io.flutter.plugin.common/MethodChannel.java',
-              windows: false,
-            ),
-            258,
-            null,
-            'MethodChannel\$IncomingMethodCallHandler.onMessage',
+          295,
+          null,
+          'DartMessenger.invokeHandler',
+        ),
+        Frame(
+          Uri.file(
+            'io.flutter.embedding.engine.dart/DartMessenger.java',
+            windows: false,
           ),
-          Frame(
-            Uri.file(
-              'io.flutter.embedding.engine.dart/DartMessenger.java',
-              windows: false,
-            ),
-            295,
-            null,
-            'DartMessenger.invokeHandler',
+          322,
+          null,
+          'DartMessenger.lambda\$dispatchMessageToQueue\$0\$io-flutter-embedding-engine-dart-DartMessenger',
+        ),
+        Frame(
+          Uri.file(
+            'io.flutter.embedding.engine.dart/Unknown<space>Source',
+            windows: false,
           ),
-          Frame(
-            Uri.file(
-              'io.flutter.embedding.engine.dart/DartMessenger.java',
-              windows: false,
-            ),
-            322,
-            null,
-            'DartMessenger.lambda\$dispatchMessageToQueue\$0\$io-flutter-embedding-engine-dart-DartMessenger',
+          12,
+          null,
+          'DartMessenger\$\$ExternalSyntheticLambda0.run',
+        ),
+        Frame(
+          Uri.file('android.os/Handler.java', windows: false),
+          942,
+          null,
+          'Handler.handleCallback',
+        ),
+        Frame(
+          Uri.file('android.os/Handler.java', windows: false),
+          99,
+          null,
+          'Handler.dispatchMessage',
+        ),
+        Frame(
+          Uri.file('android.os/Looper.java', windows: false),
+          346,
+          null,
+          'Looper.loopOnce',
+        ),
+        Frame(
+          Uri.file('android.os/Looper.java', windows: false),
+          475,
+          null,
+          'Looper.loop',
+        ),
+        Frame(
+          Uri.file('android.app/ActivityThread.java', windows: false),
+          7950,
+          null,
+          'ActivityThread.main',
+        ),
+        Frame(
+          Uri.file('java.lang.reflect/Native<space>Method', windows: false),
+          null,
+          null,
+          'Method.invoke',
+        ),
+        Frame(
+          Uri.file('com.android.internal.os/RuntimeInit.java', windows: false),
+          548,
+          null,
+          'RuntimeInit\$MethodAndArgsCaller.run',
+        ),
+        Frame(
+          Uri.file('com.android.internal.os/ZygoteInit.java', windows: false),
+          942,
+          null,
+          'ZygoteInit.main',
+        ),
+      ]),
+      Trace([
+        Frame(
+          Uri.file('java.lang/Integer.java', windows: false),
+          4,
+          null,
+          'Integer.parseInt',
+        ),
+        Frame(
+          Uri.file('java.lang/Integer.java', windows: false),
+          5,
+          null,
+          'Integer.parseInt',
+        ),
+        Frame(
+          Uri.file(
+            'dev.patapata.patapata_core_example/MainActivity.kt',
+            windows: false,
           ),
-          Frame(
-            Uri.file(
-              'io.flutter.embedding.engine.dart/Unknown<space>Source',
-              windows: false,
-            ),
-            12,
-            null,
-            'DartMessenger\$\$ExternalSyntheticLambda0.run',
-          ),
-          Frame(
-            Uri.file(
-              'android.os/Handler.java',
-              windows: false,
-            ),
-            942,
-            null,
-            'Handler.handleCallback',
-          ),
-          Frame(
-            Uri.file(
-              'android.os/Handler.java',
-              windows: false,
-            ),
-            99,
-            null,
-            'Handler.dispatchMessage',
-          ),
-          Frame(
-            Uri.file(
-              'android.os/Looper.java',
-              windows: false,
-            ),
-            346,
-            null,
-            'Looper.loopOnce',
-          ),
-          Frame(
-            Uri.file(
-              'android.os/Looper.java',
-              windows: false,
-            ),
-            475,
-            null,
-            'Looper.loop',
-          ),
-          Frame(
-            Uri.file(
-              'android.app/ActivityThread.java',
-              windows: false,
-            ),
-            7950,
-            null,
-            'ActivityThread.main',
-          ),
-          Frame(
-            Uri.file(
-              'java.lang.reflect/Native<space>Method',
-              windows: false,
-            ),
-            null,
-            null,
-            'Method.invoke',
-          ),
-          Frame(
-            Uri.file(
-              'com.android.internal.os/RuntimeInit.java',
-              windows: false,
-            ),
-            548,
-            null,
-            'RuntimeInit\$MethodAndArgsCaller.run',
-          ),
-          Frame(
-            Uri.file(
-              'com.android.internal.os/ZygoteInit.java',
-              windows: false,
-            ),
-            942,
-            null,
-            'ZygoteInit.main',
-          ),
-        ],
-      ),
-      Trace(
-        [
-          Frame(
-            Uri.file(
-              'java.lang/Integer.java',
-              windows: false,
-            ),
-            4,
-            null,
-            'Integer.parseInt',
-          ),
-          Frame(
-            Uri.file(
-              'java.lang/Integer.java',
-              windows: false,
-            ),
-            5,
-            null,
-            'Integer.parseInt',
-          ),
-          Frame(
-            Uri.file(
-              'dev.patapata.patapata_core_example/MainActivity.kt',
-              windows: false,
-            ),
-            6,
-            null,
-            'MainActivity.test',
-          ),
-        ],
-      ),
+          6,
+          null,
+          'MainActivity.test',
+        ),
+      ]),
     ];
     final tTestNativeThrowable = NativeThrowable.fromMap(tThrowableMap);
     final tTestCause = tTestNativeThrowable.cause!;
@@ -1070,9 +978,7 @@ void main() {
 
   testWidgets('Native logging level map.', (WidgetTester tester) async {
     final App tApp = createApp(
-      environment: TestLogEnvironment(
-        logLevel: Level.ALL.value,
-      ),
+      environment: TestLogEnvironment(logLevel: Level.ALL.value),
     );
 
     await tApp.run();
@@ -1086,15 +992,10 @@ void main() {
       Future<void> fNativeLogging(Map<String, Object?> arguments) async {
         await TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
             .handlePlatformMessage(
-          tChannelName,
-          tChannel.codec.encodeMethodCall(
-            MethodCall(
-              'logging',
-              arguments,
-            ),
-          ),
-          (data) {},
-        );
+              tChannelName,
+              tChannel.codec.encodeMethodCall(MethodCall('logging', arguments)),
+              (data) {},
+            );
       }
 
       NativeThrowable.registerNativeThrowableMethodChannel(tChannelName);
@@ -1127,16 +1028,11 @@ void main() {
       );
 
       // default level
-      await fNativeLogging({
-        'message': 'LogMessage',
-      });
+      await fNativeLogging({'message': 'LogMessage'});
 
       // level map
       for (var entry in tNativeLoggerLevelMap.entries) {
-        await fNativeLogging({
-          'level': entry.key,
-          'message': 'LogMessage',
-        });
+        await fNativeLogging({'level': entry.key, 'message': 'LogMessage'});
       }
 
       NativeThrowable.unregisterNativeThrowableMethodChannel(tChannelName);
@@ -1149,9 +1045,7 @@ void main() {
     debugDefaultTargetPlatformOverride = TargetPlatform.android;
 
     final App tApp = createApp(
-      environment: TestLogEnvironment(
-        logLevel: Level.ALL.value,
-      ),
+      environment: TestLogEnvironment(logLevel: Level.ALL.value),
     );
 
     await tApp.run();
@@ -1165,15 +1059,10 @@ void main() {
       Future<void> fNativeLogging(Map<String, Object?> arguments) async {
         await TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
             .handlePlatformMessage(
-          tChannelName,
-          tChannel.codec.encodeMethodCall(
-            MethodCall(
-              'logging',
-              arguments,
-            ),
-          ),
-          (data) {},
-        );
+              tChannelName,
+              tChannel.codec.encodeMethodCall(MethodCall('logging', arguments)),
+              (data) {},
+            );
       }
 
       NativeThrowable.registerNativeThrowableMethodChannel(tChannelName);
@@ -1232,7 +1121,9 @@ void main() {
       expect(tReport.error, isA<NativeThrowable>());
       expect((tReport.error as NativeThrowable).toMap(), equals(tThrowableMap));
       expect(
-          tReport.stackTrace, equals((tReport.error as NativeThrowable).chain));
+        tReport.stackTrace,
+        equals((tReport.error as NativeThrowable).chain),
+      );
 
       NativeThrowable.unregisterNativeThrowableMethodChannel(tChannelName);
     });
@@ -1267,145 +1158,88 @@ void main() {
       ],
       'cause': null,
     };
-    final tExpectTrace = Trace(
-      [
-        Frame(
-          Uri.file(
-            'Runner/<NoFileName>',
-            windows: false,
-          ),
-          72,
-          null,
-          '\$s6Runner12NativeLoggerC14viewControllerACSo011FlutterViewE0C_tcfcySo0F10MethodCallC_yypSgctcACcfu_yAH_yAIctcfu0_',
-        ),
-        Frame(
-          Uri.file(
-            'Runner/<NoFileName>',
-            windows: false,
-          ),
-          136,
-          null,
-          '\$sSo17FlutterMethodCallCypSgIegn_Ieggg_AByXlSgIeyBy_IeyByy_TR',
-        ),
-        Frame(
-          Uri.file(
-            'Flutter/<NoFileName>',
-            windows: false,
-          ),
-          172,
-          null,
-          '__45-[FlutterMethodChannel setMethodCallHandler:]_block_invoke',
-        ),
-        Frame(
-          Uri.file(
-            'Flutter/<NoFileName>',
-            windows: false,
-          ),
-          116,
-          null,
-          '___ZN7flutter25PlatformMessageHandlerIos21HandlePlatformMessageENSt21_LIBCPP_ABI_NAMESPACE10unique_ptrINS_15PlatformMessageENS1_14default_deleteIS3_EEEE_block_invoke',
-        ),
-        Frame(
-          Uri.file(
-            'libdispatch.dylib/<NoFileName>',
-            windows: false,
-          ),
-          7172,
-          null,
-          '959CD6E4-0CE7-3022-B73C-8B36F79F4745',
-        ),
-        Frame(
-          Uri.file(
-            'libdispatch.dylib/<NoFileName>',
-            windows: false,
-          ),
-          14672,
-          null,
-          '959CD6E4-0CE7-3022-B73C-8B36F79F4745',
-        ),
-        Frame(
-          Uri.file(
-            'libdispatch.dylib/<NoFileName>',
-            windows: false,
-          ),
-          940,
-          null,
-          '_dispatch_main_queue_callback_4CF',
-        ),
-        Frame(
-          Uri.file(
-            'CoreFoundation/<NoFileName>',
-            windows: false,
-          ),
-          335076,
-          null,
-          '6174789A-E88C-3F5C-BA39-DE2E9EDC0750',
-        ),
-        Frame(
-          Uri.file(
-            'CoreFoundation/<NoFileName>',
-            windows: false,
-          ),
-          48828,
-          null,
-          '6174789A-E88C-3F5C-BA39-DE2E9EDC0750',
-        ),
-        Frame(
-          Uri.file(
-            'CoreFoundation/<NoFileName>',
-            windows: false,
-          ),
-          600,
-          null,
-          'CFRunLoopRunSpecific',
-        ),
-        Frame(
-          Uri.file(
-            'GraphicsServices/<NoFileName>',
-            windows: false,
-          ),
-          164,
-          null,
-          'GSEventRunModal',
-        ),
-        Frame(
-          Uri.file(
-            'UIKitCore/<NoFileName>',
-            windows: false,
-          ),
-          5353660,
-          null,
-          '0E2D8679-D5F1-3C03-9010-7F6CE3662789',
-        ),
-        Frame(
-          Uri.file(
-            'UIKitCore/<NoFileName>',
-            windows: false,
-          ),
-          2124,
-          null,
-          'UIApplicationMain',
-        ),
-        Frame(
-          Uri.file(
-            'Runner/<NoFileName>',
-            windows: false,
-          ),
-          64,
-          null,
-          'main',
-        ),
-        Frame(
-          Uri.file(
-            'dyld/<NoFileName>',
-            windows: false,
-          ),
-          520,
-          null,
-          'start',
-        ),
-      ],
-    );
+    final tExpectTrace = Trace([
+      Frame(
+        Uri.file('Runner/<NoFileName>', windows: false),
+        72,
+        null,
+        '\$s6Runner12NativeLoggerC14viewControllerACSo011FlutterViewE0C_tcfcySo0F10MethodCallC_yypSgctcACcfu_yAH_yAIctcfu0_',
+      ),
+      Frame(
+        Uri.file('Runner/<NoFileName>', windows: false),
+        136,
+        null,
+        '\$sSo17FlutterMethodCallCypSgIegn_Ieggg_AByXlSgIeyBy_IeyByy_TR',
+      ),
+      Frame(
+        Uri.file('Flutter/<NoFileName>', windows: false),
+        172,
+        null,
+        '__45-[FlutterMethodChannel setMethodCallHandler:]_block_invoke',
+      ),
+      Frame(
+        Uri.file('Flutter/<NoFileName>', windows: false),
+        116,
+        null,
+        '___ZN7flutter25PlatformMessageHandlerIos21HandlePlatformMessageENSt21_LIBCPP_ABI_NAMESPACE10unique_ptrINS_15PlatformMessageENS1_14default_deleteIS3_EEEE_block_invoke',
+      ),
+      Frame(
+        Uri.file('libdispatch.dylib/<NoFileName>', windows: false),
+        7172,
+        null,
+        '959CD6E4-0CE7-3022-B73C-8B36F79F4745',
+      ),
+      Frame(
+        Uri.file('libdispatch.dylib/<NoFileName>', windows: false),
+        14672,
+        null,
+        '959CD6E4-0CE7-3022-B73C-8B36F79F4745',
+      ),
+      Frame(
+        Uri.file('libdispatch.dylib/<NoFileName>', windows: false),
+        940,
+        null,
+        '_dispatch_main_queue_callback_4CF',
+      ),
+      Frame(
+        Uri.file('CoreFoundation/<NoFileName>', windows: false),
+        335076,
+        null,
+        '6174789A-E88C-3F5C-BA39-DE2E9EDC0750',
+      ),
+      Frame(
+        Uri.file('CoreFoundation/<NoFileName>', windows: false),
+        48828,
+        null,
+        '6174789A-E88C-3F5C-BA39-DE2E9EDC0750',
+      ),
+      Frame(
+        Uri.file('CoreFoundation/<NoFileName>', windows: false),
+        600,
+        null,
+        'CFRunLoopRunSpecific',
+      ),
+      Frame(
+        Uri.file('GraphicsServices/<NoFileName>', windows: false),
+        164,
+        null,
+        'GSEventRunModal',
+      ),
+      Frame(
+        Uri.file('UIKitCore/<NoFileName>', windows: false),
+        5353660,
+        null,
+        '0E2D8679-D5F1-3C03-9010-7F6CE3662789',
+      ),
+      Frame(
+        Uri.file('UIKitCore/<NoFileName>', windows: false),
+        2124,
+        null,
+        'UIApplicationMain',
+      ),
+      Frame(Uri.file('Runner/<NoFileName>', windows: false), 64, null, 'main'),
+      Frame(Uri.file('dyld/<NoFileName>', windows: false), 520, null, 'start'),
+    ]);
     final tTestNativeThrowable = NativeThrowable.fromMap(tThrowableMap);
     expect(tTestNativeThrowable.type, equals('ErrorType'));
     expect(tTestNativeThrowable.message, equals('throwbleA'));
@@ -1431,9 +1265,7 @@ void main() {
     debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
 
     final App tApp = createApp(
-      environment: TestLogEnvironment(
-        logLevel: Level.ALL.value,
-      ),
+      environment: TestLogEnvironment(logLevel: Level.ALL.value),
     );
 
     await tApp.run();
@@ -1448,17 +1280,12 @@ void main() {
       Future<void> fNativeLogging(Map<String, Object?> arguments) async {
         await TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
             .handlePlatformMessage(
-          tChannelName,
-          tChannel.codec.encodeMethodCall(
-            MethodCall(
-              'logging',
-              arguments,
-            ),
-          ),
-          (data) {
-            tTimestamp = DateTime.now();
-          },
-        );
+              tChannelName,
+              tChannel.codec.encodeMethodCall(MethodCall('logging', arguments)),
+              (data) {
+                tTimestamp = DateTime.now();
+              },
+            );
       }
 
       NativeThrowable.registerNativeThrowableMethodChannel(tChannelName);
@@ -1500,13 +1327,17 @@ void main() {
       expect(tReport.level, equals(Level.INFO));
       expect(tReport.message, equals('LogMessage'));
       expect(tReport.extra, equals({'foo': 'bar'}));
-      expect(DateFormat('yyyyMMdd').format(tReport.time),
-          equals(DateFormat('yyyyMMdd').format(tTimestamp)));
+      expect(
+        DateFormat('yyyyMMdd').format(tReport.time),
+        equals(DateFormat('yyyyMMdd').format(tTimestamp)),
+      );
       expect(tReport.object, isNull);
       expect(tReport.error, isA<NativeThrowable>());
       expect((tReport.error as NativeThrowable).toMap(), equals(tThrowableMap));
       expect(
-          tReport.stackTrace, equals((tReport.error as NativeThrowable).chain));
+        tReport.stackTrace,
+        equals((tReport.error as NativeThrowable).chain),
+      );
 
       NativeThrowable.unregisterNativeThrowableMethodChannel(tChannelName);
     });
@@ -1522,13 +1353,12 @@ void main() {
     final tThrowableMap = {
       'type': 'java.lang.AAA',
       'message': 'throwbleA',
-      'stackTrace': [
-        'java.lang.Integer.parseInt(Integer.java:4)',
-      ],
+      'stackTrace': ['java.lang.Integer.parseInt(Integer.java:4)'],
       'cause': null,
     };
-    final tExpectFrame =
-        Frame.parseFriendly('java.lang.Integer.parseInt(Integer.java:4)');
+    final tExpectFrame = Frame.parseFriendly(
+      'java.lang.Integer.parseInt(Integer.java:4)',
+    );
 
     final tTestNativeThrowable = NativeThrowable.fromMap(tThrowableMap);
 
@@ -1536,16 +1366,16 @@ void main() {
     expect(tTestNativeThrowable.message, equals('throwbleA'));
     expect(tTestNativeThrowable.cause, isNull);
     expect(tTestNativeThrowable.chain!.traces.length, equals(1));
-    expect(tTestNativeThrowable.chain!.traces.first.frames.first.toString(),
-        equals(tExpectFrame.toString()));
+    expect(
+      tTestNativeThrowable.chain!.traces.first.frames.first.toString(),
+      equals(tExpectFrame.toString()),
+    );
     expect(
       tTestNativeThrowable.toMap(),
       equals({
         'type': 'java.lang.AAA',
         'message': 'throwbleA',
-        'stackTrace': [
-          tExpectFrame.toString(),
-        ],
+        'stackTrace': [tExpectFrame.toString()],
         'cause': null,
       }),
     );
@@ -1559,9 +1389,7 @@ void main() {
     final tThrowableMap = {
       'type': 'java.lang.AAA',
       'message': 'throwbleA',
-      'stackTrace': [
-        'aaa',
-      ],
+      'stackTrace': ['aaa'],
       'cause': null,
     };
     final tExpectFrame = Frame.parseFriendly('aaa');
@@ -1572,16 +1400,16 @@ void main() {
     expect(tTestNativeThrowable.message, equals('throwbleA'));
     expect(tTestNativeThrowable.cause, isNull);
     expect(tTestNativeThrowable.chain!.traces.length, equals(1));
-    expect(tTestNativeThrowable.chain!.traces.first.frames.first.toString(),
-        equals(tExpectFrame.toString()));
+    expect(
+      tTestNativeThrowable.chain!.traces.first.frames.first.toString(),
+      equals(tExpectFrame.toString()),
+    );
     expect(
       tTestNativeThrowable.toMap(),
       equals({
         'type': 'java.lang.AAA',
         'message': 'throwbleA',
-        'stackTrace': [
-          tExpectFrame.toString(),
-        ],
+        'stackTrace': [tExpectFrame.toString()],
         'cause': null,
       }),
     );

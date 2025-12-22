@@ -91,10 +91,7 @@ class DeviceInfoPlugin extends Plugin {
 
   @override
   Widget createAppWidgetWrapper(Widget child) {
-    return Provider<DeviceInfoPlugin>.value(
-      value: this,
-      child: child,
-    );
+    return Provider<DeviceInfoPlugin>.value(value: this, child: child);
   }
 
   /// If your test environment is [TargetPlatform.linux], [TargetPlatform.windows], Web,
@@ -136,41 +133,41 @@ class DeviceInfoPlugin extends Plugin {
   // of [AndroidDeviceInfo.fromMap] to make it easier to compare.
   static const Map<String, dynamic> _defaultMockAndroidDeviceInfoMap =
       <String, dynamic>{
-    'id': 'id',
-    'host': 'host',
-    'tags': 'tags',
-    'type': 'type',
-    'model': 'model',
-    'board': 'board',
-    'brand': 'Google',
-    'device': 'device',
-    'product': 'product',
-    'display': 'display',
-    'hardware': 'hardware',
-    'bootloader': 'bootloader',
-    'isPhysicalDevice': true,
-    'fingerprint': 'fingerprint',
-    'manufacturer': 'manufacturer',
-    'supportedAbis': ['arm64-v8a', 'x86', 'x86_64'],
-    'systemFeatures': ['FEATURE_AUDIO_PRO', 'FEATURE_AUDIO_OUTPUT'],
-    'supported32BitAbis': ['x86 (IA-32)', 'MMX'],
-    'supported64BitAbis': ['x86-64', 'MMX', 'SSSE3'],
-    'version': <String, dynamic>{
-      'sdkInt': 16,
-      'baseOS': 'baseOS',
-      'previewSdkInt': 30,
-      'release': 'release',
-      'codename': 'codename',
-      'incremental': 'incremental',
-      'securityPatch': 'securityPatch',
-    },
-    'serialNumber': 'SERIAL',
-    'isLowRamDevice': false,
-    'freeDiskSize': 1024,
-    'totalDiskSize': 2024,
-    'physicalRamSize': 8192,
-    'availableRamSize': 4096,
-  };
+        'id': 'id',
+        'host': 'host',
+        'tags': 'tags',
+        'type': 'type',
+        'model': 'model',
+        'board': 'board',
+        'brand': 'Google',
+        'device': 'device',
+        'product': 'product',
+        'display': 'display',
+        'hardware': 'hardware',
+        'bootloader': 'bootloader',
+        'isPhysicalDevice': true,
+        'fingerprint': 'fingerprint',
+        'manufacturer': 'manufacturer',
+        'supportedAbis': ['arm64-v8a', 'x86', 'x86_64'],
+        'systemFeatures': ['FEATURE_AUDIO_PRO', 'FEATURE_AUDIO_OUTPUT'],
+        'supported32BitAbis': ['x86 (IA-32)', 'MMX'],
+        'supported64BitAbis': ['x86-64', 'MMX', 'SSSE3'],
+        'version': <String, dynamic>{
+          'sdkInt': 16,
+          'baseOS': 'baseOS',
+          'previewSdkInt': 30,
+          'release': 'release',
+          'codename': 'codename',
+          'incremental': 'incremental',
+          'securityPatch': 'securityPatch',
+        },
+        'serialNumber': 'SERIAL',
+        'isLowRamDevice': false,
+        'freeDiskSize': 1024,
+        'totalDiskSize': 2024,
+        'physicalRamSize': 8192,
+        'availableRamSize': 4096,
+      };
 
   @visibleForTesting
   static Map<String, dynamic> mockAndroidDeviceInfoMap =
@@ -220,7 +217,8 @@ class DeviceInfoPlugin extends Plugin {
       'hardware': hardware ?? _defaultMockAndroidDeviceInfoMap['hardware'],
       'bootloader':
           bootloader ?? _defaultMockAndroidDeviceInfoMap['bootloader'],
-      'isPhysicalDevice': isPhysicalDevice ??
+      'isPhysicalDevice':
+          isPhysicalDevice ??
           _defaultMockAndroidDeviceInfoMap['isPhysicalDevice'],
       'fingerprint':
           fingerprint ?? _defaultMockAndroidDeviceInfoMap['fingerprint'],
@@ -230,9 +228,11 @@ class DeviceInfoPlugin extends Plugin {
           supportedAbis ?? _defaultMockAndroidDeviceInfoMap['supportedAbis'],
       'systemFeatures':
           systemFeatures ?? _defaultMockAndroidDeviceInfoMap['systemFeatures'],
-      'supported64BitAbis': supported64BitAbis ??
+      'supported64BitAbis':
+          supported64BitAbis ??
           _defaultMockAndroidDeviceInfoMap['supported64BitAbis'],
-      'supported32BitAbis': supported32BitAbis ??
+      'supported32BitAbis':
+          supported32BitAbis ??
           _defaultMockAndroidDeviceInfoMap['supported32BitAbis'],
       'version': version ?? _defaultMockAndroidDeviceInfoMap['version'],
       'serialNumber':
@@ -243,9 +243,11 @@ class DeviceInfoPlugin extends Plugin {
           freeDiskSize ?? _defaultMockAndroidDeviceInfoMap['freeDiskSize'],
       'totalDiskSize':
           totalDiskSize ?? _defaultMockAndroidDeviceInfoMap['totalDiskSize'],
-      'physicalRamSize': physicalRamSize ??
+      'physicalRamSize':
+          physicalRamSize ??
           _defaultMockAndroidDeviceInfoMap['physicalRamSize'],
-      'availableRamSize': availableRamSize ??
+      'availableRamSize':
+          availableRamSize ??
           _defaultMockAndroidDeviceInfoMap['availableRamSize'],
     };
   }
@@ -417,32 +419,32 @@ class DeviceInfoPlugin extends Plugin {
   @visibleForTesting
   static plugin.WindowsDeviceInfo mockWindowsDeviceInfo =
       plugin.WindowsDeviceInfo(
-    computerName: 'computerName',
-    numberOfCores: 4,
-    systemMemoryInMegabytes: 16,
-    userName: 'userName',
-    majorVersion: 10,
-    minorVersion: 0,
-    buildNumber: 10240,
-    platformId: 1,
-    csdVersion: 'csdVersion',
-    servicePackMajor: 1,
-    servicePackMinor: 0,
-    suitMask: 1,
-    productType: 1,
-    reserved: 1,
-    buildLab: '22000.co_release.210604-1628',
-    buildLabEx: '22000.1.amd64fre.co_release.210604-1628',
-    digitalProductId: Uint8List.fromList([]),
-    displayVersion: '21H2',
-    editionId: 'Pro',
-    installDate: DateTime(2022, 04, 02),
-    productId: '00000-00000-0000-AAAAA',
-    productName: 'Windows 10 Pro',
-    registeredOwner: 'registeredOwner',
-    releaseId: 'releaseId',
-    deviceId: 'deviceId',
-  );
+        computerName: 'computerName',
+        numberOfCores: 4,
+        systemMemoryInMegabytes: 16,
+        userName: 'userName',
+        majorVersion: 10,
+        minorVersion: 0,
+        buildNumber: 10240,
+        platformId: 1,
+        csdVersion: 'csdVersion',
+        servicePackMajor: 1,
+        servicePackMinor: 0,
+        suitMask: 1,
+        productType: 1,
+        reserved: 1,
+        buildLab: '22000.co_release.210604-1628',
+        buildLabEx: '22000.1.amd64fre.co_release.210604-1628',
+        digitalProductId: Uint8List.fromList([]),
+        displayVersion: '21H2',
+        editionId: 'Pro',
+        installDate: DateTime(2022, 04, 02),
+        productId: '00000-00000-0000-AAAAA',
+        productName: 'Windows 10 Pro',
+        registeredOwner: 'registeredOwner',
+        releaseId: 'releaseId',
+        deviceId: 'deviceId',
+      );
 
   /// Mocks [WindowsDeviceInfo] for testing purposes.
   @visibleForTesting
@@ -476,7 +478,8 @@ class DeviceInfoPlugin extends Plugin {
     mockWindowsDeviceInfo = plugin.WindowsDeviceInfo(
       computerName: computerName ?? mockWindowsDeviceInfo.computerName,
       numberOfCores: numberOfCores ?? mockWindowsDeviceInfo.numberOfCores,
-      systemMemoryInMegabytes: systemMemoryInMegabytes ??
+      systemMemoryInMegabytes:
+          systemMemoryInMegabytes ??
           mockWindowsDeviceInfo.systemMemoryInMegabytes,
       userName: userName ?? mockWindowsDeviceInfo.userName,
       majorVersion: majorVersion ?? mockWindowsDeviceInfo.majorVersion,
