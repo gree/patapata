@@ -1,3 +1,18 @@
+## 2.0.0
+
+> Note: This release has breaking changes.
+
+ - **FEAT**: Support Flutter 3.38.0 and set the minimum supported version to 3.35.0.
+ - **FEAT**: Implementation of `StandardChildPageWithResultFactory` and `StandardChildPageFactory`. This allows pages to have parent-child relationships, enabling the parent page to be automatically pushed when navigating to a child page. See the documentation for details.
+ - **FEAT**: Implementation of `StandardPageWithNestedNavigatorFactory`. This creates pages with nested navigators. It is useful, for example, when you want to create a footer menu where each tab maintains its own navigation stack. See the documentation for details.
+ - **FEAT**: Added `pushParentPage` parameter to navigation methods such as `context.go`. This option determines whether to push the parent page when navigating to pages defined with `StandardChildPageFactory` and similar factories.
+ - **BREAKING** **CHANGE**: Removed `StandardPageWithResultFactory.parentPageType`. Use `StandardPageWithNestedNavigatorFactory` instead.
+ - **BREAKING** **CHANGE**: Removed `willPopPage` from `StandardMaterialApp` and `StandardCupertinoApp`. This is because `Navigator`'s `onPopPage` has been deprecated, making it impossible to cancel a pop operation just before it occurs. Please use `PopScope` or similar alternatives.
+ - **BREAKING** **CHANGE**: `StandardPageBackButton` has been removed. This class is no longer necessary due to the implementation of `StandardPageWithNestedNavigator`.
+ - **BREAKING** **CHANGE**: `StandardPageWithResult.childNavigator` has been removed. Please use `StandardPageWithNestedNavigator` instead.
+ - **BREAKING** **CHANGE**: Restrict capture groups in deep link regular expressions. See the StandardPageFactory documentation for details.
+ - **FEAT**: Added `onDidRemovePage` to `StandardMaterialApp` and `StandardCupertinoApp`. This is passed to `Navigator`'s `onDidRemovePage`.
+
 ## 1.4.0
 
  - **FIX**: local_web_config, Monitor StorageEvent to detect changes from another tab.

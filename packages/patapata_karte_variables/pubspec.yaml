@@ -14,7 +14,7 @@ dependencies:
   flutter:
     sdk: flutter
 
-  patapata_core: ^1.4.0
+  patapata_core: ^2.0.0
 
   patapata_karte_core: ^1.0.0
 

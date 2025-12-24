@@ -1,3 +1,7 @@
+## 1.4.0
+
+ - **FEAT**: Support Flutter 3.38.0 and set the minimum supported version to 3.35.0.
+
 ## 1.3.1
 
  - Update a dependency to the latest release.

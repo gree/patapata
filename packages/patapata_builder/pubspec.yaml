@@ -1,5 +1,5 @@
 name: patapata_builder
-version: 1.2.0
+version: 1.2.1
 description: This package is a plugin for Patapata that uses build_runner to generate classes used in Patapata app.
 homepage: https://github.com/gree/patapata
 repository: https://github.com/gree/patapata/tree/main/packages/patapata_builder
@@ -9,7 +9,7 @@ environment:
 resolution: workspace
 
 dependencies:
-  patapata_core: ^1.4.0
+  patapata_core: ^2.0.0
 
   meta: ^1.15.0
   analyzer: ">=6.7.0 <8.0.0"
