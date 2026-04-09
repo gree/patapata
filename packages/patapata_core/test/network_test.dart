@@ -93,6 +93,7 @@ void main() {
         [NetworkConnectivity.ethernet],
         [NetworkConnectivity.bluetooth],
         [NetworkConnectivity.vpn],
+        [NetworkConnectivity.satellite],
       ];
 
       tNetwork.init(tApp);
@@ -209,6 +210,23 @@ void main() {
         isTrue,
       );
     });
+
+    test(
+      'Function _onConnectivityChanged NetworkConnectivity.satellite',
+      () async {
+        final NetworkPlugin tNetwork = NetworkPlugin();
+
+        testOnConnectivityChangedValue = [NetworkConnectivity.satellite];
+        await tNetwork.didChangeAppLifecycleState(AppLifecycleState.resumed);
+
+        expect(
+          tNetwork.information.connectivities.contains(
+            NetworkConnectivity.satellite,
+          ),
+          isTrue,
+        );
+      },
+    );
 
     test('Function dispose', () async {
       final App tApp = createApp();

@@ -44,6 +44,17 @@ enum NetworkConnectivity {
   /// There is no separate network interface type for [vpn].
   /// It returns [other] on any device (also simulator).
   vpn,
+
+  /// Satellite: Device is connected via a highly constrained satellite link.
+  ///
+  /// On iOS and macOS, reported when [NWPath.isUltraConstrained] is true.
+  /// Appears alongside [mobile] (e.g. `[mobile, satellite]`).
+  ///
+  /// On Android 15 (API 35) and newer, reported when [TRANSPORT_SATELLITE] capability
+  /// is present.
+  ///
+  /// Not reported on other platforms.
+  satellite,
 }
 
 /// A class representing the current network status of [App].
@@ -155,6 +166,9 @@ class NetworkPlugin extends Plugin with WidgetsBindingObserver {
           ConnectivityResult.ethernet => NetworkConnectivity.ethernet,
           ConnectivityResult.bluetooth => NetworkConnectivity.bluetooth,
           ConnectivityResult.vpn => NetworkConnectivity.vpn,
+          ConnectivityResult.satellite => NetworkConnectivity.satellite,
+          // ignore: unreachable_switch_case
+          _ => NetworkConnectivity.other, // coverage:ignore-line
         },
     ];
 
