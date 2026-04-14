@@ -1,3 +1,7 @@
+## 2.0.1
+
+ - **FIX**: Build failure due to a dependency error with connectivity_plus.
+
 ## 2.0.0
 
 > Note: This release has breaking changes.

@@ -3,6 +3,52 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 2026-04-14
+
+### Changes
+
+---
+
+Packages with breaking changes:
+
+ - There are no breaking changes in this release.
+
+Packages with other changes:
+
+ - [`patapata_core` - `v2.0.1`](#patapata_core---v201)
+ - [`patapata_apple_push_notifications` - `v1.3.1`](#patapata_apple_push_notifications---v131)
+ - [`patapata_builder` - `v1.2.2`](#patapata_builder---v122)
+ - [`patapata_firebase_analytics` - `v1.3.1`](#patapata_firebase_analytics---v131)
+ - [`patapata_firebase_auth` - `v1.3.1`](#patapata_firebase_auth---v131)
+ - [`patapata_firebase_core` - `v1.4.1`](#patapata_firebase_core---v141)
+ - [`patapata_firebase_crashlytics` - `v1.4.1`](#patapata_firebase_crashlytics---v141)
+ - [`patapata_firebase_messaging` - `v1.4.1`](#patapata_firebase_messaging---v141)
+ - [`patapata_firebase_remote_config` - `v1.4.1`](#patapata_firebase_remote_config---v141)
+ - [`patapata_riverpod` - `v1.4.1`](#patapata_riverpod---v141)
+ - [`patapata_sentry` - `v1.3.1`](#patapata_sentry---v131)
+
+Packages with dependency updates only:
+
+> Packages listed below depend on other packages in this workspace that have had changes. Their versions have been incremented to bump the minimum dependency versions of the packages they depend upon in this project.
+
+ - `patapata_apple_push_notifications` - `v1.3.1`
+ - `patapata_builder` - `v1.2.2`
+ - `patapata_firebase_analytics` - `v1.3.1`
+ - `patapata_firebase_auth` - `v1.3.1`
+ - `patapata_firebase_core` - `v1.4.1`
+ - `patapata_firebase_crashlytics` - `v1.4.1`
+ - `patapata_firebase_messaging` - `v1.4.1`
+ - `patapata_firebase_remote_config` - `v1.4.1`
+ - `patapata_riverpod` - `v1.4.1`
+ - `patapata_sentry` - `v1.3.1`
+
+---
+
+#### `patapata_core` - `v2.0.1`
+
+ - **FIX**: Build failure due to a dependency error with connectivity_plus.
+
+
 ## 2025-12-24
 
 ### Changes
