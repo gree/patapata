@@ -68,7 +68,7 @@ class AdjustPlugin<T extends AdjustPluginEnvironment> extends Plugin
           .firstWhere((e) => e.name == _environment.adjustLogLevel);
     }
 
-    Adjust.start(tConfig);
+    Adjust.initSdk(tConfig);
 
     WidgetsBinding.instance.addObserver(this);
 
@@ -83,7 +83,7 @@ class AdjustPlugin<T extends AdjustPluginEnvironment> extends Plugin
     _eventsSubscription?.cancel();
     WidgetsBinding.instance.removeObserver(this);
     if (await Adjust.isEnabled()) {
-      Adjust.setEnabled(false);
+      Adjust.disable();
     }
 
     return super.dispose();
@@ -93,9 +93,11 @@ class AdjustPlugin<T extends AdjustPluginEnvironment> extends Plugin
   void didChangeAppLifecycleState(AppLifecycleState state) {
     switch (state) {
       case AppLifecycleState.resumed:
+        // ignore: invalid_use_of_visible_for_testing_member
         Adjust.onResume();
         break;
       case AppLifecycleState.paused:
+        // ignore: invalid_use_of_visible_for_testing_member
         Adjust.onPause();
         break;
       default:
@@ -145,9 +147,9 @@ class AdjustPlugin<T extends AdjustPluginEnvironment> extends Plugin
     if (tId != _lastId) {
       _lastId = tId;
       if (tId == null) {
-        Adjust.removeSessionCallbackParameter('user_id');
+        Adjust.removeGlobalCallbackParameter('user_id');
       } else {
-        Adjust.addSessionCallbackParameter('user_id', tId);
+        Adjust.addGlobalCallbackParameter('user_id', tId);
       }
     }
 
@@ -155,9 +157,9 @@ class AdjustPlugin<T extends AdjustPluginEnvironment> extends Plugin
       final tValue = i.value?.toString() ?? '';
 
       if (tValue.isNotEmpty) {
-        Adjust.addSessionCallbackParameter(i.key, tValue);
+        Adjust.addGlobalCallbackParameter(i.key, tValue);
       } else {
-        Adjust.removeSessionCallbackParameter(i.key);
+        Adjust.removeGlobalCallbackParameter(i.key);
       }
     }
   }
