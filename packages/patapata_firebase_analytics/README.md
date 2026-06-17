@@ -13,6 +13,8 @@ It will automatically log analytics events to Firebase Analytics from Patapata's
 
 This plugin requires the [patapata_firebase_core](https://pub.dev/packages/patapata_firebase_core) plugin to be installed and activated.
 
+[iOS] This plugin requires 15.0 or higher.
+
 ---
 
 Due to a bug in the FlutterFire CLI, the stable version of 0.2.7 (at the time of writing this README) does not write out the required paramaters to run firebase_analytics correctly.
