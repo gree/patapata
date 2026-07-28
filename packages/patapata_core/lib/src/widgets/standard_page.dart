@@ -108,6 +108,8 @@ base class StandardPageWithResultFactory<
 
   static final _extendedDataMap = Expando<_StandardPageFactoryExtendedData>();
 
+  bool get _usableDefaultRootPage => true;
+
   StandardRouterDelegate get _delegate => _extendedDataMap[this]!.delegate;
 
   /// The parent page factory of this page, if any.
@@ -548,7 +550,8 @@ base class StandardPageFactory<T extends StandardPage<R>, R extends Object?>
 /// moved to other Navigators by [StandardPageNavigationMode.moveToTop].
 ///
 /// The [activeFirstNestedPage] property controls whether the first page in [nestedPageFactories]
-/// is always stacked as the first page of the nested Navigator. The default value is `true`.
+/// is stacked as the first page of the nested Navigator. A default page in a different group from
+/// the navigation destination is not stacked. The default value is `true`.
 ///
 /// See also:
 /// * [StandardPageWithNestedNavigator], which is the page class used with this factory.
@@ -617,8 +620,9 @@ base class StandardPageWithNestedNavigatorFactory<
   ///
   /// [anyNestedPageFactories] is an optional list of page factories that can be used in any nested Navigator.
   ///
-  /// [activeFirstNestedPage] controls whether the first page in [nestedPageFactories] should always be stacked
-  /// as the first page of the nested Navigator. The default value is `true`.
+  /// [activeFirstNestedPage] controls whether the first page in [nestedPageFactories] should be stacked
+  /// as the first page of the nested Navigator. A default page in a different group from the navigation
+  /// destination is not stacked. The default value is `true`.
   ///
   /// [enableNavigationAnalytics] is a flag indicating whether to enable navigation analytics. The default is `false`.
   ///
@@ -642,6 +646,9 @@ base class StandardPageWithNestedNavigatorFactory<
          'At least one nestedPageFactory is required.',
        ),
        super(group: null);
+
+  @override
+  bool get _usableDefaultRootPage => false;
 
   @override
   final List<StandardPageWithResultFactory> nestedPageFactories;
@@ -843,6 +850,9 @@ base class SplashPageFactory<T extends StandardPage<void>>
     super.restorationId,
     super.enableNavigationAnalytics,
   }) : super(group: 'splash', keepHistory: false);
+
+  @override
+  bool get _usableDefaultRootPage => false;
 }
 
 /// A special factory class for creating a page used during a [StartupSequence].
@@ -863,6 +873,9 @@ base class StartupPageFactory<T extends StandardPage<StartupPageCompleter>>
     super.pageName,
     super.restorationId,
   }) : super(group: 'startup${group?.isNotEmpty == true ? '@$group' : ''}');
+
+  @override
+  bool get _usableDefaultRootPage => false;
 }
 
 /// A special factory class for creating an error page that [PatapataException] can navigate to
@@ -887,6 +900,9 @@ base class StandardErrorPageFactory<T extends StandardPage<ReportRecord>>
     super.pageName,
     super.restorationId,
   });
+
+  @override
+  bool get _usableDefaultRootPage => false;
 }
 
 /// A mixin for creating a [Page] that creates [StandardPageWithResult].
@@ -1919,13 +1935,19 @@ class StandardRouterDelegate extends RouterDelegate<StandardRouteData>
   final _links = Expando<List<(RegExp, Object? Function(RegExpMatch, Uri))>>();
 
   /// Get the default root page factory.
-  StandardPageWithResultFactory get defaultRootPageFactory =>
-      (_factoryTypeMap.entries
-          .firstWhereOrNull(
-            (e) => e.value.group == StandardPageWithResultFactory.defaultGroup,
-          )
-          ?.value) ??
-      _factoryTypeMap.values.first;
+  StandardPageWithResultFactory get defaultRootPageFactory {
+    final tUsableDefaultPages = _factoryTypeMap.values.where(
+      (e) => e._usableDefaultRootPage,
+    );
+    if (tUsableDefaultPages.isEmpty) {
+      return _factoryTypeMap.values.first;
+    }
+
+    return (tUsableDefaultPages.firstWhereOrNull(
+          (e) => e.group == StandardPageWithResultFactory.defaultGroup,
+        )) ??
+        tUsableDefaultPages.first;
+  }
 
   bool _initialRouteProcessed = false;
 
@@ -2176,7 +2198,18 @@ class StandardRouterDelegate extends RouterDelegate<StandardRouteData>
     _pageInstanceCompleterMap[page] = tFactory._createResultCompleter();
   }
 
-  void _checkDefaultNestedPage(StandardPageInterface navigatorPage) {
+  bool _isDifferentGroup(
+    StandardPageWithResultFactory firstFactory,
+    StandardPageWithResultFactory secondFactory,
+  ) =>
+      firstFactory.group != null &&
+      secondFactory.group != null &&
+      firstFactory.group != secondFactory.group;
+
+  void _checkDefaultNestedPage(
+    StandardPageInterface navigatorPage, [
+    StandardPageWithResultFactory? destinationFactory,
+  ]) {
     assert(_nestedPageInstances[navigatorPage] != null);
 
     final tPageInstances = _nestedPageInstances[navigatorPage]!;
@@ -2184,6 +2217,11 @@ class StandardRouterDelegate extends RouterDelegate<StandardRouteData>
     if (tPageInstances.length <= 1) {
       final tDefaultFirstPageFactory =
           navigatorPage.factoryObject.nestedPageFactories.first;
+
+      if (destinationFactory != null &&
+          _isDifferentGroup(tDefaultFirstPageFactory, destinationFactory)) {
+        return;
+      }
 
       if (tPageInstances.isEmpty) {
         // Add the default nested page if there is no nested page.
@@ -2196,7 +2234,7 @@ class StandardRouterDelegate extends RouterDelegate<StandardRouteData>
         _pushPageInstance(tPage, tRouteData);
 
         if (tPage.factoryObject.hasNestedPages) {
-          _checkDefaultNestedPage(tPage);
+          _checkDefaultNestedPage(tPage, destinationFactory);
         }
       } else if (navigatorPage.factoryObject.activeFirstNestedPage) {
         // Ensure that the first nested page is the default one.
@@ -2215,7 +2253,7 @@ class StandardRouterDelegate extends RouterDelegate<StandardRouteData>
           _pushPageInstance(tPage, tRouteData, 0);
 
           if (tPage.factoryObject.hasNestedPages) {
-            _checkDefaultNestedPage(tPage);
+            _checkDefaultNestedPage(tPage, destinationFactory);
           }
         }
       }
@@ -3035,9 +3073,7 @@ class StandardRouterDelegate extends RouterDelegate<StandardRouteData>
           _removePage(tCurrentPage, null);
         } else {
           if ((tNavigationMode == StandardPageNavigationMode.removeAll) ||
-              (factory.group != null &&
-                  tCurrentPage.factoryObject.group != null &&
-                  tCurrentPage.factoryObject.group != factory.group)) {
+              _isDifferentGroup(factory, tCurrentPage.factoryObject)) {
             // Different group than the current one.
             // Remove all history.
             final tReversedPageInstances = _rootPageInstances.reversed.toList();
@@ -3211,7 +3247,7 @@ class StandardRouterDelegate extends RouterDelegate<StandardRouteData>
         false,
         true,
       );
-      _checkDefaultNestedPage(tNavigatorPage);
+      _checkDefaultNestedPage(tNavigatorPage, factory);
     }
     final tPage = fNavigate(
       factory,
