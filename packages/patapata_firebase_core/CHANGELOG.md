@@ -1,3 +1,9 @@
+## 2.0.0
+
+> Note: This release has breaking changes.
+
+ - **BREAKING** **CHANGE**: Update a dependency to the latest release. The minimum supported iOS version has been updated to iOS 15.
+
 ## 1.4.1
 
  - Update a dependency to the latest release.

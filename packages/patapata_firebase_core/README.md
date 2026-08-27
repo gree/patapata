@@ -12,6 +12,8 @@ This package is a plugin for [Patapata](https://pub.dev/packages/patapata_core) 
 
 This plugin itself just initializes Firebase. It does not do anything else itself. You will need to add other plugins to your app to use Firebase features.
 
+[iOS] This plugin requires 15.0 or higher.
+
 ## Getting started
 
 1. Follow the instructions for your platform to set up Firebase at https://firebase.google.com/docs/flutter/setup, up until just after executing `flutterfire configure`.
