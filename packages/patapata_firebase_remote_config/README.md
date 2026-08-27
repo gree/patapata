@@ -13,6 +13,8 @@ It will automatically fetch remote config values from Firebase and send them to 
 
 This plugin requires the [patapata_firebase_core](https://pub.dev/packages/patapata_firebase_core) plugin to be installed and activated.
 
+[iOS] This plugin requires 15.0 or higher.
+
 ## Getting started
 
 1. Add the dependency to your `pubspec.yaml` file

@@ -13,7 +13,7 @@ It integrates with Firebase Authentication and supports user authentication func
 
 This plugin requires the [patapata_firebase_core](https://pub.dev/packages/patapata_firebase_core) plugin to be installed and activated.
 
-[Android] This plugin requires minSdk 23 or higher.
+[iOS] This plugin requires 15.0 or higher.
 
 ---
 

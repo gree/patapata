@@ -15,7 +15,6 @@ workspace:
   - packages/patapata_firebase_auth
   - packages/patapata_firebase_core
   - packages/patapata_firebase_crashlytics
-  - packages/patapata_firebase_dynamic_links
   - packages/patapata_firebase_messaging
   - packages/patapata_firebase_remote_config
   - packages/patapata_karte_core

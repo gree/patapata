@@ -17,7 +17,7 @@ dependencies:
 
   patapata_core: ^2.0.1
 
-  adjust_sdk: ^4.38.0
+  adjust_sdk: ^5.6.2
 
 dev_dependencies:
   flutter_test:

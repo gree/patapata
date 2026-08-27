@@ -17,7 +17,7 @@ dependencies:
 
   patapata_firebase_core: ^1.4.1
 
-  firebase_messaging: ^15.2.4
+  firebase_messaging: ^16.0.0
   path_provider: ">=2.0.9 <3.0.0"
   crypto: ">=3.0.3 <4.0.0"
   flutter_local_notifications: ^19.0.0
