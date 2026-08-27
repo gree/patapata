@@ -3,6 +3,57 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 2026-08-27
+
+### Changes
+
+---
+
+Packages with breaking changes:
+
+ - [`patapata_firebase_analytics` - `v2.0.0`](#patapata_firebase_analytics---v200)
+ - [`patapata_firebase_auth` - `v2.0.0`](#patapata_firebase_auth---v200)
+ - [`patapata_firebase_core` - `v2.0.0`](#patapata_firebase_core---v200)
+ - [`patapata_firebase_crashlytics` - `v2.0.0`](#patapata_firebase_crashlytics---v200)
+ - [`patapata_firebase_messaging` - `v2.0.0`](#patapata_firebase_messaging---v200)
+ - [`patapata_firebase_remote_config` - `v2.0.0`](#patapata_firebase_remote_config---v200)
+ - [`patapata_sentry` - `v2.0.0`](#patapata_sentry---v200)
+
+Packages with other changes:
+
+ - There are no other changes in this release.
+
+---
+
+#### `patapata_firebase_analytics` - `v2.0.0`
+
+ - **BREAKING** **CHANGE**: Update a dependency to the latest release. The minimum supported iOS version has been updated to iOS 15.
+
+#### `patapata_firebase_auth` - `v2.0.0`
+
+ - **BREAKING** **CHANGE**: Update a dependency to the latest release. The minimum supported iOS version has been updated to iOS 15.
+
+#### `patapata_firebase_core` - `v2.0.0`
+
+ - **BREAKING** **CHANGE**: Update a dependency to the latest release. The minimum supported iOS version has been updated to iOS 15.
+
+#### `patapata_firebase_crashlytics` - `v2.0.0`
+
+ - **BREAKING** **CHANGE**: Update a dependency to the latest release. The minimum supported iOS version has been updated to iOS 15.
+
+#### `patapata_firebase_messaging` - `v2.0.0`
+
+ - **BREAKING** **CHANGE**: Update a dependency to the latest release. The minimum supported iOS version has been updated to iOS 15.
+
+#### `patapata_firebase_remote_config` - `v2.0.0`
+
+ - **BREAKING** **CHANGE**: Update a dependency to the latest release. The minimum supported iOS version has been updated to iOS 15.
+
+#### `patapata_sentry` - `v2.0.0`
+
+ - **BREAKING** **CHANGE**: Updated the dependent `sentry_flutter` and `sentry` packages to their latest versions. Please review the breaking changes in each package's CHANGELOG.
+
+
 ## 2026-04-14
 
 ### Changes

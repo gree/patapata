@@ -1,3 +1,9 @@
+## 2.0.0
+
+> Note: This release has breaking changes.
+
+ - **BREAKING** **CHANGE**: Updated the dependent `sentry_flutter` and `sentry` packages to their latest versions. Please review the breaking changes in each package's CHANGELOG.
+
 ## 1.3.1
 
  - Update a dependency to the latest release.
