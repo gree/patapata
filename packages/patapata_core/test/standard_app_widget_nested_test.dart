@@ -478,17 +478,15 @@ void main() {
             StandardPageWithNestedNavigatorFactory<TestNestedA>(
               create: (data) => TestNestedA(),
               nestedPageFactories: [
+                SplashPageFactory(
+                  create: (data) => TestPageA(),
+                  pageName: () => 'SplashPage',
+                ),
                 StandardPageFactory<TestPageB, void>(
                   create: (data) => TestPageB(),
                 ),
                 StandardPageFactory<TestPageC, void>(
                   create: (data) => TestPageC(),
-                ),
-                // If placed at the beginning of nestedPageFactories,
-                //it will be automatically added as the default page during processInitialRoute, so place it last.
-                SplashPageFactory(
-                  create: (data) => TestPageA(),
-                  pageName: () => 'SplashPage',
                 ),
               ],
             ),
@@ -524,6 +522,206 @@ void main() {
           'TestNestedA': ['TestPageB'],
         },
         expectedActiveStates: [true, true],
+      );
+    });
+
+    tApp.dispose();
+  });
+
+  testWidgets('Standard Nested Page Test. Different Standard Page Groups', (
+    WidgetTester tester,
+  ) async {
+    await _setTestDeviceSize(tester);
+
+    final tNavigatorMode = TestNavigatorMode(
+      StandardPageNavigationMode.moveToTop,
+    );
+
+    final App tApp = createApp(
+      environment: NoAutoProcessInitialRouteEnvironment(),
+      appWidget: Provider<TestNavigatorMode>.value(
+        value: tNavigatorMode,
+        child: StandardMaterialApp(
+          onGenerateTitle: (context) => 'Generate Test Title',
+          pages: [
+            StandardPageWithNestedNavigatorFactory<TestNestedA>(
+              create: (data) => TestNestedA(),
+              nestedPageFactories: [
+                SplashPageFactory(
+                  create: (data) => TestPageA(),
+                  pageName: () => 'SplashPage',
+                ),
+                StandardPageFactory<TestPageB, void>(
+                  create: (data) => TestPageB(),
+                  group: 'first-group',
+                ),
+                StandardPageFactory<TestPageC, void>(
+                  create: (data) => TestPageC(),
+                  group: 'second-group',
+                  groupRoot: true,
+                ),
+                StandardPageFactory<TestPageD, void>(
+                  create: (data) => TestPageD(),
+                  group: 'second-group',
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+
+    await tApp.run();
+
+    await tApp.runProcess(() async {
+      await tester.pumpAndSettle();
+      expect(find.text('Test Title'), findsOneWidget);
+
+      _checkPageInstances(
+        tApp,
+        expectedPageInstanceNames: ['TestNestedA', 'SplashPage'],
+        expectedRootPageInstanceNames: ['TestNestedA'],
+        expectedNestedPageInstanceNames: {
+          'TestNestedA': ['SplashPage'],
+        },
+        expectedActiveStates: [true, true],
+      );
+
+      await tApp.standardAppPlugin.delegate?.processInitialRoute();
+      await tester.pumpAndSettle();
+
+      _checkPageInstances(
+        tApp,
+        expectedPageInstanceNames: ['TestNestedA', 'TestPageB'],
+        expectedRootPageInstanceNames: ['TestNestedA'],
+        expectedNestedPageInstanceNames: {
+          'TestNestedA': ['TestPageB'],
+        },
+        expectedActiveStates: [true, true],
+      );
+
+      await tester.tap(find.byKey(const ValueKey(kTestButtonGoC)));
+      await tester.pumpAndSettle();
+
+      _checkPageInstances(
+        tApp,
+        expectedPageInstanceNames: ['TestNestedA', 'TestPageC'],
+        expectedRootPageInstanceNames: ['TestNestedA'],
+        expectedNestedPageInstanceNames: {
+          'TestNestedA': ['TestPageC'],
+        },
+        expectedActiveStates: [true, true],
+      );
+
+      await tester.tap(find.byKey(const ValueKey(kTestButtonGoB)));
+      await tester.pumpAndSettle();
+
+      _checkPageInstances(
+        tApp,
+        expectedPageInstanceNames: ['TestNestedA', 'TestPageB'],
+        expectedRootPageInstanceNames: ['TestNestedA'],
+        expectedNestedPageInstanceNames: {
+          'TestNestedA': ['TestPageB'],
+        },
+        expectedActiveStates: [true, true],
+      );
+
+      await tester.tap(find.byKey(const ValueKey(kTestButtonGoD)));
+      await tester.pumpAndSettle();
+
+      _checkPageInstances(
+        tApp,
+        expectedPageInstanceNames: ['TestNestedA', 'TestPageC', 'TestPageD'],
+        expectedRootPageInstanceNames: ['TestNestedA'],
+        expectedNestedPageInstanceNames: {
+          'TestNestedA': ['TestPageC', 'TestPageD'],
+        },
+        expectedActiveStates: [true, false, true],
+      );
+    });
+
+    tApp.dispose();
+  });
+
+  testWidgets('Standard Nested Page Test. Null Root Page Group', (
+    WidgetTester tester,
+  ) async {
+    await _setTestDeviceSize(tester);
+
+    final tNavigatorMode = TestNavigatorMode(
+      StandardPageNavigationMode.moveToTop,
+    );
+
+    final App tApp = createApp(
+      environment: NoAutoProcessInitialRouteEnvironment(),
+      appWidget: Provider<TestNavigatorMode>.value(
+        value: tNavigatorMode,
+        child: StandardMaterialApp(
+          onGenerateTitle: (context) => 'Generate Test Title',
+          pages: [
+            StandardPageWithNestedNavigatorFactory<TestNestedA>(
+              create: (data) => TestNestedA(),
+              nestedPageFactories: [
+                StandardPageFactory<TestPageA, void>(
+                  create: (data) => TestPageA(),
+                  group: null,
+                ),
+                StandardPageFactory<TestPageB, void>(
+                  create: (data) => TestPageB(),
+                  group: 'first-group',
+                ),
+                SplashPageFactory(
+                  create: (data) => TestPageA(),
+                  pageName: () => 'SplashPage',
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+
+    await tApp.run();
+
+    await tApp.runProcess(() async {
+      await tester.pumpAndSettle();
+      expect(find.text('Test Title'), findsOneWidget);
+
+      _checkPageInstances(
+        tApp,
+        expectedPageInstanceNames: ['TestNestedA', 'SplashPage'],
+        expectedRootPageInstanceNames: ['TestNestedA'],
+        expectedNestedPageInstanceNames: {
+          'TestNestedA': ['SplashPage'],
+        },
+        expectedActiveStates: [true, true],
+      );
+
+      await tApp.standardAppPlugin.delegate?.processInitialRoute();
+      await tester.pumpAndSettle();
+
+      _checkPageInstances(
+        tApp,
+        expectedPageInstanceNames: ['TestNestedA', 'TestPageA'],
+        expectedRootPageInstanceNames: ['TestNestedA'],
+        expectedNestedPageInstanceNames: {
+          'TestNestedA': ['TestPageA'],
+        },
+        expectedActiveStates: [true, true],
+      );
+
+      await tester.tap(find.byKey(const ValueKey(kTestButtonGoB)));
+      await tester.pumpAndSettle();
+      expect(find.text('Test Title B'), findsOneWidget);
+
+      _checkPageInstances(
+        tApp,
+        expectedPageInstanceNames: ['TestNestedA', 'TestPageA', 'TestPageB'],
+        expectedRootPageInstanceNames: ['TestNestedA'],
+        expectedNestedPageInstanceNames: {
+          'TestNestedA': ['TestPageA', 'TestPageB'],
+        },
+        expectedActiveStates: [true, false, true],
       );
     });
 

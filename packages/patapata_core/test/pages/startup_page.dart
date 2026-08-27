@@ -189,6 +189,17 @@ class StartupModalPageC extends StatelessWidget {
   }
 }
 
+class ErrorPage extends StandardPage<ReportRecord> {
+  @override
+  Widget buildPage(BuildContext context) {
+    final tError = pageData.error as PatapataException;
+    return Scaffold(
+      appBar: AppBar(title: Text(tError.localizedMessage)),
+      body: const SizedBox.shrink(),
+    );
+  }
+}
+
 class TestHomePage extends StandardPage<void> {
   @override
   Widget buildPage(BuildContext context) {
