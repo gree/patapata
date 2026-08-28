@@ -3,6 +3,52 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 2026-08-28
+
+### Changes
+
+---
+
+Packages with breaking changes:
+
+ - There are no breaking changes in this release.
+
+Packages with other changes:
+
+ - [`patapata_core` - `v2.0.2`](#patapata_core---v202)
+ - [`patapata_apple_push_notifications` - `v1.3.2`](#patapata_apple_push_notifications---v132)
+ - [`patapata_builder` - `v1.2.3`](#patapata_builder---v123)
+ - [`patapata_firebase_analytics` - `v2.0.1`](#patapata_firebase_analytics---v201)
+ - [`patapata_firebase_auth` - `v2.0.1`](#patapata_firebase_auth---v201)
+ - [`patapata_firebase_core` - `v2.0.1`](#patapata_firebase_core---v201)
+ - [`patapata_firebase_crashlytics` - `v2.0.1`](#patapata_firebase_crashlytics---v201)
+ - [`patapata_firebase_messaging` - `v2.0.1`](#patapata_firebase_messaging---v201)
+ - [`patapata_firebase_remote_config` - `v2.0.1`](#patapata_firebase_remote_config---v201)
+ - [`patapata_riverpod` - `v1.4.2`](#patapata_riverpod---v142)
+ - [`patapata_sentry` - `v2.0.1`](#patapata_sentry---v201)
+
+Packages with dependency updates only:
+
+> Packages listed below depend on other packages in this workspace that have had changes. Their versions have been incremented to bump the minimum dependency versions of the packages they depend upon in this project.
+
+ - `patapata_apple_push_notifications` - `v1.3.2`
+ - `patapata_builder` - `v1.2.3`
+ - `patapata_firebase_analytics` - `v2.0.1`
+ - `patapata_firebase_auth` - `v2.0.1`
+ - `patapata_firebase_core` - `v2.0.1`
+ - `patapata_firebase_crashlytics` - `v2.0.1`
+ - `patapata_firebase_messaging` - `v2.0.1`
+ - `patapata_firebase_remote_config` - `v2.0.1`
+ - `patapata_riverpod` - `v1.4.2`
+ - `patapata_sentry` - `v2.0.1`
+
+---
+
+#### `patapata_core` - `v2.0.2`
+
+ - **FIX**: Fix nested navigators adding a default page from a different group during navigation.
+
+
 ## 2026-08-27
 
 ### Changes

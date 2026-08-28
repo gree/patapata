@@ -1,3 +1,7 @@
+## 2.0.2
+
+ - **FIX**: Fix nested navigators adding a default page from a different group during navigation.
+
 ## 2.0.1
 
  - **FIX**: Build failure due to a dependency error with connectivity_plus.

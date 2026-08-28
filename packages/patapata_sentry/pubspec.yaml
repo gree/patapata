@@ -1,6 +1,6 @@
 name: patapata_sentry
 description: This package is a plugin for Patapata that adds support for Sentry to your Patapata app.
-version: 2.0.0
+version: 2.0.1
 homepage: https://github.com/gree/patapata
 repository: https://github.com/gree/patapata/tree/main/packages/patapata_sentry
 
@@ -13,7 +13,7 @@ dependencies:
   flutter:
     sdk: flutter
 
-  patapata_core: ^2.0.1
+  patapata_core: ^2.0.2
 
   sentry_flutter: ^9.22.0
   sentry: ^9.22.0

@@ -14,7 +14,7 @@ dependencies:
   flutter:
     sdk: flutter
 
-  patapata_core: ^2.0.1
+  patapata_core: ^2.0.2
 
   appsflyer_sdk: ^6.11.3
 
